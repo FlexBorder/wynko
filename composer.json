@@ -1,0 +1,42 @@
+{
+    "name": "flexborder/wynko",
+    "description": "Wynko – Campaigns & Sign-Up Forms for Laposta",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://flex-border.com/wynko",
+    "authors": [
+        {
+            "name": "FlexBorder Co., Ltd",
+            "homepage": "https://flex-border.com"
+        }
+    ],
+    "require": { "php": ">=8.0" },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "wp-coding-standards/wpcs": "^3.1",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpstan/phpstan": "^2.1",
+        "php-stubs/wordpress-stubs": "^6.4",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1"
+    },
+    "autoload": { "psr-4": { "Wynko\\": "includes/" } },
+    "autoload-dev": { "psr-4": { "Wynko\\Tests\\": "tests/" } },
+    "scripts": {
+        "post-install-cmd": "git config core.hooksPath .githooks || true",
+        "post-update-cmd": "git config core.hooksPath .githooks || true",
+        "lint": "phpcs",
+        "lint:fix": "phpcbf",
+        "lint:security": "phpcs --standard=phpcs-security.xml.dist",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "test": "phpunit",
+        "sbom": "bin/sbom-generate.sh",
+        "sbom:check": "bin/sbom-check.sh --regenerate",
+        "audit:deps": "bin/dependency-audit.sh"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "allow-plugins": { "dealerdirect/phpcodesniffer-composer-installer": true },
+        "platform": { "php": "8.0" }
+    }
+}

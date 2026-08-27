@@ -1,0 +1,12 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+	level: 5
+	paths:
+		- wynko.php
+		- uninstall.php
+		- includes
+		- config
+	bootstrapFiles:
+		- phpstan-bootstrap.php

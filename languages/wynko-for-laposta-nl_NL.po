@@ -1,0 +1,2115 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Wynko 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wynko-for-laposta\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-11T12:22:23+00:00\n"
+"PO-Revision-Date: 2026-08-20 11:03+0800\n"
+"Language: nl_NL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: wynko-for-laposta\n"
+
+#. Plugin Name of the plugin
+#: wynko.php
+msgid "Wynko for Laposta"
+msgstr "Wynko voor Laposta"
+
+#: includes/Admin/Menu.php:73
+#: includes/Admin/Menu.php:74
+#: includes/Admin/SettingsPage.php:807
+msgid "Wynko"
+msgstr "Wynko"
+
+#. translators: %s: error message.
+#: includes/Cache.php:102
+#, php-format
+msgid "Sync failed: %s"
+msgstr "Synchronisatie mislukt: %s"
+
+#: includes/Api/Client.php:69
+msgid "No API key configured."
+msgstr "Geen API-sleutel geconfigureerd."
+
+#. translators: %s: underlying HTTP error message.
+#: includes/Api/Client.php:88
+#, php-format
+msgid "Could not connect to Laposta: %s"
+msgstr "Kon geen verbinding maken met Laposta: %s"
+
+#: includes/Api/Client.php:108
+msgid "Could not parse the Laposta response."
+msgstr "Kon het antwoord van Laposta niet verwerken."
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:48
+#, php-format
+msgid "Invalid API key (HTTP %d)"
+msgstr "Ongeldige API-sleutel (HTTP %d)"
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:55
+#, php-format
+msgid "Unexpected response from Laposta (HTTP %d)"
+msgstr "Onverwacht antwoord van Laposta (HTTP %d)"
+
+#: includes/Admin/SettingsPage.php:156
+msgid "Connection"
+msgstr "Verbinding"
+
+#: includes/Admin/SettingsPage.php:157
+msgid "API key"
+msgstr "API-sleutel"
+
+#: includes/Admin/SettingsPage.php:160
+msgid "Cache duration (minutes)"
+msgstr "Cacheduur (minuten)"
+
+#: includes/Admin/SettingsPage.php:340
+msgid "••••••••  (saved — leave blank to keep)"
+msgstr "••••••••  (opgeslagen — laat leeg om te behouden)"
+
+#: includes/Admin/SettingsPage.php:340
+msgid "Enter your Laposta API key"
+msgstr "Vul je Laposta API-sleutel in"
+
+#. translators: %s: error message.
+#: includes/Admin/SettingsPage.php:681
+#, php-format
+msgid "API key not saved: %s"
+msgstr "API-sleutel niet opgeslagen: %s"
+
+#. translators: %s: error message.
+#: includes/Admin/SettingsPage.php:683
+#, php-format
+msgid "API key rejected on save: %s"
+msgstr "API-sleutel geweigerd bij opslaan: %s"
+
+#. translators: %d: number of campaigns.
+#: includes/Admin/SettingsPage.php:699
+#, php-format
+msgid "API key verified — %d campaigns loaded."
+msgstr "API-sleutel geverifieerd — %d campagnes geladen."
+
+#: includes/Admin/AlertNotice.php:140
+#: includes/Admin/EnvironmentNotice.php:185
+#: includes/Admin/Forms/FormEditPage.php:673
+#: includes/Admin/LogPage.php:282
+#: includes/Admin/LogPage.php:352
+#: includes/Admin/NotificationsTab.php:67
+#: includes/Admin/SecurityTab.php:104
+#: includes/Admin/SettingsPage.php:716
+#: includes/Admin/SystemReport.php:242
+#: includes/Admin/SystemReport.php:265
+msgid "Forbidden"
+msgstr "Verboden"
+
+#: includes/Admin/SettingsPage.php:856
+msgid "Sync complete."
+msgstr "Synchronisatie voltooid."
+
+#: includes/Admin/NotificationsTab.php:50
+#: includes/Admin/SecurityTab.php:59
+#: includes/Admin/SettingsPage.php:864
+msgid "Save changes"
+msgstr "Wijzigingen opslaan"
+
+#: includes/Admin/SettingsPage.php:869
+msgid "Sync now"
+msgstr "Nu synchroniseren"
+
+#: includes/Admin/LogPage.php:45
+#: includes/Admin/Menu.php:57
+msgid "Activity log"
+msgstr "Activiteitenlog"
+
+#: includes/Admin/LogPage.php:225
+msgid "Time"
+msgstr "Tijd"
+
+#: includes/Admin/LogPage.php:226
+msgid "Level"
+msgstr "Niveau"
+
+#: includes/Admin/LogPage.php:227
+msgid "Message"
+msgstr "Bericht"
+
+#: includes/Admin/Forms/Screen.php:59
+#: includes/Admin/Menu.php:44
+#: includes/Admin/PluginLinks.php:34
+#: src/block/edit.js:88
+msgid "Settings"
+msgstr "Instellingen"
+
+#: src/block/block.json
+msgctxt "block title"
+msgid "Wynko: Campaigns"
+msgstr "Wynko: Campagnes"
+
+#: src/block/block.json
+msgctxt "block description"
+msgid "List your most recent sent Laposta campaigns as links."
+msgstr "Toon je meest recent verzonden Laposta-campagnes als links."
+
+#. Description of the plugin
+#: wynko.php
+msgid "Create native signup forms connected to your Laposta lists, and display your latest campaigns anywhere on your site."
+msgstr "Voeg aanmeldformulieren toe die rechtstreeks aansluiten op je Laposta-lijsten, en laat je nieuwste campagnes zien op elke pagina."
+
+#: includes/Admin/AboutTab.php:63
+msgid "About Wynko"
+msgstr "Over Wynko"
+
+#: includes/Admin/AboutTab.php:65
+msgid "Independence"
+msgstr "Onafhankelijkheid"
+
+#: includes/Admin/AboutTab.php:66
+msgid "Wynko is an independent plugin. It is not affiliated with, endorsed by, or sponsored by Laposta B.V. \"Laposta\" is a trademark of its respective owner."
+msgstr "Wynko is een onafhankelijke plugin. Er is geen samenwerking met, goedkeuring door of sponsoring vanuit Laposta B.V. “Laposta” is een handelsmerk van de betreffende eigenaar."
+
+#: includes/Admin/AboutTab.php:72
+msgid "Inspiration"
+msgstr "Inspiratie"
+
+#: includes/Admin/AboutTab.php:117
+msgid "MC4WP"
+msgstr "MC4WP"
+
+#: includes/Admin/AboutTab.php:259
+msgid "Dependencies"
+msgstr "Afhankelijkheden"
+
+#: includes/Admin/AboutTab.php:263
+msgid "This plugin bundles no third-party runtime dependencies. It requires only PHP and WordPress itself."
+msgstr "Deze plugin bundelt geen externe runtime-afhankelijkheden en vereist alleen PHP en WordPress zelf."
+
+#: includes/Admin/SettingsPage.php:159
+msgid "Status"
+msgstr "Status"
+
+#: includes/Admin/SettingsPage.php:195
+#: includes/SystemInfo.php:734
+#: includes/SystemInfo.php:775
+msgid "No API key configured"
+msgstr "Geen API-sleutel geconfigureerd"
+
+#: includes/Admin/SettingsPage.php:203
+#: includes/SystemInfo.php:778
+msgid "Connected"
+msgstr "Verbonden"
+
+#. translators: %s: reason the connection failed.
+#: includes/Admin/SettingsPage.php:213
+#: includes/SystemInfo.php:785
+#, php-format
+msgid "Not connected — %s"
+msgstr "Niet verbonden — %s"
+
+#: includes/Admin/SettingsPage.php:232
+msgid "Stored API key could not be decrypted; the site security salts have changed."
+msgstr "Opgeslagen API-sleutel kon niet worden ontsleuteld; de beveiligingssalts van de site zijn gewijzigd."
+
+#: includes/Admin/SettingsPage.php:329
+msgid "— supplied by an environment variable and used as-is. Unset it to manage the key from this page."
+msgstr "— aangeleverd door een omgevingsvariabele. Verwijder die variabele om de sleutel vanaf deze pagina te beheren."
+
+#: includes/Admin/SettingsPage.php:330
+msgid "— defined in wp-config.php and used as-is. Remove it there to manage the key from this page."
+msgstr "— gedefinieerd in wp-config.php. Verwijder de regel daar om de sleutel vanaf deze pagina te beheren."
+
+#: includes/Admin/SettingsPage.php:544
+msgid "The API key to connect with your Laposta account."
+msgstr "De API-sleutel om verbinding te maken met je Laposta-account."
+
+#: includes/Admin/SettingsPage.php:548
+msgid "Learn how to create an API key"
+msgstr "Lees hoe je een API-sleutel aanmaakt"
+
+#. translators: %s: name of the environment variable or PHP constant supplying the key.
+#: includes/Admin/SettingsPage.php:661
+#, php-format
+msgid "API key not saved: %s takes precedence."
+msgstr "API-sleutel niet opgeslagen: %s heeft voorrang."
+
+#: includes/Admin/SettingsPage.php:765
+msgid "API"
+msgstr "API"
+
+#: includes/Admin/SettingsPage.php:768
+msgid "About"
+msgstr "Over"
+
+#: includes/Admin/SettingsPage.php:856
+msgid "Sync failed — see the activity log."
+msgstr "Synchronisatie mislukt — zie het activiteitenlog."
+
+#: includes/Blocks/Campaigns.php:122
+msgid "Wynko: no sent campaigns for the selected list."
+msgstr "Wynko: geen verzonden campagnes voor de gekozen lijst."
+
+#: includes/Blocks/Campaigns.php:124
+msgid "Wynko: no campaigns to show yet. Check the Wynko menu."
+msgstr "Wynko: nog geen campagnes om te tonen. Ga naar het Wynko-menu."
+
+#: includes/Admin/Forms/FormsTable.php:64
+#: src/block/edit.js:103
+msgid "List"
+msgstr "Lijst"
+
+#. translators: 1: campaign subject or name, 2: date the campaign was sent.
+#. translators: 1: report section, e.g. "PHP"; 2: row label, e.g. "Version".
+#: includes/Blocks/Campaigns.php:192
+#: includes/SystemInfo.php:217
+#, php-format
+msgid "%1$s — %2$s"
+msgstr "%1$s — %2$s"
+
+#: includes/Admin/SettingsPage.php:188
+msgid "The stored API key could not be read — it was encrypted with this site's security salts, which have since changed. Re-enter it above."
+msgstr "De opgeslagen API-sleutel kon niet worden gelezen — de sleutel is versleuteld met de beveiligingssalts van deze site, en die zijn sindsdien gewijzigd. Voer de sleutel hierboven opnieuw in."
+
+#: includes/Admin/SettingsPage.php:434
+msgid "Safer ways to store this key"
+msgstr "Veiligere manieren om deze sleutel op te slaan"
+
+#: includes/Admin/SettingsPage.php:436
+msgid "Encrypting the key in the database protects it in a database dump, but not against anyone who can read wp-config.php. Either route above avoids that."
+msgstr "Versleuteling in de database beschermt de sleutel in een databasedump, maar niet tegen iemand die wp-config.php kan lezen. Beide routes hierboven voorkomen dat."
+
+#. translators: %s: the words "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:378
+#, php-format
+msgid "Saving a new key verifies it with Laposta first, then stores it in the database, encrypted with this site's %s — see below for ways to keep it out of the database entirely."
+msgstr "Een nieuwe sleutel wordt bij het opslaan eerst geverifieerd bij Laposta en daarna versleuteld opgeslagen in de database, met de %s van deze site — zie hieronder hoe je de sleutel helemaal buiten de database houdt."
+
+#: includes/Admin/SettingsPage.php:379
+msgctxt "link text in the storage note"
+msgid "security salts"
+msgstr "beveiligingssalts"
+
+#. translators: %s: the words "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:477
+#, php-format
+msgid "This site has no usable %s, so the API key is stored in the database as plain text. It still works — but anyone who can read the database can read the key."
+msgstr "Deze site heeft geen bruikbare %s, dus de API-sleutel wordt als platte tekst in de database opgeslagen. Het werkt nog steeds — maar iedereen die de database kan lezen, kan de sleutel lezen."
+
+#: includes/Admin/SettingsPage.php:478
+msgctxt "link text in the no-salts warning"
+msgid "security salts"
+msgstr "beveiligingssalts"
+
+#: includes/Admin/Forms/FormEditPage.php:118
+msgid "Save form"
+msgstr "Formulier opslaan"
+
+#: includes/Admin/Forms/FormEditPage.php:144
+#: includes/Frontend/FormSubmitHandler.php:87
+msgid "That form does not exist."
+msgstr "Dat formulier bestaat niet."
+
+#: includes/Forms/FormData.php:88
+msgid "New signup form"
+msgstr "Nieuw aanmeldformulier"
+
+#: includes/Admin/Forms/FormEditPage.php:694
+#: includes/Admin/Forms/FormsTable.php:191
+msgid "Form name"
+msgstr "Formuliernaam"
+
+#: includes/Admin/Forms/FormEditPage.php:746
+msgid "Laposta list"
+msgstr "Laposta-lijst"
+
+#: includes/Admin/Forms/FormEditPage.php:748
+msgid "— Choose a list —"
+msgstr "— Kies een lijst —"
+
+#: includes/Admin/Forms/FormEditPage.php:776
+msgid "Could not load your lists. Check the API key on the Settings screen."
+msgstr "Kan de lijsten niet laden. Controleer de API-sleutel op het instellingenscherm."
+
+#: includes/Admin/Assets.php:81
+#: includes/Admin/Forms/FormEditPage.php:790
+msgid "Could not load the fields for this list. Check the API key on the Settings screen."
+msgstr "Kan de velden voor deze lijst niet laden. Controleer de API-sleutel op het instellingenscherm."
+
+#: includes/Admin/Forms/FormEditPage.php:794
+msgid "Fields"
+msgstr "Velden"
+
+#: includes/Admin/Forms/FieldRows.php:42
+msgid "Order"
+msgstr "Volgorde"
+
+#: includes/Admin/Forms/FieldRows.php:43
+msgid "Field"
+msgstr "Veld"
+
+#: includes/Admin/Forms/FieldRows.php:45
+msgid "Shown"
+msgstr "Getoond"
+
+#: includes/Admin/Forms/FieldRows.php:46
+msgid "Label"
+msgstr "Label"
+
+#: includes/Admin/Forms/FieldRows.php:95
+#: includes/Admin/Forms/FieldRows.php:434
+msgid "CSS class"
+msgstr "CSS-klasse"
+
+#: includes/Admin/Forms/FormEditPage.php:897
+msgid "Leave a message empty to use the wording shown in grey."
+msgstr "Laat een bericht leeg om de tekst in het grijs te gebruiken."
+
+#: includes/Admin/Forms/FormEditPage.php:1123
+msgid "After signup"
+msgstr "Na aanmelding"
+
+#: includes/Admin/Forms/FormEditPage.php:1127
+msgid "Hide the form and show only the success message"
+msgstr "Verberg het formulier en toon alleen het succesbericht"
+
+#: includes/Admin/Forms/FormEditPage.php:1132
+msgid "Double opt-in"
+msgstr "Dubbele opt-in"
+
+#: includes/Admin/Forms/FormEditPage.php:1136
+msgid "Skip double opt-in for this form"
+msgstr "Dubbele opt-in overslaan voor dit formulier"
+
+#: includes/Admin/Forms/FormEditPage.php:1195
+msgid "Terms checkbox"
+msgstr "Voorwaarden-selectievakje"
+
+#: includes/Admin/Forms/FormEditPage.php:1199
+msgid "Require visitors to agree before subscribing"
+msgstr "Bezoekers moeten akkoord gaan voordat ze zich aanmelden"
+
+#: includes/Admin/Forms/FormEditPage.php:1210
+#: includes/Frontend/FormRenderer.php:588
+msgid "I agree to the terms and conditions"
+msgstr "Ik ga akkoord met de algemene voorwaarden"
+
+#: includes/Admin/Forms/FormEditPage.php:1265
+msgid "example.com/terms"
+msgstr "voorbeeld.nl/voorwaarden"
+
+#: includes/Admin/Forms/FormEditPage.php:1283
+#: includes/Admin/Forms/FormsTable.php:156
+msgid "Delete this form? Places that use its shortcode will show nothing."
+msgstr "Dit formulier verwijderen? Plekken die de shortcode gebruiken, tonen dan niets meer."
+
+#: includes/Admin/Forms/FormEditPage.php:1284
+msgid "Delete form"
+msgstr "Formulier verwijderen"
+
+#: includes/Admin/Forms/FormsListPage.php:109
+#: includes/Admin/Menu.php:49
+#: includes/Forms/PostType.php:49
+msgid "Signup forms"
+msgstr "Aanmeldformulieren"
+
+#: includes/Admin/Forms/FormsTable.php:248
+msgid "No signup forms yet. Add one to get started."
+msgstr "Nog geen aanmeldformulieren. Voeg er een toe om te beginnen."
+
+#: includes/Admin/Forms/FormsTable.php:63
+msgid "Name"
+msgstr "Naam"
+
+#: includes/Admin/Forms/FormEditPage.php:700
+#: includes/Admin/Forms/FormsTable.php:65
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: includes/Admin/Forms/FormsTable.php:212
+msgid "No list selected"
+msgstr "Geen lijst geselecteerd"
+
+#: includes/Admin/Forms/FormsListPage.php:212
+msgid "Add form"
+msgstr "Formulier toevoegen"
+
+#: includes/Admin/Forms/Screen.php:57
+msgid "Editor"
+msgstr "Editor"
+
+#: includes/Admin/Forms/Screen.php:58
+msgid "Messages"
+msgstr "Berichten"
+
+#: includes/Blocks/Form.php:126
+msgid "Wynko: choose a signup form in the block settings."
+msgstr "Wynko: kies een aanmeldformulier in de blokinstellingen."
+
+#: includes/Forms/Messages.php:33
+msgid "Sorry, something went wrong. Please try again later."
+msgstr "Sorry, er ging iets mis. Probeer het later opnieuw."
+
+#: includes/Forms/Messages.php:34
+msgid "This email address is already subscribed."
+msgstr "Dit e-mailadres is al aangemeld."
+
+#: includes/Forms/Messages.php:35
+msgid "Please enter a valid email address."
+msgstr "Vul een geldig e-mailadres in."
+
+#: includes/Forms/Messages.php:36
+msgid "Please fill in this field."
+msgstr "Vul dit veld in."
+
+#: includes/Forms/Messages.php:37
+msgid "Please check this value."
+msgstr "Controleer deze waarde."
+
+#: includes/Forms/Messages.php:39
+msgid "Please agree to the terms before subscribing."
+msgstr "Ga akkoord met de voorwaarden voordat je je aanmeldt."
+
+#: includes/Forms/Messages.php:99
+msgid "Success"
+msgstr "Succesbericht"
+
+#: includes/Forms/Messages.php:100
+msgid "Something went wrong"
+msgstr "Er ging iets mis"
+
+#: includes/Admin/Forms/FormEditPage.php:1168
+#: includes/Forms/Messages.php:101
+msgid "Already subscribed"
+msgstr "Al aangemeld"
+
+#: includes/Forms/Messages.php:102
+msgid "Invalid email address"
+msgstr "Ongeldig e-mailadres"
+
+#: includes/Forms/Messages.php:103
+msgid "Required field left empty"
+msgstr "Verplicht veld leeg gelaten"
+
+#: includes/Forms/Messages.php:104
+msgid "Invalid value"
+msgstr "Ongeldige waarde"
+
+#: includes/Forms/Messages.php:106
+msgid "Terms not agreed"
+msgstr "Niet akkoord met voorwaarden"
+
+#: includes/Forms/PostType.php:50
+#: src/block-form/edit.js:52
+msgid "Signup form"
+msgstr "Aanmeldformulier"
+
+#: includes/Frontend/FormRenderer.php:75
+msgid "Wynko: this signup form has no Laposta list selected yet."
+msgstr "Wynko: voor dit aanmeldformulier is nog geen Laposta-lijst geselecteerd."
+
+#: includes/Frontend/FormRenderer.php:80
+msgid "Wynko: could not load this list's fields. Check the API key on the Wynko settings screen."
+msgstr "Wynko: kan de velden van deze lijst niet laden. Controleer de API-sleutel op het Wynko-instellingenscherm."
+
+#: includes/Forms/Button.php:29
+msgid "Subscribe"
+msgstr "Aanmelden"
+
+#: includes/Admin/Forms/FieldRows.php:627
+#: includes/Forms/FormData.php:153
+msgid "Email address"
+msgstr "E-mailadres"
+
+#: includes/Admin/SecurityTab.php:181
+#: src/block-form/edit.js:60
+msgid "Form"
+msgstr "Formulier"
+
+#: src/block-form/block.json
+msgctxt "block title"
+msgid "Wynko: Signup form"
+msgstr "Wynko: Aanmeldformulier"
+
+#: src/block-form/block.json
+msgctxt "block description"
+msgid "Show a Laposta signup form."
+msgstr "Toon een Laposta-aanmeldformulier."
+
+#: includes/Admin/Assets.php:80
+msgid "Copied"
+msgstr "Gekopieerd"
+
+#: includes/Admin/Forms/FieldRows.php:44
+msgid "Type"
+msgstr "Type"
+
+#: includes/Admin/Forms/FieldRows.php:130
+msgid "Single choice"
+msgstr "Eén keuze"
+
+#: includes/Admin/Forms/FieldRows.php:131
+msgid "Multiple choice"
+msgstr "Meerdere keuzes"
+
+#: includes/Admin/Forms/FieldRows.php:135
+msgid "Number"
+msgstr "Getal"
+
+#: includes/Admin/Forms/FieldRows.php:136
+msgid "Date (YYYY-MM-DD)"
+msgstr "Datum (JJJJ-MM-DD)"
+
+#: includes/Admin/Forms/FieldRows.php:139
+msgid "Text"
+msgstr "Tekst"
+
+#: includes/Admin/Forms/FieldRows.php:198
+msgid "Email"
+msgstr "E-mail"
+
+#: includes/Admin/Forms/FieldRows.php:211
+msgid "Required"
+msgstr "Verplicht"
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:179
+#, php-format
+msgid "Move %s up"
+msgstr "%s omhoog verplaatsen"
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:186
+#, php-format
+msgid "Move %s down"
+msgstr "%s omlaag verplaatsen"
+
+#. translators: %d: how many further options the field has.
+#: includes/Admin/Forms/FieldRows.php:680
+#, php-format
+msgid "+%d more"
+msgid_plural "+%d more"
+msgstr[0] "+%d meer"
+msgstr[1] "+%d meer"
+
+#: includes/Admin/Forms/FormEditPage.php:708
+msgid "Copy"
+msgstr "Kopiëren"
+
+#: includes/Admin/Forms/FormEditPage.php:805
+msgid "Field names, types, and whether a field is required all come from Laposta — change them there. Drag a row by its handle to reorder, or use the arrow buttons."
+msgstr "Veldnamen, types en of een veld verplicht is, komen allemaal uit Laposta — pas ze daar aan. Sleep een rij aan de greep om de volgorde te wijzigen, of gebruik de pijlknoppen."
+
+#: includes/Admin/Forms/FormEditPage.php:1079
+msgid "After a successful signup"
+msgstr "Na een geslaagde aanmelding"
+
+#: includes/Admin/Forms/FormEditPage.php:1084
+msgid "Stay on the page and show the success message"
+msgstr "Op de pagina blijven en het succesbericht tonen"
+
+#: includes/Admin/Forms/FormEditPage.php:1096
+msgid "Send the visitor to a page"
+msgstr "De bezoeker naar een pagina sturen"
+
+#: includes/Admin/Forms/FormEditPage.php:1103
+#: includes/Admin/Forms/FormEditPage.php:1251
+msgid "— Choose a page —"
+msgstr "— Kies een pagina —"
+
+#: includes/Admin/Forms/FormEditPage.php:1112
+msgid "Send the visitor to a URL"
+msgstr "De bezoeker naar een URL sturen"
+
+#: includes/Admin/Forms/FormEditPage.php:1117
+msgid "example.com/thanks"
+msgstr "example.com/bedankt"
+
+#: includes/Admin/Forms/FormsTable.php:76
+#: includes/Admin/Forms/FormsTable.php:157
+msgid "Delete"
+msgstr "Verwijderen"
+
+#. translators: %s: form name.
+#: includes/Admin/Forms/FormsTable.php:128
+#, php-format
+msgid "Select %s"
+msgstr "%s selecteren"
+
+#: includes/Admin/Forms/FormsTable.php:146
+msgid "Edit"
+msgstr "Bewerken"
+
+#: includes/Admin/Forms/FieldRows.php:537
+msgid "Min"
+msgstr "Min"
+
+#: includes/Admin/Forms/FieldRows.php:538
+msgid "Max"
+msgstr "Max"
+
+#: includes/Admin/Forms/FieldRows.php:539
+msgid "Step"
+msgstr "Stap"
+
+#: includes/Admin/Forms/FieldRows.php:541
+msgid "Max length"
+msgstr "Max. lengte"
+
+#: includes/Admin/Forms/FieldRows.php:573
+msgid "Slider"
+msgstr "Schuifregelaar"
+
+#: includes/Admin/Forms/FormEditPage.php:75
+msgid "Edit signup form"
+msgstr "Aanmeldformulier bewerken"
+
+#: includes/Admin/Forms/FieldRows.php:50
+msgid "Options"
+msgstr "Opties"
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:243
+#, php-format
+msgid "Options for %s"
+msgstr "Opties voor %s"
+
+#: includes/Admin/Forms/FieldRows.php:47
+msgid "Placeholder"
+msgstr "Placeholder"
+
+#: includes/Admin/Forms/FieldRows.php:428
+msgid "Help text"
+msgstr "Helptekst"
+
+#: includes/Admin/Forms/FieldRows.php:477
+msgid "Default value"
+msgstr "Standaardwaarde"
+
+#: includes/Admin/Forms/FieldRows.php:540
+msgid "Min length"
+msgstr "Min. lengte"
+
+#: includes/Admin/Forms/FieldRows.php:542
+msgid "Pattern"
+msgstr "Patroon"
+
+#: includes/Admin/Forms/FieldRows.php:543
+msgid "Pattern description"
+msgstr "Beschrijving van het patroon"
+
+#: includes/Admin/Forms/FieldRows.php:544
+msgid "Autofill"
+msgstr "Automatisch invullen"
+
+#: includes/Admin/Forms/FieldRows.php:622
+msgid "Not set"
+msgstr "Niet ingesteld"
+
+#: includes/Admin/Forms/FieldRows.php:623
+msgid "Never autofill"
+msgstr "Nooit automatisch invullen"
+
+#: includes/Admin/Forms/FieldRows.php:624
+msgid "Full name"
+msgstr "Volledige naam"
+
+#: includes/Admin/Forms/FieldRows.php:625
+msgid "First name"
+msgstr "Voornaam"
+
+#: includes/Admin/Forms/FieldRows.php:626
+msgid "Last name"
+msgstr "Achternaam"
+
+#: includes/Admin/Forms/FieldRows.php:628
+msgid "Telephone"
+msgstr "Telefoon"
+
+#: includes/Admin/Forms/FieldRows.php:629
+msgid "Company"
+msgstr "Bedrijf"
+
+#: includes/Admin/Forms/FieldRows.php:630
+msgid "Street address"
+msgstr "Adres"
+
+#: includes/Admin/Forms/FieldRows.php:631
+msgid "Postcode"
+msgstr "Postcode"
+
+#: includes/Admin/Forms/FieldRows.php:632
+msgid "Country"
+msgstr "Land"
+
+#: includes/Admin/Forms/FieldRows.php:633
+msgid "Date of birth"
+msgstr "Geboortedatum"
+
+#: includes/Admin/Forms/FormEditPage.php:1016
+msgid "One of the fields has a pattern that is not a valid expression, so nothing was saved."
+msgstr "Één van de velden heeft een patroon dat geen geldige expressie is; er is niets opgeslagen."
+
+#: includes/Admin/Forms/FormEditPage.php:1039
+msgid "A label above each field"
+msgstr "Een label boven elk veld"
+
+#: includes/Admin/Forms/FormEditPage.php:1040
+msgid "A label and a placeholder"
+msgstr "Een label en een placeholder"
+
+#: includes/Admin/Forms/FormEditPage.php:1041
+msgid "A placeholder only"
+msgstr "Alleen een placeholder"
+
+#: includes/Admin/Forms/FormEditPage.php:1045
+msgid "Field labels"
+msgstr "Veldlabels"
+
+#: includes/Admin/Forms/FormEditPage.php:1060
+msgid "Dates and choice fields cannot carry a placeholder, so they keep a visible label whatever this is set to."
+msgstr "Datum- en keuzevelden kunnen geen placeholder tonen; die houden altijd een zichtbaar label, wat je hier ook instelt."
+
+#: includes/Frontend/FormRenderer.php:498
+msgid "More information"
+msgstr "Meer informatie"
+
+#: includes/Admin/AboutTab.php:148
+msgid "Getting help"
+msgstr "Hulp krijgen"
+
+#: includes/Admin/AboutTab.php:153
+msgid "Support requests"
+msgstr "Ondersteuningsverzoeken"
+
+#: includes/Admin/AboutTab.php:154
+msgid "the WordPress.org plugin support forum"
+msgstr "het ondersteuningsforum van de plugin op WordPress.org"
+
+#: includes/Admin/AboutTab.php:158
+msgid "Bugs and ideas"
+msgstr "Bugs en ideeën"
+
+#: includes/Admin/AboutTab.php:159
+msgid "the GitHub issue tracker"
+msgstr "de issue tracker op GitHub"
+
+#: includes/Admin/AboutTab.php:180
+msgid "(not available yet)"
+msgstr "(nog niet beschikbaar)"
+
+#: includes/Admin/SystemReport.php:35
+msgid "System report"
+msgstr "Systeemrapport"
+
+#: includes/Admin/SystemReport.php:36
+msgid "What this site is running, and what the plugin makes of it. Download it and attach it to a support request."
+msgstr "Waar deze site op draait, en wat de plugin daarvan vindt. Download het en voeg het toe aan een ondersteuningsverzoek."
+
+#: includes/Admin/SystemReport.php:92
+msgid "Wynko — system report"
+msgstr "Wynko — systeemrapport"
+
+#. translators: 1: date and time; 2: timezone name.
+#: includes/Admin/SystemReport.php:95
+#, php-format
+msgid "Generated: %1$s (%2$s)"
+msgstr "Gegenereerd: %1$s (%2$s)"
+
+#. translators: %s: site address.
+#. translators: %s: this site's address.
+#: includes/Admin/SystemReport.php:101
+#: includes/Notifier.php:191
+#, php-format
+msgid "Site: %s"
+msgstr "Site: %s"
+
+#: includes/Admin/SystemReport.php:203
+msgid "Download report (.txt)"
+msgstr "Rapport downloaden (.txt)"
+
+#: includes/Admin/SystemReport.php:79
+msgid "Test connection now"
+msgstr "Verbinding nu testen"
+
+#: includes/Admin/SystemReport.php:227
+msgid "Laposta answered and the API key was accepted."
+msgstr "Laposta antwoordde en accepteerde de API-sleutel."
+
+#: includes/SystemInfo.php:105
+msgid "Yes"
+msgstr "Ja"
+
+#: includes/SystemInfo.php:105
+msgid "No"
+msgstr "Nee"
+
+#: includes/SystemInfo.php:114
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: includes/Admin/LogPage.php:325
+#: includes/SystemInfo.php:158
+msgid "WordPress"
+msgstr "WordPress"
+
+#: includes/Admin/LogPage.php:326
+#: includes/SystemInfo.php:162
+msgid "PHP"
+msgstr "PHP"
+
+#: includes/SystemInfo.php:166
+#: includes/SystemInfo.php:732
+msgid "Database"
+msgstr "Database"
+
+#: includes/SystemInfo.php:170
+msgid "PHP modules"
+msgstr "PHP-modules"
+
+#: includes/SystemInfo.php:174
+#: includes/SystemInfo.php:387
+#: includes/SystemInfo.php:397
+msgid "Server"
+msgstr "Server"
+
+#: includes/Admin/LogPage.php:324
+#: includes/SystemInfo.php:138
+msgid "Plugin"
+msgstr "Plugin"
+
+#: includes/SystemInfo.php:262
+#: includes/SystemInfo.php:289
+msgid "Version"
+msgstr "Versie"
+
+#: includes/SystemInfo.php:267
+msgid "Multisite"
+msgstr "Multisite"
+
+#: includes/SystemInfo.php:268
+msgid "Environment type"
+msgstr "Omgevingstype"
+
+#: includes/SystemInfo.php:269
+msgid "Debug mode"
+msgstr "Debugmodus"
+
+#: includes/SystemInfo.php:270
+msgid "Site language"
+msgstr "Sitetaal"
+
+#: includes/SystemInfo.php:294
+msgid "Server interface"
+msgstr "Serverinterface"
+
+#: includes/SystemInfo.php:297
+msgid "WordPress memory limit"
+msgstr "WordPress-geheugenlimiet"
+
+#: includes/SystemInfo.php:305
+msgid "Max execution time"
+msgstr "Maximale uitvoeringstijd"
+
+#: includes/SystemInfo.php:357
+msgid "Unlimited"
+msgstr "Onbeperkt"
+
+#: includes/SystemInfo.php:366
+msgid "Memory limit"
+msgstr "Geheugenlimiet"
+
+#: includes/SystemInfo.php:427
+msgid "Loaded"
+msgstr "Geladen"
+
+#: includes/SystemInfo.php:427
+#: includes/SystemInfo.php:435
+msgid "Missing"
+msgstr "Ontbreekt"
+
+#: includes/SystemInfo.php:492
+msgid "advised"
+msgstr "aangeraden"
+
+#: includes/SystemInfo.php:436
+msgid "None"
+msgstr "Geen"
+
+#: includes/SystemInfo.php:526
+msgid "Software"
+msgstr "Software"
+
+#: includes/SystemInfo.php:552
+#: includes/SystemInfo.php:556
+msgid "HTTPS"
+msgstr "HTTPS"
+
+#: includes/SystemInfo.php:671
+msgid "Plugin version"
+msgstr "Pluginversie"
+
+#: includes/SystemInfo.php:672
+msgid "API key source"
+msgstr "Bron van de API-sleutel"
+
+#: includes/SystemInfo.php:674
+msgid "Cache duration"
+msgstr "Cacheduur"
+
+#. translators: %d: number of minutes.
+#: includes/SystemInfo.php:677
+#, php-format
+msgid "%d minutes"
+msgstr "%d minuten"
+
+#: includes/SystemInfo.php:681
+msgid "Last sync"
+msgstr "Laatste synchronisatie"
+
+#: includes/SystemInfo.php:684
+msgid "Connection status"
+msgstr "Verbindingsstatus"
+
+#: includes/SystemInfo.php:721
+msgid "Database — unreadable (the security salts changed)"
+msgstr "Database — onleesbaar (de beveiligingssalts zijn gewijzigd)"
+
+#. translators: %s: environment variable name.
+#: includes/SystemInfo.php:725
+#, php-format
+msgid "Environment variable (%s)"
+msgstr "Omgevingsvariabele (%s)"
+
+#. translators: %s: wp-config.php constant name.
+#: includes/SystemInfo.php:729
+#, php-format
+msgid "wp-config.php constant (%s)"
+msgstr "Constante in wp-config.php (%s)"
+
+#: includes/SystemInfo.php:745
+msgid "Never"
+msgstr "Nooit"
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/SystemInfo.php:750
+#, php-format
+msgid "%1$s ago (%2$s)"
+msgstr "%1$s geleden (%2$s)"
+
+#. translators: %s: the time of the failed sync.
+#: includes/SystemInfo.php:757
+#, php-format
+msgid "%s — failed"
+msgstr "%s — mislukt"
+
+#: includes/SystemInfo.php:772
+msgid "The stored API key could not be read"
+msgstr "De opgeslagen API-sleutel kon niet worden gelezen"
+
+#: includes/SystemInfo.php:781
+msgid "Not checked yet"
+msgstr "Nog niet gecontroleerd"
+
+#: includes/Admin/Forms/FieldRows.php:73
+msgid "Sign up button"
+msgstr "Aanmeldknop"
+
+#. translators: A row's entry in the field table's Type column, beside Text, Number, and Date.
+#: includes/Admin/Forms/FieldRows.php:75
+msgid "Button"
+msgstr "Knop"
+
+#: includes/Admin/Forms/FieldRows.php:89
+msgid "Options for the sign up button"
+msgstr "Opties voor de aanmeldknop"
+
+#: includes/Admin/Forms/FieldRows.php:335
+msgid "A sentence explaining what to enter. It appears behind a (?) beside the field."
+msgstr "Een zin die uitlegt wat er ingevuld moet worden. De zin verschijnt achter een (?) naast het veld."
+
+#: includes/Admin/Forms/FieldRows.php:337
+msgid "Added to this field on the rendered form, for your theme or your own CSS to style."
+msgstr "Wordt aan dit veld toegevoegd op het formulier, zodat je thema of je eigen CSS het kan opmaken."
+
+#: includes/Admin/Forms/FieldRows.php:338
+msgid "The lowest value the form accepts."
+msgstr "De laagste waarde die het formulier accepteert."
+
+#: includes/Admin/Forms/FieldRows.php:339
+msgid "The highest value the form accepts."
+msgstr "De hoogste waarde die het formulier accepteert."
+
+#: includes/Admin/Forms/FieldRows.php:340
+msgid "How far apart the accepted values are — 5 accepts 0, 5, 10, and refuses 7."
+msgstr "Hoe ver de toegestane waarden uit elkaar liggen — 5 accepteert 0, 5, 10 en weigert 7."
+
+#: includes/Admin/Forms/FieldRows.php:341
+msgid "How many characters the answer must have at least."
+msgstr "Hoeveel tekens het antwoord minimaal moet hebben."
+
+#: includes/Admin/Forms/FieldRows.php:342
+msgid "How many characters the field takes. Typing stops there."
+msgstr "Hoeveel tekens het veld aanneemt. Daarna kan er niets meer bij."
+
+#: includes/Admin/Forms/FieldRows.php:343
+msgid "A regular expression the answer must match, without slashes — [0-9]{4} takes four digits and nothing else."
+msgstr "Een reguliere expressie waaraan het antwoord moet voldoen, zonder slashes — [0-9]{4} accepteert vier cijfers en verder niets."
+
+#: includes/Admin/Forms/FieldRows.php:344
+msgid "What the visitor is told when the pattern refuses their answer. Describe the pattern, do not repeat it."
+msgstr "Wat de bezoeker te zien krijgt als het patroon het antwoord weigert. Beschrijf het patroon, herhaal het niet."
+
+#: includes/Admin/Forms/FieldRows.php:345
+msgid "Lets the browser offer what it already knows about the visitor. Choose what this field holds."
+msgstr "Laat de browser aanbieden wat die al van de bezoeker weet. Kies wat dit veld bevat."
+
+#: includes/Admin/Forms/FieldRows.php:346
+msgid "Shows the number as a slider between its lowest and highest value instead of a box."
+msgstr "Toont het getal als schuifregelaar tussen de laagste en hoogste waarde in plaats van als invoervak."
+
+#: includes/Admin/Forms/FieldRows.php:373
+msgid "What is this?"
+msgstr "Wat is dit?"
+
+#: includes/Admin/Forms/FieldRows.php:425
+msgid "What the visitor sees"
+msgstr "Wat de bezoeker ziet"
+
+#: includes/Admin/Forms/FieldRows.php:550
+msgid "What the form accepts"
+msgstr "Wat het formulier accepteert"
+
+#: includes/Frontend/FormRenderer.php:668
+msgid "Error:"
+msgstr "Fout:"
+
+#: includes/Admin/LogPage.php:117
+msgid "Change in Settings"
+msgstr "Aanpassen"
+
+#: includes/Admin/LogPage.php:145
+msgid "Filter by level"
+msgstr "Filteren op niveau"
+
+#: includes/Admin/LogPage.php:157
+#: includes/Admin/LogPage.php:162
+msgid "Search messages"
+msgstr "Berichten doorzoeken"
+
+#: includes/Admin/LogPage.php:165
+#: includes/Admin/LogPage.php:328
+msgid "Filter"
+msgstr "Filteren"
+
+#: includes/Admin/LogPage.php:168
+msgid "Reset"
+msgstr "Herstellen"
+
+#: includes/Admin/LogPage.php:182
+msgid "All levels"
+msgstr "Alle niveaus"
+
+#: includes/Admin/LogLevels.php:33
+msgid "Warnings and errors"
+msgstr "Waarschuwingen en fouten"
+
+#: includes/Admin/LogLevels.php:32
+msgid "Errors only"
+msgstr "Alleen fouten"
+
+#. translators: 1: entries shown, 2: entries stored.
+#: includes/Admin/LogPage.php:204
+#, php-format
+msgid "Showing %1$d of %2$d entries."
+msgstr "%1$d van de %2$d regels getoond."
+
+#: includes/Admin/LogPage.php:220
+msgid "No activity to show."
+msgstr "Geen activiteit om te tonen."
+
+#: includes/Admin/LogPage.php:257
+msgid "Download log (.txt)"
+msgstr "Log downloaden (.txt)"
+
+#: includes/Admin/LogPage.php:265
+msgid "Clear the activity log? Every stored entry is deleted."
+msgstr "Het activiteitenlog wissen? Elke opgeslagen regel wordt verwijderd."
+
+#: includes/Admin/LogPage.php:266
+msgid "Clear log"
+msgstr "Log wissen"
+
+#: includes/Admin/LogPage.php:322
+msgid "Site"
+msgstr "Site"
+
+#: includes/Admin/LogPage.php:323
+msgid "Generated"
+msgstr "Gegenereerd"
+
+#: includes/Admin/LogPage.php:327
+msgid "Recording"
+msgstr "Vastgelegd"
+
+#: includes/Admin/LogPage.php:384
+msgid "The activity log has been cleared."
+msgstr "Het activiteitenlog is gewist."
+
+#: includes/Admin/SettingsPage.php:161
+msgid "Activity log detail"
+msgstr "Detailniveau activiteitenlog"
+
+#: includes/Admin/SettingsPage.php:610
+msgid "Applies when an event happens, so it decides what gets recorded rather than what is shown. Entries already stored stay visible."
+msgstr "Geldt op het moment dat er iets gebeurt: het bepaalt wat er wordt vastgelegd, niet wat er wordt getoond. Al opgeslagen regels blijven zichtbaar."
+
+#: includes/Admin/SystemReport.php:290
+msgid "Connection test skipped: no API key is configured."
+msgstr "Verbindingstest overgeslagen: er is geen API-sleutel ingesteld."
+
+#. translators: %s: error message.
+#: includes/Cache.php:104
+#, php-format
+msgid "Automatic sync failed: %s"
+msgstr "Automatische synchronisatie mislukt: %s"
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:193
+#, php-format
+msgid "Signup failed on \"%s\": the form has no list selected."
+msgstr "Aanmelding via \"%s\" mislukt: het formulier heeft geen lijst geselecteerd."
+
+#. translators: 1: form name, 2: number of fields that failed validation.
+#: includes/Frontend/FormSubmitHandler.php:217
+#, php-format
+msgid "Signup on \"%1$s\" rejected: %2$d field(s) failed validation."
+msgstr "Aanmelding via \"%1$s\" geweigerd: %2$d veld(en) niet correct ingevuld."
+
+#. translators: 1: form name, 2: error message.
+#: includes/Frontend/FormSubmitHandler.php:342
+#, php-format
+msgid "Signup on \"%1$s\" failed: %2$s"
+msgstr "Aanmelding via \"%1$s\" mislukt: %2$s"
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:367
+#, php-format
+msgid "New signup through \"%s\"."
+msgstr "Nieuwe aanmelding via \"%s\"."
+
+#: includes/KeyStatus.php:126
+msgid "Connected to the Laposta API."
+msgstr "Verbonden met de Laposta-API."
+
+#. translators: %s: error message.
+#: includes/KeyStatus.php:132
+#, php-format
+msgid "Connection to the Laposta API failed: %s"
+msgstr "Verbinding met de Laposta-API mislukt: %s"
+
+#: includes/Admin/LogLevels.php:34
+msgid "Info, warnings and errors"
+msgstr "Info, waarschuwingen en fouten"
+
+#. translators: %s: the wording of the current level threshold.
+#: includes/Admin/LogPage.php:129
+#, php-format
+msgid "Recording: %s."
+msgstr "Wordt vastgelegd: %s."
+
+#: includes/Admin/Forms/FormEditPage.php:1206
+msgid "Checkbox text"
+msgstr "Tekst bij het selectievakje"
+
+#: includes/Admin/Forms/FormEditPage.php:1215
+msgid "Link the text to"
+msgstr "Link de tekst naar"
+
+#: includes/Admin/Forms/FormEditPage.php:1217
+msgid "The checkbox text becomes a link to whichever you choose."
+msgstr "De tekst bij het selectievakje wordt een link naar wat je hier kiest."
+
+#: includes/Admin/Forms/FormEditPage.php:1238
+msgid "Nothing — leave the text unlinked"
+msgstr "Niets — laat de tekst zonder link"
+
+#: includes/Admin/Forms/FormEditPage.php:1244
+msgid "A page on this site"
+msgstr "Een pagina op deze site"
+
+#: includes/Admin/Forms/FormEditPage.php:1260
+msgid "A URL"
+msgstr "Een URL"
+
+#: includes/Admin/SettingsPage.php:411
+msgid "Set the WYNKO_API_KEY environment variable — in your .env file, your web server config, or your container definition. The key then never reaches the database."
+msgstr "Stel de omgevingsvariabele WYNKO_API_KEY in — in je .env-bestand, je webserverconfiguratie of je containerdefinitie. De sleutel belandt dan nooit in de database."
+
+#. translators: %s: the environment variable name for this site, e.g. WYNKO_API_KEY_3.
+#: includes/Admin/SettingsPage.php:416
+#, php-format
+msgid "For this site alone, name it %s instead."
+msgstr "Alleen voor deze site: noem de variabele %s."
+
+#: includes/Admin/SettingsPage.php:424
+msgid "Or define it in wp-config.php, above the line that says \"That's all, stop editing\". Same effect, kept in a file instead:"
+msgstr "Of definieer de sleutel in wp-config.php, boven de regel \"That's all, stop editing\". Zelfde effect, maar dan in een bestand:"
+
+#: includes/Admin/SettingsPage.php:453
+msgid "Or, for this site only:"
+msgstr "Of, alleen voor deze site:"
+
+#: includes/Admin/SystemReport.php:228
+msgid "The check failed — see the connection row below for why."
+msgstr "De controle is mislukt — zie de regel Verbindingsstatus hieronder voor de reden."
+
+#. translators: %s: minimum supported version.
+#: includes/SystemInfo.php:67
+#, php-format
+msgid "requires %s or newer"
+msgstr "vereist %s of nieuwer"
+
+#. translators: %s: recommended version.
+#: includes/SystemInfo.php:71
+#, php-format
+msgid "%s or newer is advised"
+msgstr "%s of nieuwer wordt aangeraden"
+
+#: includes/SystemInfo.php:491
+msgid "required by this plugin"
+msgstr "vereist door deze plugin"
+
+#: includes/SystemInfo.php:852
+msgid "Laposta was not reached — the request did not complete"
+msgstr "Laposta is niet bereikt — het verzoek is niet voltooid"
+
+#: includes/SystemInfo.php:855
+msgid "Laposta answered and turned the request down"
+msgstr "Laposta antwoordde en wees het verzoek af"
+
+#: includes/Admin/Forms/FormEditPage.php:799
+msgid "Choose a list above and its fields appear here. Nothing is stored until you save the form."
+msgstr "Kies hierboven een lijst en de velden verschijnen hier. Er wordt niets opgeslagen tot je het formulier opslaat."
+
+#: includes/Admin/Forms/FormEditPage.php:885
+msgid "Shown above the form"
+msgstr "Boven het formulier getoond"
+
+#: includes/Admin/Forms/FormEditPage.php:886
+msgid "The outcome of a submission, in the form's place or above it. These may carry simple HTML: a link, <strong>, <em>, and <br>."
+msgstr "De uitkomst van een aanmelding, in plaats van het formulier of erboven. Deze mogen eenvoudige HTML bevatten: een link, <strong>, <em> en <br>."
+
+#: includes/Admin/Forms/FormEditPage.php:892
+msgid "Shown beside a field"
+msgstr "Naast een veld getoond"
+
+#: includes/Admin/Forms/FormEditPage.php:893
+msgid "Attached to the one field they are about, in the space next to it. Plain text only — markup there breaks the layout of the row."
+msgstr "Gekoppeld aan het ene veld waar ze over gaan, in de ruimte ernaast. Alleen platte tekst — opmaak breekt daar de indeling van de rij."
+
+#: includes/SystemInfo.php:301
+msgid "WordPress admin memory limit"
+msgstr "WordPress-geheugenlimiet beheer"
+
+#: includes/Admin/NotificationsTab.php:38
+msgid "Critical email alerts"
+msgstr "Kritieke e-mailmeldingen"
+
+#: includes/Admin/NotificationsTab.php:41
+msgid "When the plugin records an error, it can email you. Warnings and informational entries never send. At most one alert goes out per hour; the activity log has everything else."
+msgstr "Als de plugin een fout vastlegt, kan die je een e-mail sturen. Waarschuwingen en informatieve regels leiden nooit tot een bericht. Er wordt maximaal één melding per uur verstuurd; al het andere staat in het activiteitenlog."
+
+#: includes/Admin/NotificationsTab.php:241
+msgid "Send test email"
+msgstr "Testmail versturen"
+
+#: includes/Admin/NotificationsTab.php:104
+msgid "Nothing was sent — there is no valid address configured above."
+msgstr "Er is niets verstuurd — hierboven staat geen geldig adres."
+
+#: includes/Admin/NotificationsTab.php:138
+msgid "Alerts are switched on, but no valid address is configured — nothing will be sent."
+msgstr "Meldingen staan aan, maar er is geen geldig adres ingesteld — er wordt niets verstuurd."
+
+#: includes/Admin/NotificationsTab.php:155
+msgid "Email me when an error is recorded"
+msgstr "Stuur me een e-mail als er een fout wordt vastgelegd"
+
+#. translators: %s: the addresses that were not stored, comma-separated.
+#: includes/Admin/NotificationsTab.php:286
+#, php-format
+msgid "Not a valid email address, so it was not saved: %s"
+msgstr "Geen geldig e-mailadres, dus niet opgeslagen: %s"
+
+#: includes/Admin/SettingsPage.php:168
+msgid "Alerts"
+msgstr "Meldingen"
+
+#: includes/Admin/SettingsPage.php:172
+msgid "Critical email"
+msgstr "Kritieke e-mail"
+
+#: includes/Admin/NotificationsTab.php:214
+msgid "Send to"
+msgstr "Versturen naar"
+
+#: includes/Admin/SettingsPage.php:767
+msgid "Notifications"
+msgstr "Meldingen"
+
+#. translators: %d: number of intended recipients.
+#: includes/Notifier.php:91
+#, php-format
+msgid "Critical-email alert could not be sent to %d recipient(s); check this site's mail configuration."
+msgstr "Kritieke e-mailmelding kon niet naar %d ontvanger(s) worden verstuurd; controleer de mailinstellingen van deze site."
+
+#. translators: %s: this site's name.
+#: includes/Notifier.php:176
+#, php-format
+msgid "[%s] Laposta error"
+msgstr "[%s] Laposta-fout"
+
+#. translators: %s: the time the error was recorded, in site time.
+#: includes/Notifier.php:196
+#, php-format
+msgid "Time: %s"
+msgstr "Tijd: %s"
+
+#: includes/Notifier.php:202
+msgid "Further errors within the hour are not mailed. The activity log has them:"
+msgstr "Verdere fouten binnen het uur worden niet gemaild. Ze staan in het activiteitenlog:"
+
+#: includes/Notifier.php:236
+msgid "This is a test alert. The plugin has not recorded an error; someone pressed the test button on the Notifications tab."
+msgstr "Dit is een testmelding. De plugin heeft geen fout vastgelegd; iemand heeft op het tabblad Meldingen op de testknop gedrukt."
+
+#: includes/Admin/NotificationsTab.php:100
+msgid "Test email sent. If it does not arrive, look at this site's mail configuration rather than the plugin."
+msgstr "Testmail verstuurd. Komt de mail niet aan, kijk dan naar de mailinstellingen van deze site en niet naar de plugin."
+
+#: includes/Admin/NotificationsTab.php:110
+msgid "The address is fine, but this site could not send the message. The reason the mail system gave is in the activity log."
+msgstr "Het adres is in orde, maar deze site kon het bericht niet versturen. De reden die het mailsysteem gaf, staat in het activiteitenlog."
+
+#. translators: %s: the reason the mail system gave for refusing the message.
+#: includes/Notifier.php:249
+#, php-format
+msgid "Test alert could not be sent: %s"
+msgstr "Testmelding kon niet worden verstuurd: %s"
+
+#: includes/Notifier.php:250
+msgid "the mail system gave no reason."
+msgstr "het mailsysteem gaf geen reden."
+
+#: includes/Admin/Forms/FieldRows.php:284
+msgid "This type of field takes no placeholder."
+msgstr "Dit type veld kan geen placeholder tonen."
+
+#: includes/Admin/Forms/FieldRows.php:567
+msgid "Shown as"
+msgstr "Weergegeven als"
+
+#: includes/Admin/Forms/FormEditPage.php:764
+msgid "Refresh fields"
+msgstr "Velden vernieuwen"
+
+#: includes/Admin/Forms/FormEditPage.php:772
+msgid "Open this list in Laposta"
+msgstr "Deze lijst openen in Laposta"
+
+#: includes/Admin/Forms/FormEditPage.php:864
+msgid "This form shows placeholders instead of labels, but no placeholder has been filled in — so each field shows its label as the grey text inside it. Fill in the Placeholder column to say something else. Dates, choice fields, and sliders keep a visible label whatever this is set to."
+msgstr "Dit formulier toont placeholders in plaats van labels, maar er is geen placeholder ingevuld — elk veld toont dus het eigen label als grijze tekst. Vul de kolom Placeholder in om iets anders te tonen. Datums, keuzevelden en schuifregelaars houden altijd een zichtbaar label, wat je hier ook instelt."
+
+#: includes/Admin/Forms/FormEditPage.php:981
+msgid "This form sends the visitor to another page after signing up, so this message is never shown."
+msgstr "Dit formulier stuurt de bezoeker na aanmelding naar een andere pagina, dus dit bericht wordt nooit getoond."
+
+#: includes/Admin/Forms/FormEditPage.php:983
+msgid "Change what happens after a successful signup"
+msgstr "Aanpassen wat er na een geslaagde aanmelding gebeurt"
+
+#: includes/Admin/Forms/FormEditPage.php:1017
+msgid "One of the number fields has a default value outside its own minimum and maximum, so nothing was saved."
+msgstr "Een van de numerieke velden heeft een standaardwaarde buiten het eigen minimum en maximum, dus er is niets opgeslagen."
+
+#: includes/Admin/Forms/FormEditPage.php:1088
+msgid "The wording of that message is on the Messages tab."
+msgstr "De tekst van dat bericht staat op het tabblad Berichten."
+
+#: includes/Admin/Forms/FormEditPage.php:1090
+msgid "Edit the success message"
+msgstr "Het succesbericht bewerken"
+
+#: includes/Admin/Forms/FormEditPage.php:1146
+msgid "Double opt-in is a setting on the Laposta list itself, and this plugin leaves it alone. Skipping it needs a paid Laposta plan, so the option is shown but cannot be used — on a free plan there is no confirmation step to skip."
+msgstr "Dubbele opt-in is een instelling van de Laposta-lijst zelf, en deze plugin laat die met rust. Overslaan vereist een betaald Laposta-abonnement, dus de optie wordt wel getoond maar kan niet worden gebruikt — bij een gratis abonnement is er geen bevestigingsstap om over te slaan."
+
+#: includes/Admin/Forms/FormEditPage.php:1172
+msgid "Tell the visitor when their address is already on the list"
+msgstr "De bezoeker vertellen dat het adres al op de lijst staat"
+
+#: includes/Admin/Forms/FormEditPage.php:1176
+msgid "Left off, an address that is already subscribed gets the same thank-you as a new one. Turning this on lets anyone with a link to this form check whether a particular address is on your list, one address at a time."
+msgstr "Staat dit uit, dan krijgt een al aangemeld adres hetzelfde bedankje als een nieuw adres. Zet je dit aan, dan kan iedereen met een link naar dit formulier nagaan of een bepaald adres op je lijst staat, adres voor adres."
+
+#: includes/Admin/SettingsPage.php:163
+msgid "Signup rate limits"
+msgstr "Aanmeldlimieten"
+
+#: includes/Admin/SettingsPage.php:164
+msgid "Window (minutes)"
+msgstr "Tijdvak (minuten)"
+
+#: includes/Admin/SettingsPage.php:165
+msgid "Per visitor"
+msgstr "Per bezoeker"
+
+#: includes/Admin/SettingsPage.php:166
+msgid "Per form"
+msgstr "Per formulier"
+
+#: includes/Admin/SecurityTab.php:89
+msgid "Signup rate limits cleared."
+msgstr "Aanmeldlimieten gewist."
+
+#: includes/Admin/SecurityTab.php:64
+msgid "Clear the signup rate limits? Every form starts counting again from zero."
+msgstr "De aanmeldlimieten wissen? Elk formulier begint weer bij nul met tellen."
+
+#: includes/Admin/SecurityTab.php:65
+msgid "Reset signup limits"
+msgstr "Aanmeldlimieten resetten"
+
+#: includes/Forms/Messages.php:32
+msgid "Thanks for signing up."
+msgstr "Bedankt voor je aanmelding."
+
+#: includes/Frontend/FormRenderer.php:266
+msgid "Leave this field empty"
+msgstr "Laat dit veld leeg"
+
+#: includes/Frontend/FormSubmitHandler.php:93
+msgid "Too many submissions. Please wait a few minutes and try again."
+msgstr "Te veel aanmeldingen. Wacht een paar minuten en probeer het opnieuw."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:330
+#, php-format
+msgid "Signup through \"%s\": the address was already subscribed."
+msgstr "Aanmelding via \"%s\": het adres was al aangemeld."
+
+#: includes/Admin/Assets.php:82
+msgid "This replaces the fields below, and you have changes that are not saved yet. Continue and lose them?"
+msgstr "Hiermee worden de velden hieronder vervangen, en je hebt wijzigingen die nog niet zijn opgeslagen. Doorgaan en wijzigingen verliezen?"
+
+#: includes/Admin/Forms/FieldRows.php:336
+msgid "Filled in for the visitor, who can still change it. A value Laposta already holds is shown here and keeps following Laposta unless you type something else; empty the box to go back to it."
+msgstr "Wordt voor de bezoeker ingevuld, die het nog kan wijzigen. Een waarde die Laposta al heeft staat hier ingevuld en blijft Laposta volgen tenzij je zelf iets anders typt; maak het veld leeg om terug te gaan."
+
+#: includes/Admin/Forms/FormEditPage.php:1002
+msgid "Form saved."
+msgstr "Formulier opgeslagen."
+
+#: includes/Admin/Assets.php:86
+#: includes/Admin/Forms/FieldRows.php:296
+msgid "Set \"Field labels\" above to show a placeholder before typing one."
+msgstr "Kies hierboven bij \"Veldlabels\" een stand met placeholder voordat je er een typt."
+
+#: includes/Admin/SettingsPage.php:766
+msgid "Security"
+msgstr "Beveiliging"
+
+#: includes/Forms/Messages.php:38
+msgid "Please match the format this field asks for."
+msgstr "Gebruik de indeling die dit veld vraagt."
+
+#: includes/Forms/Messages.php:105
+msgid "Pattern not matched"
+msgstr "Voldoet niet aan het patroon"
+
+#: includes/SystemInfo.php:682
+msgid "Signup rate limit"
+msgstr "Aanmeldlimiet"
+
+#. translators: 1: signups allowed from one visitor, 2: signups allowed on one form, 3: number of minutes in the window.
+#: includes/SystemInfo.php:704
+#, php-format
+msgid "%1$d per visitor, %2$d per form, per %3$d minutes"
+msgstr "%1$d per bezoeker, %2$d per formulier, per %3$d minuten"
+
+#. translators: %s: the reason the mail system gave.
+#: includes/Admin/AlertNotice.php:100
+#, php-format
+msgid "an error was recorded but the alert email could not be sent — %s"
+msgstr "er is een fout vastgelegd, maar de meldingsmail kon niet worden verstuurd — %s"
+
+#. translators: 1: activity log URL, 2: notification settings URL.
+#: includes/Admin/AlertNotice.php:107
+#, php-format
+msgid "The error itself is in the <a href=\"%1$s\">activity log</a>. Check the <a href=\"%2$s\">notification settings</a> and this site's mail configuration."
+msgstr "De fout zelf staat in het <a href=\"%1$s\">activiteitenlog</a>. Controleer de <a href=\"%2$s\">meldingsinstellingen</a> en de mailconfiguratie van deze site."
+
+#: includes/Admin/AlertNotice.php:116
+#: includes/Admin/EnvironmentNotice.php:95
+msgid "Dismiss"
+msgstr "Sluiten"
+
+#: includes/Admin/Assets.php:89
+#: includes/Admin/Forms/FieldRows.php:229
+msgid "This form shows placeholders instead of labels, so this label is not displayed."
+msgstr "Dit formulier toont placeholders in plaats van labels, dus dit label wordt niet weergegeven."
+
+#: includes/Admin/SettingsPage.php:702
+msgid "API key saved and verified."
+msgstr "API-sleutel opgeslagen en geverifieerd."
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:52
+#, php-format
+msgid "Laposta is rate limiting this site (HTTP %d); requests will succeed again shortly."
+msgstr "Laposta limiteert het aantal aanvragen van deze site (HTTP %d); aanvragen slagen binnenkort weer."
+
+#. translators: %s: error message.
+#: includes/Cache.php:173
+#, php-format
+msgid "The list index could not be fetched: %s"
+msgstr "De lijstindex kon niet worden opgehaald: %s"
+
+#. translators: %d: number of campaigns.
+#: includes/Cache.php:279
+#, php-format
+msgid "%d new campaign"
+msgid_plural "%d new campaigns"
+msgstr[0] "%d nieuwe campagne"
+msgstr[1] "%d nieuwe campagnes"
+
+#. translators: %d: number of lists.
+#: includes/Cache.php:283
+#, php-format
+msgid "%d new list"
+msgid_plural "%d new lists"
+msgstr[0] "%d nieuwe lijst"
+msgstr[1] "%d nieuwe lijsten"
+
+#. translators: %d: number of fields.
+#: includes/Cache.php:287
+#, php-format
+msgid "%d new field"
+msgid_plural "%d new fields"
+msgstr[0] "%d nieuw veld"
+msgstr[1] "%d nieuwe velden"
+
+#: includes/Cache.php:291
+msgid "Sync succeeded."
+msgstr "Synchronisatie geslaagd."
+
+#: includes/Cache.php:291
+msgid "Automatic sync succeeded."
+msgstr "Automatische synchronisatie geslaagd."
+
+#. translators: %s: what the sync found, e.g. "2 new campaigns, 1 new list".
+#: includes/Cache.php:299
+#, php-format
+msgid "Sync succeeded: %s."
+msgstr "Synchronisatie geslaagd: %s."
+
+#. translators: %s: what the sync found, e.g. "2 new campaigns, 1 new list".
+#: includes/Cache.php:301
+#, php-format
+msgid "Automatic sync succeeded: %s."
+msgstr "Automatische synchronisatie geslaagd: %s."
+
+#. translators: 1: form name, 2: submissions allowed, 3: window length in minutes.
+#: includes/Frontend/FormSubmitHandler.php:149
+#, php-format
+msgid "Signups on \"%1$s\" are being rate limited: more than %2$d in %3$d minutes."
+msgstr "Aanmeldingen via \"%1$s\" worden gelimiteerd: meer dan %2$d in %3$d minuten."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:174
+#, php-format
+msgid "A signup was submitted to \"%s\", which is no longer published."
+msgstr "Er is een aanmelding verstuurd naar \"%s\", dat niet meer gepubliceerd is."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:446
+#, php-format
+msgid "Signup failed on \"%s\": its list no longer exists in Laposta."
+msgstr "Aanmelding via \"%s\" mislukt: de bijbehorende lijst bestaat niet meer in Laposta."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:450
+#, php-format
+msgid "Signup failed on \"%s\": no Laposta API key is configured."
+msgstr "Aanmelding via \"%s\" mislukt: er is geen Laposta API-sleutel ingesteld."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:453
+#, php-format
+msgid "Signup failed on \"%s\": Laposta could not be reached."
+msgstr "Aanmelding via \"%s\" mislukt: Laposta was niet bereikbaar."
+
+#. translators: 1: list name or id, 2: number of signup forms.
+#: includes/GoneLists.php:56
+#, php-format
+msgid "The list \"%1$s\" no longer exists in Laposta, but %2$d signup form still uses it."
+msgid_plural "The list \"%1$s\" no longer exists in Laposta, but %2$d signup forms still use it."
+msgstr[0] "De lijst \"%1$s\" bestaat niet meer in Laposta, maar %2$d aanmeldformulier gebruikt die lijst nog."
+msgstr[1] "De lijst \"%1$s\" bestaat niet meer in Laposta, maar %2$d aanmeldformulieren gebruiken die lijst nog."
+
+#. translators: %d: number of recipients.
+#: includes/Notifier.php:241
+#, php-format
+msgid "Test email sent to %d recipient."
+msgid_plural "Test email sent to %d recipients."
+msgstr[0] "Testmail verstuurd naar %d ontvanger."
+msgstr[1] "Testmail verstuurd naar %d ontvangers."
+
+#. translators: 1: form name, 2: number of fields.
+#: includes/Frontend/FormSubmitHandler.php:267
+#, php-format
+msgid "Fields changed in Laposta for \"%1$s\"; the form now asks for %2$d field the visitor had not been shown."
+msgid_plural "Fields changed in Laposta for \"%1$s\"; the form now asks for %2$d fields the visitor had not been shown."
+msgstr[0] "Velden in Laposta zijn gewijzigd voor \"%1$s\"; het formulier vraagt nu om %2$d veld dat de bezoeker niet te zien kreeg."
+msgstr[1] "Velden in Laposta zijn gewijzigd voor \"%1$s\"; het formulier vraagt nu om %2$d velden die de bezoeker niet te zien kreeg."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:295
+#, php-format
+msgid "Fields changed in Laposta for \"%s\"; the form was resynced and the signup went through."
+msgstr "Velden in Laposta zijn gewijzigd voor \"%s\"; het formulier is opnieuw gesynchroniseerd en de aanmelding is alsnog gelukt."
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:306
+#, php-format
+msgid "Fields changed in Laposta for \"%s\"; resyncing did not fix the signup."
+msgstr "Velden in Laposta zijn gewijzigd voor \"%s\"; opnieuw synchroniseren heeft de aanmelding niet hersteld."
+
+#: includes/Admin/AboutTab.php:97
+msgid "That independence also sets the limit of what this plugin can do for you: if something is wrong with your Laposta account, your lists, or your fields, it has to be solved on the Laposta side."
+msgstr "Die onafhankelijkheid bepaalt ook waar deze plugin ophoudt: is er iets mis met je Laposta-account, je lijsten of je velden, dan moet dat aan de kant van Laposta worden opgelost."
+
+#. translators: %s: link to Laposta's support page.
+#: includes/Admin/AboutTab.php:100
+#, php-format
+msgid "Contact %s."
+msgstr "Neem contact op met %s."
+
+#: includes/Admin/AboutTab.php:101
+msgid "Laposta support"
+msgstr "de klantenservice van Laposta"
+
+#. translators: 1: the name "MC4WP — Mailchimp for WordPress", linked to the plugin; 2: the name "MC4WP", linked to the plugin.
+#: includes/Admin/AboutTab.php:115
+#, php-format
+msgid "Wynko was inspired by %1$s. If the list you want to connect lives in Mailchimp rather than Laposta, use %2$s instead."
+msgstr "Wynko is geïnspireerd door %1$s. Staat de lijst die je wilt koppelen in Mailchimp in plaats van in Laposta, gebruik dan %2$s."
+
+#: includes/Admin/AboutTab.php:116
+msgid "MC4WP — Mailchimp for WordPress"
+msgstr "MC4WP — Mailchimp for WordPress"
+
+#: includes/Admin/AlertNotice.php:96
+#: includes/Admin/EnvironmentNotice.php:81
+#: includes/Admin/SecurityTab.php:283
+msgid "Wynko:"
+msgstr "Wynko:"
+
+#: includes/Admin/Forms/FieldRows.php:210
+msgid "This field is set as required in Laposta, so the form always shows it and always asks for it. To change that, edit the field in Laposta."
+msgstr "Dit veld staat in Laposta als verplicht ingesteld, dus het formulier toont het altijd en vraagt er altijd om. Wil je dat veranderen, pas het veld dan in Laposta aan."
+
+#. translators: %d: number of forms deleted.
+#: includes/Admin/Forms/FormsListPage.php:235
+#, php-format
+msgid "%d form deleted."
+msgid_plural "%d forms deleted."
+msgstr[0] "%d formulier verwijderd."
+msgstr[1] "%d formulieren verwijderd."
+
+#: includes/Admin/Forms/FormsListPage.php:246
+msgid "Form renamed."
+msgstr "Formulier hernoemd."
+
+#: includes/Admin/Forms/FormsTable.php:66
+msgid "Signups"
+msgstr "Aanmeldingen"
+
+#: includes/Admin/Forms/FormsTable.php:151
+msgid "Quick edit"
+msgstr "Snel bewerken"
+
+#: includes/Admin/Forms/FormsTable.php:195
+msgid "Save"
+msgstr "Opslaan"
+
+#: includes/Admin/Forms/FormsTable.php:196
+msgid "Cancel"
+msgstr "Annuleren"
+
+#. translators: %d: maximum number of alert recipients.
+#: includes/Admin/NotificationsTab.php:229
+#, php-format
+msgid "Separate addresses with commas. Maximum %d addresses."
+msgstr "Scheid adressen met komma's. Maximaal %d adressen."
+
+#: includes/Admin/SecurityTab.php:133
+msgid "Signup forms are public, so they are metered. Every submission a form accepts is counted, whether or not Laposta went on to accept it, and the counts are kept over a rolling stretch of time called the window: a submission stops counting once it is older than the window. A visitor who exceeds either cap is asked to wait; nothing is sent to Laposta. Raise the per-visitor cap if an office or campus shares one address, and use \"Reset signup limits\" below to clear the counters now."
+msgstr ""
+"Aanmeldformulieren zijn openbaar en worden daarom meegeteld. Elke aanmelding telt mee, ook als Laposta deze later niet accepteert. De telling loopt over een bepaalde periode. Zodra een aanmelding ouder is dan deze periode, telt die niet meer mee. Bereikt een bezoeker een limiet? Dan moet die even wachten en wordt de aanmelding niet naar Laposta gestuurd.\n"
+"\n"
+"Zijn je bezoekers vooral afkomstig van grote instellingen, zoals kantoren of scholen? Verhoog dan de limiet per bezoeker. Met ‘Aanmeldlimieten resetten’ hieronder kun je de tellers direct leegmaken."
+
+#: includes/Admin/SecurityTab.php:143
+msgid "How long a submission keeps counting towards the caps below. Both caps are measured over this stretch of time."
+msgstr "Hoe lang een aanmelding blijft meetellen voor de limieten hieronder. Beide limieten worden over deze periode gemeten."
+
+#: includes/Admin/SecurityTab.php:152
+msgid "How many signups one visitor may submit within the window, counted per address across all your forms."
+msgstr "Hoeveel aanmeldingen één bezoeker binnen het venster mag versturen, geteld per adres over al je formulieren samen."
+
+#: includes/Admin/SecurityTab.php:163
+msgid "How many signups one form may take within the window, counting every visitor together rather than one at a time. Keep it well above real traffic: it is a backstop, and a form that reaches it accepts nobody until the window passes."
+msgstr "Hoeveel aanmeldingen één formulier binnen het venster mag aannemen, waarbij alle bezoekers bij elkaar worden geteld in plaats van elk apart. Houd deze ruim boven het echte verkeer: het is een noodrem, en een formulier dat de limiet bereikt neemt niemand meer aan tot het venster voorbij is."
+
+#: includes/Admin/SecurityTab.php:182
+msgid "Signups in this window"
+msgstr "Aanmeldingen in dit venster"
+
+#. translators: 1: signups counted in the open window, 2: the per-form cap.
+#: includes/Admin/SecurityTab.php:220
+#, php-format
+msgid "%1$d of %2$d"
+msgstr "%1$d van %2$d"
+
+#. translators: %d: window length in minutes.
+#: includes/Admin/SecurityTab.php:237
+#, php-format
+msgid "Signups counted over the last %d minute; older ones no longer count towards the per-form limit."
+msgid_plural "Signups counted over the last %d minutes; older ones no longer count towards the per-form limit."
+msgstr[0] "Aanmeldingen geteld over de afgelopen %d minuut; oudere tellen niet meer mee voor de limiet per formulier."
+msgstr[1] "Aanmeldingen geteld over de afgelopen %d minuten; oudere tellen niet meer mee voor de limiet per formulier."
+
+#. translators: %s: form names, comma-separated.
+#: includes/Admin/SecurityTab.php:287
+#, php-format
+msgid "the signup form %s is close to the number of signups it allows per window."
+msgid_plural "these signup forms are close to the number of signups they allow per window: %s."
+msgstr[0] "aanmeldformulier %s zit dicht bij het aantal aanmeldingen dat het per venster toestaat."
+msgstr[1] "deze aanmeldformulieren zitten dicht bij het aantal aanmeldingen dat ze per venster toestaan: %s."
+
+#. translators: %s: URL of the Security tab.
+#: includes/Admin/SecurityTab.php:299
+#, php-format
+msgid "Once the cap is reached the form turns every signup away until the window passes. Review the <a href=\"%s\">signup rate limits</a>."
+msgstr "Zodra de limiet is bereikt wijst het formulier elke aanmelding af tot het venster voorbij is. Bekijk de <a href=\"%s\">aanmeldlimieten</a>."
+
+#: includes/Admin/SettingsPage.php:260
+msgid "— supplied by an environment variable and used as-is. Unset it to manage this setting from this page."
+msgstr "— aangeleverd door een omgevingsvariabele. Verwijder die variabele om deze instelling vanaf deze pagina te beheren."
+
+#: includes/Admin/SettingsPage.php:261
+msgid "— defined in wp-config.php and used as-is. Remove it there to manage this setting from this page."
+msgstr "— gedefinieerd in wp-config.php. Verwijder de regel daar om deze instelling vanaf deze pagina te beheren."
+
+#. translators: %s: the value currently in effect for this setting.
+#: includes/Admin/SettingsPage.php:266
+#, php-format
+msgid "In effect: %s"
+msgstr "Nu van kracht: %s"
+
+#: includes/Admin/SettingsPage.php:287
+msgid "on"
+msgstr "aan"
+
+#: includes/Admin/SettingsPage.php:287
+msgid "off"
+msgstr "uit"
+
+#: includes/Admin/SettingsPage.php:877
+msgid "Sync now clears the cached campaigns, lists, and fields, then fetches them from Laposta again."
+msgstr "'Nu synchroniseren' wist de opgeslagen campagnes, lijsten en velden en haalt ze daarna opnieuw op bij Laposta."
+
+#: includes/Cache.php:364
+msgid "Nothing has been fetched from Laposta yet."
+msgstr "Er is nog niets opgehaald bij Laposta."
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/Cache.php:373
+#, php-format
+msgid "Last refreshed %1$s ago (%2$s)."
+msgstr "Laatst ververst %1$s geleden (%2$s)."
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/Cache.php:379
+#, php-format
+msgid "The last refresh failed, %1$s ago (%2$s) — see the activity log."
+msgstr "De laatste verversing is mislukt, %1$s geleden (%2$s) — zie het activiteitenlog."
+
+#. translators: 1: form name, 2: signups counted, 3: the per-form cap, 4: window length in minutes.
+#: includes/Throttle.php:88
+#, php-format
+msgid "Signup form \"%1$s\" has taken %2$d of the %3$d signups it allows per %4$d minutes. Once the cap is reached the form turns every signup away until the window passes — raise the per-form limit on the Security tab if this is real traffic."
+msgstr "Aanmeldformulier \"%1$s\" heeft %2$d van de %3$d aanmeldingen aangenomen die het per %4$d minuten toestaat. Zodra de limiet is bereikt wijst het formulier elke aanmelding af tot het venster voorbij is — verhoog de limiet per formulier op het tabblad Beveiliging als dit echt verkeer is."
+
+#. translators: %s: name of the setting that supplies the recipients.
+#: includes/Admin/NotificationsTab.php:183
+#, php-format
+msgid "Switched on because %s supplies the addresses below. Remove it to manage this setting from this page."
+msgstr "Ingeschakeld omdat %s de adressen hieronder aanlevert. Verwijder die instelling om de adressen vanaf deze pagina te beheren."
+
+#: includes/Admin/AboutTab.php:212
+msgid "Recommended server configuration"
+msgstr "Aanbevolen serverconfiguratie"
+
+#: includes/Admin/AboutTab.php:213
+msgid "None of these are checked by the report below — a plugin cannot see past a reverse proxy to tell how your server is configured. They are what a host should be doing anyway."
+msgstr "Het rapport hieronder controleert geen van deze punten — een plugin kan niet langs een reverse proxy heen kijken om te zien hoe je server is ingericht. Het is wat een hostingpartij sowieso zou moeten doen."
+
+#: includes/Admin/AboutTab.php:218
+msgid "TLS 1.2 or 1.3, with TLS 1.0 and 1.1 disabled"
+msgstr "TLS 1.2 of 1.3, met TLS 1.0 en 1.1 uitgeschakeld"
+
+#: includes/Admin/AboutTab.php:219
+msgid "the older versions are deprecated and refused outright by modern API endpoints, so a server still relying on them will see calls to Laposta fail at the handshake. They also leave your visitors negotiating cipher suites with known weaknesses — and this plugin's signup forms carry a name and an email address."
+msgstr "de oudere versies zijn verouderd en worden door moderne API-endpoints regelrecht geweigerd, dus op een server die er nog op leunt, lopen aanroepen naar Laposta mogelijk al bij de handshake stuk. "
+
+#: includes/Admin/AboutTab.php:222
+msgid "HTTP/2 or HTTP/3"
+msgstr "HTTP/2 of HTTP/3"
+
+#: includes/Admin/AboutTab.php:223
+msgid "these carry many requests over one connection instead of queueing them. It changes nothing about what this plugin does, but the settings screen and the block editor each pull a good number of small files, and on HTTP/1.1 those wait in line. General hygiene rather than a requirement."
+msgstr "deze zorgen ervoor dat veel verzoeken tegelijk via één verbinding gaan, in plaats van dat ze in de rij staan. Het verandert niets aan wat de plugin doet. Wel laden het instellingenscherm en de blokeditor sneller met HTTP/2 en HTTP/3. Dit is vooral algemene optimalisatie, geen vereiste"
+
+#: includes/Admin/AboutTab.php:226
+msgid "A persistent object cache"
+msgstr "Een persistente objectcache"
+
+#: includes/Admin/AboutTab.php:227
+msgid "this plugin leans on transients — for cached campaigns, for the connection verdict, for the signup rate limits. Without a persistent cache those are rows in the options table; with one they stay in memory."
+msgstr "deze plugin leunt op transients — voor campagnes in de cache, voor het verbindingsoordeel, voor de aanmeldlimieten. Zonder persistente cache zijn dat rijen in de optietabel; mét blijven ze in het geheugen."
+
+#: includes/Admin/AboutTab.php:230
+msgid "Current versions of everything"
+msgstr "Actuele versies van alles"
+
+#: includes/Admin/AboutTab.php:231
+msgid "the versions the report advises are the newest that have been out long enough to be widely deployed. Running behind them is not necessarily broken — it is untested, which is a different thing and the reason the plugin warns rather than refuses."
+msgstr "de versies die het rapport adviseert zijn de nieuwste die lang genoeg uit zijn om breed in gebruik te zijn. Achterlopen is niet per se slecht: het is ongetest, wat iets anders is, en de reden dat de plugin waarschuwt in plaats van weigert."
+
+#: includes/Admin/EnvironmentNotice.php:82
+msgid "this site is running versions this plugin has not been tested with. It may not work as expected."
+msgstr "deze site draait versies waarmee deze plugin niet is getest. De plugin werkt mogelijk niet zoals verwacht."
+
+#. translators: %s: URL of the About tab.
+#: includes/Admin/EnvironmentNotice.php:87
+#, php-format
+msgid "The full report, and what is recommended instead, is under <a href=\"%s\">Settings → About</a>."
+msgstr "Het volledige rapport, en wat in plaats daarvan wordt aanbevolen, staat onder <a href=\"%s\">Instellingen → Over</a>."
+
+#. translators: 1: what was measured, e.g. "PHP — Version"; 2: the reading, e.g. "8.1.29".
+#: includes/Admin/EnvironmentNotice.php:119
+#, php-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
+
+#. translators: 1: what was measured, e.g. "PHP — Version"; 2: the reading, e.g. "8.1.29"; 3: what is wanted instead, e.g. "8.4 or newer is advised".
+#: includes/Admin/EnvironmentNotice.php:125
+#, php-format
+msgid "%1$s: %2$s — %3$s"
+msgstr "%1$s: %2$s — %3$s"
+
+#. translators: %d: number of further findings not listed.
+#: includes/Admin/EnvironmentNotice.php:140
+#, php-format
+msgid "and %d more"
+msgid_plural "and %d more"
+msgstr[0] "en nog %d"
+msgstr[1] "en nog %d"
+
+#: includes/SystemInfo.php:559
+msgid "not counted against a local or development install"
+msgstr "telt niet mee bij een lokale of ontwikkelinstallatie"
+
+#: includes/SystemInfo.php:560
+msgid "signup forms post a name and an email address; without HTTPS those travel in the clear"
+msgstr "aanmeldformulieren versturen een naam en een e-mailadres; zonder HTTPS gaan die onversleuteld over de lijn"
+
+#: includes/SystemInfo.php:582
+#: includes/SystemInfo.php:592
+msgid "TLS library"
+msgstr "TLS-bibliotheek"
+
+#: includes/SystemInfo.php:643
+msgid "Request protocol"
+msgstr "Protocol van dit verzoek"
+
+#: includes/SystemInfo.php:645
+msgid "as PHP was handed it; a proxy or CDN may serve a newer version to browsers"
+msgstr "zoals PHP het aangereikt kreeg; een proxy of CDN kan browsers een nieuwere versie serveren"
+
+#: includes/SystemInfo.php:648
+msgid "Request TLS version"
+msgstr "TLS-versie van dit verzoek"
+
+#: includes/SystemInfo.php:650
+msgid "not reported by this server; most stacks other than Apache do not set it"
+msgstr "wordt door deze server niet gemeld; de meeste stacks buiten Apache geven deze waarde niet door"
+
+#: includes/SystemInfo.php:461
+#: includes/SystemInfo.php:469
+msgid "Outbound HTTPS"
+msgstr "Uitgaande HTTPS"
+
+#: includes/SystemInfo.php:462
+msgid "Available (curl)"
+msgstr "Beschikbaar (curl)"
+
+#: includes/SystemInfo.php:462
+msgid "Available (openssl)"
+msgstr "Beschikbaar (openssl)"
+
+#: includes/SystemInfo.php:470
+msgid "Unavailable"
+msgstr "Niet beschikbaar"
+
+#: includes/SystemInfo.php:471
+msgid "every call to Laposta needs one of curl or openssl; with neither, nothing this plugin does can reach the API"
+msgstr "elke aanroep naar Laposta heeft curl of openssl nodig; zonder een van beide kan niets van wat deze plugin doet de API bereiken"
+
+#. Plugin URI of the plugin
+#: wynko.php
+msgid "https://getwynko.com/?utm_source=wp-plugin&utm_medium=wynko&utm_campaign=plugins-page"
+msgstr ""
+
+#. Author of the plugin
+#: wynko.php
+msgid "FlexBorder"
+msgstr ""
+
+#. Author URI of the plugin
+#: wynko.php
+msgid "https://flex-border.com"
+msgstr ""
+
+#. translators: %s: "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:483
+#, php-format
+msgid "Add %s to wp-config.php. That turns encryption at rest back on for a key kept in the database."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:484
+msgctxt "link text in the no-salts warning remedy"
+msgid "security salts"
+msgstr ""
+
+#: includes/Privacy.php:47
+msgid "Laposta's privacy policy"
+msgstr ""
+
+#: includes/Privacy.php:52
+msgid "This suggested text is based on how Wynko is configured for your site — it applies whenever a visitor submits a signup form."
+msgstr ""
+
+#: includes/Privacy.php:53
+msgid "Wynko connects this site to Laposta. When a visitor submits a signup form, whatever they typed in — including their email address — is sent to Laposta to add them to the list you configured. Wynko itself does not store signups."
+msgstr ""
+
+#. translators: %s: linked text "Laposta's privacy policy".
+#: includes/Privacy.php:56
+#, php-format
+msgid "For more detail, see %s."
+msgstr ""
+
+#: includes/Admin/PluginLinks.php:58
+msgid "Documentation"
+msgstr "Documentatie"
+
+#: src/block-form/edit.js:26
+msgid "— Choose a form —"
+msgstr ""
+
+#: src/block-form/edit.js:38
+msgid "No published signup forms yet. Create one under Wynko → Signup forms."
+msgstr ""
+
+#: src/block-form/edit.js:42
+msgid "The chosen form is no longer published, so nothing is shown. Pick another one in the block settings."
+msgstr ""
+
+#: src/block-form/edit.js:69
+msgid "Edit this form"
+msgstr ""
+
+#: src/block-form/edit.js:79
+msgid "Open signup forms"
+msgstr ""
+
+#: src/block/edit.js:28
+#: src/block/edit.js:48
+msgid "Date sent"
+msgstr ""
+
+#: src/block/edit.js:29
+#: src/block/edit.js:47
+msgid "Subject"
+msgstr ""
+
+#: src/block/edit.js:30
+#: src/block/edit.js:50
+msgid "Campaign name"
+msgstr ""
+
+#: src/block/edit.js:38
+msgid "Newest first"
+msgstr ""
+
+#: src/block/edit.js:39
+msgid "Oldest first"
+msgstr ""
+
+#: src/block/edit.js:42
+msgid "A–Z"
+msgstr ""
+
+#: src/block/edit.js:43
+msgid "Z–A"
+msgstr ""
+
+#: src/block/edit.js:49
+msgid "Subject and date sent"
+msgstr ""
+
+#: src/block/edit.js:51
+msgid "Campaign name and date sent"
+msgstr ""
+
+#: src/block/edit.js:91
+msgid "Number of campaigns"
+msgstr ""
+
+#: src/block/edit.js:109
+msgid "All lists"
+msgstr ""
+
+#: src/block/edit.js:116
+msgid "Order by"
+msgstr ""
+
+#: src/block/edit.js:128
+msgid "Direction"
+msgstr ""
+
+#: src/block/edit.js:140
+msgid "Item label"
+msgstr ""
+
+#: src/block/edit.js:152
+msgid "Your lists could not be loaded, so only “All lists” is available."
+msgstr ""

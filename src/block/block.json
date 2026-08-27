@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "wynko/campaigns",
+    "title": "Wynko: Campaigns",
+    "category": "widgets",
+    "icon": "email-alt",
+    "description": "List your most recent sent Laposta campaigns as links.",
+    "textdomain": "wynko-for-laposta",
+    "attributes": {
+        "count": { "type": "number", "default": 5 },
+        "listId": { "type": "string", "default": "" },
+        "orderBy": { "type": "string", "default": "date" },
+        "order": { "type": "string", "default": "desc" },
+        "labelFormat": { "type": "string", "default": "subject" }
+    },
+    "supports": { "html": false },
+    "editorScript": "file:./index.js"
+}

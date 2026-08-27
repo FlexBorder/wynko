@@ -1,0 +1,2112 @@
+# Copyright (C) 2026 FlexBorder
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Wynko for Laposta 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wynko-for-laposta\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-26T00:03:24+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wynko-for-laposta\n"
+
+#. Plugin Name of the plugin
+#: wynko.php
+msgid "Wynko for Laposta"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: wynko.php
+msgid "https://getwynko.com/?utm_source=wp-plugin&utm_medium=wynko&utm_campaign=plugins-page"
+msgstr ""
+
+#. Description of the plugin
+#: wynko.php
+msgid "Create native signup forms connected to your Laposta lists, and display your latest campaigns anywhere on your site."
+msgstr ""
+
+#. Author of the plugin
+#: wynko.php
+msgid "FlexBorder"
+msgstr ""
+
+#. Author URI of the plugin
+#: wynko.php
+msgid "https://flex-border.com"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:63
+msgid "About Wynko"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:65
+msgid "Independence"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:66
+msgid "Wynko is an independent plugin. It is not affiliated with, endorsed by, or sponsored by Laposta B.V. \"Laposta\" is a trademark of its respective owner."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:72
+msgid "Inspiration"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:97
+msgid "That independence also sets the limit of what this plugin can do for you: if something is wrong with your Laposta account, your lists, or your fields, it has to be solved on the Laposta side."
+msgstr ""
+
+#. translators: %s: link to Laposta's support page.
+#: includes/Admin/AboutTab.php:100
+#, php-format
+msgid "Contact %s."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:101
+msgid "Laposta support"
+msgstr ""
+
+#. translators: 1: the name "MC4WP — Mailchimp for WordPress", linked to the plugin; 2: the name "MC4WP", linked to the plugin.
+#: includes/Admin/AboutTab.php:115
+#, php-format
+msgid "Wynko was inspired by %1$s. If the list you want to connect lives in Mailchimp rather than Laposta, use %2$s instead."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:116
+msgid "MC4WP — Mailchimp for WordPress"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:117
+msgid "MC4WP"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:148
+msgid "Getting help"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:153
+msgid "Support requests"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:154
+msgid "the WordPress.org plugin support forum"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:158
+msgid "Bugs and ideas"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:159
+msgid "the GitHub issue tracker"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:180
+msgid "(not available yet)"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:212
+msgid "Recommended server configuration"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:213
+msgid "None of these are checked by the report below — a plugin cannot see past a reverse proxy to tell how your server is configured. They are what a host should be doing anyway."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:218
+msgid "TLS 1.2 or 1.3, with TLS 1.0 and 1.1 disabled"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:219
+msgid "the older versions are deprecated and refused outright by modern API endpoints, so a server still relying on them will see calls to Laposta fail at the handshake. They also leave your visitors negotiating cipher suites with known weaknesses — and this plugin's signup forms carry a name and an email address."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:222
+msgid "HTTP/2 or HTTP/3"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:223
+msgid "these carry many requests over one connection instead of queueing them. It changes nothing about what this plugin does, but the settings screen and the block editor each pull a good number of small files, and on HTTP/1.1 those wait in line. General hygiene rather than a requirement."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:226
+msgid "A persistent object cache"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:227
+msgid "this plugin leans on transients — for cached campaigns, for the connection verdict, for the signup rate limits. Without a persistent cache those are rows in the options table; with one they stay in memory."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:230
+msgid "Current versions of everything"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:231
+msgid "the versions the report advises are the newest that have been out long enough to be widely deployed. Running behind them is not necessarily broken — it is untested, which is a different thing and the reason the plugin warns rather than refuses."
+msgstr ""
+
+#: includes/Admin/AboutTab.php:259
+msgid "Dependencies"
+msgstr ""
+
+#: includes/Admin/AboutTab.php:263
+msgid "This plugin bundles no third-party runtime dependencies. It requires only PHP and WordPress itself."
+msgstr ""
+
+#: includes/Admin/AlertNotice.php:96
+#: includes/Admin/EnvironmentNotice.php:81
+#: includes/Admin/SecurityTab.php:283
+msgid "Wynko:"
+msgstr ""
+
+#. translators: %s: the reason the mail system gave.
+#: includes/Admin/AlertNotice.php:100
+#, php-format
+msgid "an error was recorded but the alert email could not be sent — %s"
+msgstr ""
+
+#. translators: 1: activity log URL, 2: notification settings URL.
+#: includes/Admin/AlertNotice.php:107
+#, php-format
+msgid "The error itself is in the <a href=\"%1$s\">activity log</a>. Check the <a href=\"%2$s\">notification settings</a> and this site's mail configuration."
+msgstr ""
+
+#: includes/Admin/AlertNotice.php:116
+#: includes/Admin/EnvironmentNotice.php:95
+msgid "Dismiss"
+msgstr ""
+
+#: includes/Admin/AlertNotice.php:140
+#: includes/Admin/EnvironmentNotice.php:185
+#: includes/Admin/Forms/FormEditPage.php:673
+#: includes/Admin/LogPage.php:282
+#: includes/Admin/LogPage.php:352
+#: includes/Admin/NotificationsTab.php:67
+#: includes/Admin/SecurityTab.php:104
+#: includes/Admin/SettingsPage.php:716
+#: includes/Admin/SystemReport.php:242
+#: includes/Admin/SystemReport.php:265
+msgid "Forbidden"
+msgstr ""
+
+#: includes/Admin/Assets.php:80
+msgid "Copied"
+msgstr ""
+
+#: includes/Admin/Assets.php:81
+#: includes/Admin/Forms/FormEditPage.php:790
+msgid "Could not load the fields for this list. Check the API key on the Settings screen."
+msgstr ""
+
+#: includes/Admin/Assets.php:82
+msgid "This replaces the fields below, and you have changes that are not saved yet. Continue and lose them?"
+msgstr ""
+
+#: includes/Admin/Assets.php:86
+#: includes/Admin/Forms/FieldRows.php:296
+msgid "Set \"Field labels\" above to show a placeholder before typing one."
+msgstr ""
+
+#: includes/Admin/Assets.php:89
+#: includes/Admin/Forms/FieldRows.php:229
+msgid "This form shows placeholders instead of labels, so this label is not displayed."
+msgstr ""
+
+#: includes/Admin/EnvironmentNotice.php:82
+msgid "this site is running versions this plugin has not been tested with. It may not work as expected."
+msgstr ""
+
+#. translators: %s: URL of the About tab.
+#: includes/Admin/EnvironmentNotice.php:87
+#, php-format
+msgid "The full report, and what is recommended instead, is under <a href=\"%s\">Settings → About</a>."
+msgstr ""
+
+#. translators: 1: what was measured, e.g. "PHP — Version"; 2: the reading, e.g. "8.1.29".
+#: includes/Admin/EnvironmentNotice.php:119
+#, php-format
+msgid "%1$s: %2$s"
+msgstr ""
+
+#. translators: 1: what was measured, e.g. "PHP — Version"; 2: the reading, e.g. "8.1.29"; 3: what is wanted instead, e.g. "8.4 or newer is advised".
+#: includes/Admin/EnvironmentNotice.php:125
+#, php-format
+msgid "%1$s: %2$s — %3$s"
+msgstr ""
+
+#. translators: %d: number of further findings not listed.
+#: includes/Admin/EnvironmentNotice.php:140
+#, php-format
+msgid "and %d more"
+msgid_plural "and %d more"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/Forms/FieldRows.php:42
+msgid "Order"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:43
+msgid "Field"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:44
+msgid "Type"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:45
+msgid "Shown"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:46
+msgid "Label"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:47
+msgid "Placeholder"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:50
+msgid "Options"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:73
+msgid "Sign up button"
+msgstr ""
+
+#. translators: A row's entry in the field table's Type column, beside Text, Number, and Date.
+#: includes/Admin/Forms/FieldRows.php:75
+msgid "Button"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:89
+msgid "Options for the sign up button"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:95
+#: includes/Admin/Forms/FieldRows.php:434
+msgid "CSS class"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:130
+msgid "Single choice"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:131
+msgid "Multiple choice"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:135
+msgid "Number"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:136
+msgid "Date (YYYY-MM-DD)"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:139
+msgid "Text"
+msgstr ""
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:179
+#, php-format
+msgid "Move %s up"
+msgstr ""
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:186
+#, php-format
+msgid "Move %s down"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:198
+msgid "Email"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:210
+msgid "This field is set as required in Laposta, so the form always shows it and always asks for it. To change that, edit the field in Laposta."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:211
+msgid "Required"
+msgstr ""
+
+#. translators: %s: field name.
+#: includes/Admin/Forms/FieldRows.php:243
+#, php-format
+msgid "Options for %s"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:284
+msgid "This type of field takes no placeholder."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:335
+msgid "A sentence explaining what to enter. It appears behind a (?) beside the field."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:336
+msgid "Filled in for the visitor, who can still change it. A value Laposta already holds is shown here and keeps following Laposta unless you type something else; empty the box to go back to it."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:337
+msgid "Added to this field on the rendered form, for your theme or your own CSS to style."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:338
+msgid "The lowest value the form accepts."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:339
+msgid "The highest value the form accepts."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:340
+msgid "How far apart the accepted values are — 5 accepts 0, 5, 10, and refuses 7."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:341
+msgid "How many characters the answer must have at least."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:342
+msgid "How many characters the field takes. Typing stops there."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:343
+msgid "A regular expression the answer must match, without slashes — [0-9]{4} takes four digits and nothing else."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:344
+msgid "What the visitor is told when the pattern refuses their answer. Describe the pattern, do not repeat it."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:345
+msgid "Lets the browser offer what it already knows about the visitor. Choose what this field holds."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:346
+msgid "Shows the number as a slider between its lowest and highest value instead of a box."
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:373
+msgid "What is this?"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:425
+msgid "What the visitor sees"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:428
+msgid "Help text"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:477
+msgid "Default value"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:537
+msgid "Min"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:538
+msgid "Max"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:539
+msgid "Step"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:540
+msgid "Min length"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:541
+msgid "Max length"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:542
+msgid "Pattern"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:543
+msgid "Pattern description"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:544
+msgid "Autofill"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:550
+msgid "What the form accepts"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:567
+msgid "Shown as"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:573
+msgid "Slider"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:622
+msgid "Not set"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:623
+msgid "Never autofill"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:624
+msgid "Full name"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:625
+msgid "First name"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:626
+msgid "Last name"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:627
+#: includes/Forms/FormData.php:153
+msgid "Email address"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:628
+msgid "Telephone"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:629
+msgid "Company"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:630
+msgid "Street address"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:631
+msgid "Postcode"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:632
+msgid "Country"
+msgstr ""
+
+#: includes/Admin/Forms/FieldRows.php:633
+msgid "Date of birth"
+msgstr ""
+
+#. translators: %d: how many further options the field has.
+#: includes/Admin/Forms/FieldRows.php:680
+#, php-format
+msgid "+%d more"
+msgid_plural "+%d more"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/Forms/FormEditPage.php:75
+msgid "Edit signup form"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:118
+msgid "Save form"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:144
+#: includes/Frontend/FormSubmitHandler.php:87
+msgid "That form does not exist."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:694
+#: includes/Admin/Forms/FormsTable.php:191
+msgid "Form name"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:700
+#: includes/Admin/Forms/FormsTable.php:65
+msgid "Shortcode"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:708
+msgid "Copy"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:746
+msgid "Laposta list"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:748
+msgid "— Choose a list —"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:764
+msgid "Refresh fields"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:772
+msgid "Open this list in Laposta"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:776
+msgid "Could not load your lists. Check the API key on the Settings screen."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:794
+msgid "Fields"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:799
+msgid "Choose a list above and its fields appear here. Nothing is stored until you save the form."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:805
+msgid "Field names, types, and whether a field is required all come from Laposta — change them there. Drag a row by its handle to reorder, or use the arrow buttons."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:864
+msgid "This form shows placeholders instead of labels, but no placeholder has been filled in — so each field shows its label as the grey text inside it. Fill in the Placeholder column to say something else. Dates, choice fields, and sliders keep a visible label whatever this is set to."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:885
+msgid "Shown above the form"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:886
+msgid "The outcome of a submission, in the form's place or above it. These may carry simple HTML: a link, <strong>, <em>, and <br>."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:892
+msgid "Shown beside a field"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:893
+msgid "Attached to the one field they are about, in the space next to it. Plain text only — markup there breaks the layout of the row."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:897
+msgid "Leave a message empty to use the wording shown in grey."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:981
+msgid "This form sends the visitor to another page after signing up, so this message is never shown."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:983
+msgid "Change what happens after a successful signup"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1002
+msgid "Form saved."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1016
+msgid "One of the fields has a pattern that is not a valid expression, so nothing was saved."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1017
+msgid "One of the number fields has a default value outside its own minimum and maximum, so nothing was saved."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1039
+msgid "A label above each field"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1040
+msgid "A label and a placeholder"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1041
+msgid "A placeholder only"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1045
+msgid "Field labels"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1060
+msgid "Dates and choice fields cannot carry a placeholder, so they keep a visible label whatever this is set to."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1079
+msgid "After a successful signup"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1084
+msgid "Stay on the page and show the success message"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1088
+msgid "The wording of that message is on the Messages tab."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1090
+msgid "Edit the success message"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1096
+msgid "Send the visitor to a page"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1103
+#: includes/Admin/Forms/FormEditPage.php:1251
+msgid "— Choose a page —"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1112
+msgid "Send the visitor to a URL"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1117
+msgid "example.com/thanks"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1123
+msgid "After signup"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1127
+msgid "Hide the form and show only the success message"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1132
+msgid "Double opt-in"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1136
+msgid "Skip double opt-in for this form"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1146
+msgid "Double opt-in is a setting on the Laposta list itself, and this plugin leaves it alone. Skipping it needs a paid Laposta plan, so the option is shown but cannot be used — on a free plan there is no confirmation step to skip."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1168
+#: includes/Forms/Messages.php:101
+msgid "Already subscribed"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1172
+msgid "Tell the visitor when their address is already on the list"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1176
+msgid "Left off, an address that is already subscribed gets the same thank-you as a new one. Turning this on lets anyone with a link to this form check whether a particular address is on your list, one address at a time."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1195
+msgid "Terms checkbox"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1199
+msgid "Require visitors to agree before subscribing"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1206
+msgid "Checkbox text"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1210
+#: includes/Frontend/FormRenderer.php:588
+msgid "I agree to the terms and conditions"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1215
+msgid "Link the text to"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1217
+msgid "The checkbox text becomes a link to whichever you choose."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1238
+msgid "Nothing — leave the text unlinked"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1244
+msgid "A page on this site"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1260
+msgid "A URL"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1265
+msgid "example.com/terms"
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1283
+#: includes/Admin/Forms/FormsTable.php:156
+msgid "Delete this form? Places that use its shortcode will show nothing."
+msgstr ""
+
+#: includes/Admin/Forms/FormEditPage.php:1284
+msgid "Delete form"
+msgstr ""
+
+#: includes/Admin/Forms/FormsListPage.php:109
+#: includes/Admin/Menu.php:49
+#: includes/Forms/PostType.php:49
+msgid "Signup forms"
+msgstr ""
+
+#: includes/Admin/Forms/FormsListPage.php:212
+msgid "Add form"
+msgstr ""
+
+#. translators: %d: number of forms deleted.
+#: includes/Admin/Forms/FormsListPage.php:235
+#, php-format
+msgid "%d form deleted."
+msgid_plural "%d forms deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/Forms/FormsListPage.php:246
+msgid "Form renamed."
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:63
+msgid "Name"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:64
+#: src/block/edit.js:103
+msgid "List"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:66
+msgid "Signups"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:76
+#: includes/Admin/Forms/FormsTable.php:157
+msgid "Delete"
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Admin/Forms/FormsTable.php:128
+#, php-format
+msgid "Select %s"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:146
+msgid "Edit"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:151
+msgid "Quick edit"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:195
+msgid "Save"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:196
+msgid "Cancel"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:212
+msgid "No list selected"
+msgstr ""
+
+#: includes/Admin/Forms/FormsTable.php:248
+msgid "No signup forms yet. Add one to get started."
+msgstr ""
+
+#: includes/Admin/Forms/Screen.php:57
+msgid "Editor"
+msgstr ""
+
+#: includes/Admin/Forms/Screen.php:58
+msgid "Messages"
+msgstr ""
+
+#: includes/Admin/Forms/Screen.php:59
+#: includes/Admin/Menu.php:44
+#: includes/Admin/PluginLinks.php:34
+#: src/block/edit.js:88
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/LogLevels.php:32
+msgid "Errors only"
+msgstr ""
+
+#: includes/Admin/LogLevels.php:33
+msgid "Warnings and errors"
+msgstr ""
+
+#: includes/Admin/LogLevels.php:34
+msgid "Info, warnings and errors"
+msgstr ""
+
+#: includes/Admin/LogPage.php:45
+#: includes/Admin/Menu.php:57
+msgid "Activity log"
+msgstr ""
+
+#: includes/Admin/LogPage.php:117
+msgid "Change in Settings"
+msgstr ""
+
+#. translators: %s: the wording of the current level threshold.
+#: includes/Admin/LogPage.php:129
+#, php-format
+msgid "Recording: %s."
+msgstr ""
+
+#: includes/Admin/LogPage.php:145
+msgid "Filter by level"
+msgstr ""
+
+#: includes/Admin/LogPage.php:157
+#: includes/Admin/LogPage.php:162
+msgid "Search messages"
+msgstr ""
+
+#: includes/Admin/LogPage.php:165
+#: includes/Admin/LogPage.php:328
+msgid "Filter"
+msgstr ""
+
+#: includes/Admin/LogPage.php:168
+msgid "Reset"
+msgstr ""
+
+#: includes/Admin/LogPage.php:182
+msgid "All levels"
+msgstr ""
+
+#. translators: 1: entries shown, 2: entries stored.
+#: includes/Admin/LogPage.php:204
+#, php-format
+msgid "Showing %1$d of %2$d entries."
+msgstr ""
+
+#: includes/Admin/LogPage.php:220
+msgid "No activity to show."
+msgstr ""
+
+#: includes/Admin/LogPage.php:225
+msgid "Time"
+msgstr ""
+
+#: includes/Admin/LogPage.php:226
+msgid "Level"
+msgstr ""
+
+#: includes/Admin/LogPage.php:227
+msgid "Message"
+msgstr ""
+
+#: includes/Admin/LogPage.php:257
+msgid "Download log (.txt)"
+msgstr ""
+
+#: includes/Admin/LogPage.php:265
+msgid "Clear the activity log? Every stored entry is deleted."
+msgstr ""
+
+#: includes/Admin/LogPage.php:266
+msgid "Clear log"
+msgstr ""
+
+#: includes/Admin/LogPage.php:322
+msgid "Site"
+msgstr ""
+
+#: includes/Admin/LogPage.php:323
+msgid "Generated"
+msgstr ""
+
+#: includes/Admin/LogPage.php:324
+#: includes/SystemInfo.php:138
+msgid "Plugin"
+msgstr ""
+
+#: includes/Admin/LogPage.php:325
+#: includes/SystemInfo.php:158
+msgid "WordPress"
+msgstr ""
+
+#: includes/Admin/LogPage.php:326
+#: includes/SystemInfo.php:162
+msgid "PHP"
+msgstr ""
+
+#: includes/Admin/LogPage.php:327
+msgid "Recording"
+msgstr ""
+
+#: includes/Admin/LogPage.php:384
+msgid "The activity log has been cleared."
+msgstr ""
+
+#: includes/Admin/Menu.php:73
+#: includes/Admin/Menu.php:74
+#: includes/Admin/SettingsPage.php:807
+msgid "Wynko"
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:38
+msgid "Critical email alerts"
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:41
+msgid "When the plugin records an error, it can email you. Warnings and informational entries never send. At most one alert goes out per hour; the activity log has everything else."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:50
+#: includes/Admin/SecurityTab.php:59
+#: includes/Admin/SettingsPage.php:864
+msgid "Save changes"
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:100
+msgid "Test email sent. If it does not arrive, look at this site's mail configuration rather than the plugin."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:104
+msgid "Nothing was sent — there is no valid address configured above."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:110
+msgid "The address is fine, but this site could not send the message. The reason the mail system gave is in the activity log."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:138
+msgid "Alerts are switched on, but no valid address is configured — nothing will be sent."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:155
+msgid "Email me when an error is recorded"
+msgstr ""
+
+#. translators: %s: name of the setting that supplies the recipients.
+#: includes/Admin/NotificationsTab.php:183
+#, php-format
+msgid "Switched on because %s supplies the addresses below. Remove it to manage this setting from this page."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:214
+msgid "Send to"
+msgstr ""
+
+#. translators: %d: maximum number of alert recipients.
+#: includes/Admin/NotificationsTab.php:229
+#, php-format
+msgid "Separate addresses with commas. Maximum %d addresses."
+msgstr ""
+
+#: includes/Admin/NotificationsTab.php:241
+msgid "Send test email"
+msgstr ""
+
+#. translators: %s: the addresses that were not stored, comma-separated.
+#: includes/Admin/NotificationsTab.php:286
+#, php-format
+msgid "Not a valid email address, so it was not saved: %s"
+msgstr ""
+
+#: includes/Admin/PluginLinks.php:58
+msgid "Documentation"
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:64
+msgid "Clear the signup rate limits? Every form starts counting again from zero."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:65
+msgid "Reset signup limits"
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:89
+msgid "Signup rate limits cleared."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:133
+msgid "Signup forms are public, so they are metered. Every submission a form accepts is counted, whether or not Laposta went on to accept it, and the counts are kept over a rolling stretch of time called the window: a submission stops counting once it is older than the window. A visitor who exceeds either cap is asked to wait; nothing is sent to Laposta. Raise the per-visitor cap if an office or campus shares one address, and use \"Reset signup limits\" below to clear the counters now."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:143
+msgid "How long a submission keeps counting towards the caps below. Both caps are measured over this stretch of time."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:152
+msgid "How many signups one visitor may submit within the window, counted per address across all your forms."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:163
+msgid "How many signups one form may take within the window, counting every visitor together rather than one at a time. Keep it well above real traffic: it is a backstop, and a form that reaches it accepts nobody until the window passes."
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:181
+#: src/block-form/edit.js:60
+msgid "Form"
+msgstr ""
+
+#: includes/Admin/SecurityTab.php:182
+msgid "Signups in this window"
+msgstr ""
+
+#. translators: 1: signups counted in the open window, 2: the per-form cap.
+#: includes/Admin/SecurityTab.php:220
+#, php-format
+msgid "%1$d of %2$d"
+msgstr ""
+
+#. translators: %d: window length in minutes.
+#: includes/Admin/SecurityTab.php:237
+#, php-format
+msgid "Signups counted over the last %d minute; older ones no longer count towards the per-form limit."
+msgid_plural "Signups counted over the last %d minutes; older ones no longer count towards the per-form limit."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: form names, comma-separated.
+#: includes/Admin/SecurityTab.php:287
+#, php-format
+msgid "the signup form %s is close to the number of signups it allows per window."
+msgid_plural "these signup forms are close to the number of signups they allow per window: %s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: URL of the Security tab.
+#: includes/Admin/SecurityTab.php:299
+#, php-format
+msgid "Once the cap is reached the form turns every signup away until the window passes. Review the <a href=\"%s\">signup rate limits</a>."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:156
+msgid "Connection"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:157
+msgid "API key"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:159
+msgid "Status"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:160
+msgid "Cache duration (minutes)"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:161
+msgid "Activity log detail"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:163
+msgid "Signup rate limits"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:164
+msgid "Window (minutes)"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:165
+msgid "Per visitor"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:166
+msgid "Per form"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:168
+msgid "Alerts"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:172
+msgid "Critical email"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:188
+msgid "The stored API key could not be read — it was encrypted with this site's security salts, which have since changed. Re-enter it above."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:195
+#: includes/SystemInfo.php:734
+#: includes/SystemInfo.php:775
+msgid "No API key configured"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:203
+#: includes/SystemInfo.php:778
+msgid "Connected"
+msgstr ""
+
+#. translators: %s: reason the connection failed.
+#: includes/Admin/SettingsPage.php:213
+#: includes/SystemInfo.php:785
+#, php-format
+msgid "Not connected — %s"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:232
+msgid "Stored API key could not be decrypted; the site security salts have changed."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:260
+msgid "— supplied by an environment variable and used as-is. Unset it to manage this setting from this page."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:261
+msgid "— defined in wp-config.php and used as-is. Remove it there to manage this setting from this page."
+msgstr ""
+
+#. translators: %s: the value currently in effect for this setting.
+#: includes/Admin/SettingsPage.php:266
+#, php-format
+msgid "In effect: %s"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:287
+msgid "on"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:287
+msgid "off"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:329
+msgid "— supplied by an environment variable and used as-is. Unset it to manage the key from this page."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:330
+msgid "— defined in wp-config.php and used as-is. Remove it there to manage the key from this page."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:340
+msgid "••••••••  (saved — leave blank to keep)"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:340
+msgid "Enter your Laposta API key"
+msgstr ""
+
+#. translators: %s: the words "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:378
+#, php-format
+msgid "Saving a new key verifies it with Laposta first, then stores it in the database, encrypted with this site's %s — see below for ways to keep it out of the database entirely."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:379
+msgctxt "link text in the storage note"
+msgid "security salts"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:411
+msgid "Set the WYNKO_API_KEY environment variable — in your .env file, your web server config, or your container definition. The key then never reaches the database."
+msgstr ""
+
+#. translators: %s: the environment variable name for this site, e.g. WYNKO_API_KEY_3.
+#: includes/Admin/SettingsPage.php:416
+#, php-format
+msgid "For this site alone, name it %s instead."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:424
+msgid "Or define it in wp-config.php, above the line that says \"That's all, stop editing\". Same effect, kept in a file instead:"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:434
+msgid "Safer ways to store this key"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:436
+msgid "Encrypting the key in the database protects it in a database dump, but not against anyone who can read wp-config.php. Either route above avoids that."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:453
+msgid "Or, for this site only:"
+msgstr ""
+
+#. translators: %s: the words "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:477
+#, php-format
+msgid "This site has no usable %s, so the API key is stored in the database as plain text. It still works — but anyone who can read the database can read the key."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:478
+msgctxt "link text in the no-salts warning"
+msgid "security salts"
+msgstr ""
+
+#. translators: %s: "security salts", linked to the wp_salt() reference.
+#: includes/Admin/SettingsPage.php:483
+#, php-format
+msgid "Add %s to wp-config.php. That turns encryption at rest back on for a key kept in the database."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:484
+msgctxt "link text in the no-salts warning remedy"
+msgid "security salts"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:544
+msgid "The API key to connect with your Laposta account."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:548
+msgid "Learn how to create an API key"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:610
+msgid "Applies when an event happens, so it decides what gets recorded rather than what is shown. Entries already stored stay visible."
+msgstr ""
+
+#. translators: %s: name of the environment variable or PHP constant supplying the key.
+#: includes/Admin/SettingsPage.php:661
+#, php-format
+msgid "API key not saved: %s takes precedence."
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/Admin/SettingsPage.php:681
+#, php-format
+msgid "API key not saved: %s"
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/Admin/SettingsPage.php:683
+#, php-format
+msgid "API key rejected on save: %s"
+msgstr ""
+
+#. translators: %d: number of campaigns.
+#: includes/Admin/SettingsPage.php:699
+#, php-format
+msgid "API key verified — %d campaigns loaded."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:702
+msgid "API key saved and verified."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:765
+msgid "API"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:766
+msgid "Security"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:767
+msgid "Notifications"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:768
+msgid "About"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:856
+msgid "Sync complete."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:856
+msgid "Sync failed — see the activity log."
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:869
+msgid "Sync now"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:877
+msgid "Sync now clears the cached campaigns, lists, and fields, then fetches them from Laposta again."
+msgstr ""
+
+#: includes/Admin/SystemReport.php:35
+msgid "System report"
+msgstr ""
+
+#: includes/Admin/SystemReport.php:36
+msgid "What this site is running, and what the plugin makes of it. Download it and attach it to a support request."
+msgstr ""
+
+#: includes/Admin/SystemReport.php:79
+msgid "Test connection now"
+msgstr ""
+
+#: includes/Admin/SystemReport.php:92
+msgid "Wynko — system report"
+msgstr ""
+
+#. translators: 1: date and time; 2: timezone name.
+#: includes/Admin/SystemReport.php:95
+#, php-format
+msgid "Generated: %1$s (%2$s)"
+msgstr ""
+
+#. translators: %s: site address.
+#. translators: %s: this site's address.
+#: includes/Admin/SystemReport.php:101
+#: includes/Notifier.php:191
+#, php-format
+msgid "Site: %s"
+msgstr ""
+
+#: includes/Admin/SystemReport.php:203
+msgid "Download report (.txt)"
+msgstr ""
+
+#: includes/Admin/SystemReport.php:227
+msgid "Laposta answered and the API key was accepted."
+msgstr ""
+
+#: includes/Admin/SystemReport.php:228
+msgid "The check failed — see the connection row below for why."
+msgstr ""
+
+#: includes/Admin/SystemReport.php:290
+msgid "Connection test skipped: no API key is configured."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:48
+#, php-format
+msgid "Invalid API key (HTTP %d)"
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:52
+#, php-format
+msgid "Laposta is rate limiting this site (HTTP %d); requests will succeed again shortly."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/Api/Client.php:55
+#, php-format
+msgid "Unexpected response from Laposta (HTTP %d)"
+msgstr ""
+
+#: includes/Api/Client.php:69
+msgid "No API key configured."
+msgstr ""
+
+#. translators: %s: underlying HTTP error message.
+#: includes/Api/Client.php:88
+#, php-format
+msgid "Could not connect to Laposta: %s"
+msgstr ""
+
+#: includes/Api/Client.php:108
+msgid "Could not parse the Laposta response."
+msgstr ""
+
+#: includes/Blocks/Campaigns.php:122
+msgid "Wynko: no sent campaigns for the selected list."
+msgstr ""
+
+#: includes/Blocks/Campaigns.php:124
+msgid "Wynko: no campaigns to show yet. Check the Wynko menu."
+msgstr ""
+
+#. translators: 1: campaign subject or name, 2: date the campaign was sent.
+#. translators: 1: report section, e.g. "PHP"; 2: row label, e.g. "Version".
+#: includes/Blocks/Campaigns.php:192
+#: includes/SystemInfo.php:217
+#, php-format
+msgid "%1$s — %2$s"
+msgstr ""
+
+#: includes/Blocks/Form.php:126
+msgid "Wynko: choose a signup form in the block settings."
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/Cache.php:102
+#, php-format
+msgid "Sync failed: %s"
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/Cache.php:104
+#, php-format
+msgid "Automatic sync failed: %s"
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/Cache.php:173
+#, php-format
+msgid "The list index could not be fetched: %s"
+msgstr ""
+
+#. translators: %d: number of campaigns.
+#: includes/Cache.php:279
+#, php-format
+msgid "%d new campaign"
+msgid_plural "%d new campaigns"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of lists.
+#: includes/Cache.php:283
+#, php-format
+msgid "%d new list"
+msgid_plural "%d new lists"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of fields.
+#: includes/Cache.php:287
+#, php-format
+msgid "%d new field"
+msgid_plural "%d new fields"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Cache.php:291
+msgid "Sync succeeded."
+msgstr ""
+
+#: includes/Cache.php:291
+msgid "Automatic sync succeeded."
+msgstr ""
+
+#. translators: %s: what the sync found, e.g. "2 new campaigns, 1 new list".
+#: includes/Cache.php:299
+#, php-format
+msgid "Sync succeeded: %s."
+msgstr ""
+
+#. translators: %s: what the sync found, e.g. "2 new campaigns, 1 new list".
+#: includes/Cache.php:301
+#, php-format
+msgid "Automatic sync succeeded: %s."
+msgstr ""
+
+#: includes/Cache.php:364
+msgid "Nothing has been fetched from Laposta yet."
+msgstr ""
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/Cache.php:373
+#, php-format
+msgid "Last refreshed %1$s ago (%2$s)."
+msgstr ""
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/Cache.php:379
+#, php-format
+msgid "The last refresh failed, %1$s ago (%2$s) — see the activity log."
+msgstr ""
+
+#: includes/Forms/Button.php:29
+msgid "Subscribe"
+msgstr ""
+
+#: includes/Forms/FormData.php:88
+msgid "New signup form"
+msgstr ""
+
+#: includes/Forms/Messages.php:32
+msgid "Thanks for signing up."
+msgstr ""
+
+#: includes/Forms/Messages.php:33
+msgid "Sorry, something went wrong. Please try again later."
+msgstr ""
+
+#: includes/Forms/Messages.php:34
+msgid "This email address is already subscribed."
+msgstr ""
+
+#: includes/Forms/Messages.php:35
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: includes/Forms/Messages.php:36
+msgid "Please fill in this field."
+msgstr ""
+
+#: includes/Forms/Messages.php:37
+msgid "Please check this value."
+msgstr ""
+
+#: includes/Forms/Messages.php:38
+msgid "Please match the format this field asks for."
+msgstr ""
+
+#: includes/Forms/Messages.php:39
+msgid "Please agree to the terms before subscribing."
+msgstr ""
+
+#: includes/Forms/Messages.php:99
+msgid "Success"
+msgstr ""
+
+#: includes/Forms/Messages.php:100
+msgid "Something went wrong"
+msgstr ""
+
+#: includes/Forms/Messages.php:102
+msgid "Invalid email address"
+msgstr ""
+
+#: includes/Forms/Messages.php:103
+msgid "Required field left empty"
+msgstr ""
+
+#: includes/Forms/Messages.php:104
+msgid "Invalid value"
+msgstr ""
+
+#: includes/Forms/Messages.php:105
+msgid "Pattern not matched"
+msgstr ""
+
+#: includes/Forms/Messages.php:106
+msgid "Terms not agreed"
+msgstr ""
+
+#: includes/Forms/PostType.php:50
+#: src/block-form/edit.js:52
+msgid "Signup form"
+msgstr ""
+
+#: includes/Frontend/FormRenderer.php:75
+msgid "Wynko: this signup form has no Laposta list selected yet."
+msgstr ""
+
+#: includes/Frontend/FormRenderer.php:80
+msgid "Wynko: could not load this list's fields. Check the API key on the Wynko settings screen."
+msgstr ""
+
+#: includes/Frontend/FormRenderer.php:266
+msgid "Leave this field empty"
+msgstr ""
+
+#: includes/Frontend/FormRenderer.php:498
+msgid "More information"
+msgstr ""
+
+#: includes/Frontend/FormRenderer.php:668
+msgid "Error:"
+msgstr ""
+
+#: includes/Frontend/FormSubmitHandler.php:93
+msgid "Too many submissions. Please wait a few minutes and try again."
+msgstr ""
+
+#. translators: 1: form name, 2: submissions allowed, 3: window length in minutes.
+#: includes/Frontend/FormSubmitHandler.php:149
+#, php-format
+msgid "Signups on \"%1$s\" are being rate limited: more than %2$d in %3$d minutes."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:174
+#, php-format
+msgid "A signup was submitted to \"%s\", which is no longer published."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:193
+#, php-format
+msgid "Signup failed on \"%s\": the form has no list selected."
+msgstr ""
+
+#. translators: 1: form name, 2: number of fields that failed validation.
+#: includes/Frontend/FormSubmitHandler.php:217
+#, php-format
+msgid "Signup on \"%1$s\" rejected: %2$d field(s) failed validation."
+msgstr ""
+
+#. translators: 1: form name, 2: number of fields.
+#: includes/Frontend/FormSubmitHandler.php:267
+#, php-format
+msgid "Fields changed in Laposta for \"%1$s\"; the form now asks for %2$d field the visitor had not been shown."
+msgid_plural "Fields changed in Laposta for \"%1$s\"; the form now asks for %2$d fields the visitor had not been shown."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:295
+#, php-format
+msgid "Fields changed in Laposta for \"%s\"; the form was resynced and the signup went through."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:306
+#, php-format
+msgid "Fields changed in Laposta for \"%s\"; resyncing did not fix the signup."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:330
+#, php-format
+msgid "Signup through \"%s\": the address was already subscribed."
+msgstr ""
+
+#. translators: 1: form name, 2: error message.
+#: includes/Frontend/FormSubmitHandler.php:342
+#, php-format
+msgid "Signup on \"%1$s\" failed: %2$s"
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:367
+#, php-format
+msgid "New signup through \"%s\"."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:446
+#, php-format
+msgid "Signup failed on \"%s\": its list no longer exists in Laposta."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:450
+#, php-format
+msgid "Signup failed on \"%s\": no Laposta API key is configured."
+msgstr ""
+
+#. translators: %s: form name.
+#: includes/Frontend/FormSubmitHandler.php:453
+#, php-format
+msgid "Signup failed on \"%s\": Laposta could not be reached."
+msgstr ""
+
+#. translators: 1: list name or id, 2: number of signup forms.
+#: includes/GoneLists.php:56
+#, php-format
+msgid "The list \"%1$s\" no longer exists in Laposta, but %2$d signup form still uses it."
+msgid_plural "The list \"%1$s\" no longer exists in Laposta, but %2$d signup forms still use it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/KeyStatus.php:126
+msgid "Connected to the Laposta API."
+msgstr ""
+
+#. translators: %s: error message.
+#: includes/KeyStatus.php:132
+#, php-format
+msgid "Connection to the Laposta API failed: %s"
+msgstr ""
+
+#. translators: %d: number of intended recipients.
+#: includes/Notifier.php:91
+#, php-format
+msgid "Critical-email alert could not be sent to %d recipient(s); check this site's mail configuration."
+msgstr ""
+
+#. translators: %s: this site's name.
+#: includes/Notifier.php:176
+#, php-format
+msgid "[%s] Laposta error"
+msgstr ""
+
+#. translators: %s: the time the error was recorded, in site time.
+#: includes/Notifier.php:196
+#, php-format
+msgid "Time: %s"
+msgstr ""
+
+#: includes/Notifier.php:202
+msgid "Further errors within the hour are not mailed. The activity log has them:"
+msgstr ""
+
+#: includes/Notifier.php:236
+msgid "This is a test alert. The plugin has not recorded an error; someone pressed the test button on the Notifications tab."
+msgstr ""
+
+#. translators: %d: number of recipients.
+#: includes/Notifier.php:241
+#, php-format
+msgid "Test email sent to %d recipient."
+msgid_plural "Test email sent to %d recipients."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: the reason the mail system gave for refusing the message.
+#: includes/Notifier.php:249
+#, php-format
+msgid "Test alert could not be sent: %s"
+msgstr ""
+
+#: includes/Notifier.php:250
+msgid "the mail system gave no reason."
+msgstr ""
+
+#: includes/Privacy.php:47
+msgid "Laposta's privacy policy"
+msgstr ""
+
+#: includes/Privacy.php:52
+msgid "This suggested text is based on how Wynko is configured for your site — it applies whenever a visitor submits a signup form."
+msgstr ""
+
+#: includes/Privacy.php:53
+msgid "Wynko connects this site to Laposta. When a visitor submits a signup form, whatever they typed in — including their email address — is sent to Laposta to add them to the list you configured. Wynko itself does not store signups."
+msgstr ""
+
+#. translators: %s: linked text "Laposta's privacy policy".
+#: includes/Privacy.php:56
+#, php-format
+msgid "For more detail, see %s."
+msgstr ""
+
+#. translators: %s: minimum supported version.
+#: includes/SystemInfo.php:67
+#, php-format
+msgid "requires %s or newer"
+msgstr ""
+
+#. translators: %s: recommended version.
+#: includes/SystemInfo.php:71
+#, php-format
+msgid "%s or newer is advised"
+msgstr ""
+
+#: includes/SystemInfo.php:105
+msgid "Yes"
+msgstr ""
+
+#: includes/SystemInfo.php:105
+msgid "No"
+msgstr ""
+
+#: includes/SystemInfo.php:114
+msgid "Unknown"
+msgstr ""
+
+#: includes/SystemInfo.php:166
+#: includes/SystemInfo.php:732
+msgid "Database"
+msgstr ""
+
+#: includes/SystemInfo.php:170
+msgid "PHP modules"
+msgstr ""
+
+#: includes/SystemInfo.php:174
+#: includes/SystemInfo.php:387
+#: includes/SystemInfo.php:397
+msgid "Server"
+msgstr ""
+
+#: includes/SystemInfo.php:262
+#: includes/SystemInfo.php:289
+msgid "Version"
+msgstr ""
+
+#: includes/SystemInfo.php:267
+msgid "Multisite"
+msgstr ""
+
+#: includes/SystemInfo.php:268
+msgid "Environment type"
+msgstr ""
+
+#: includes/SystemInfo.php:269
+msgid "Debug mode"
+msgstr ""
+
+#: includes/SystemInfo.php:270
+msgid "Site language"
+msgstr ""
+
+#: includes/SystemInfo.php:294
+msgid "Server interface"
+msgstr ""
+
+#: includes/SystemInfo.php:297
+msgid "WordPress memory limit"
+msgstr ""
+
+#: includes/SystemInfo.php:301
+msgid "WordPress admin memory limit"
+msgstr ""
+
+#: includes/SystemInfo.php:305
+msgid "Max execution time"
+msgstr ""
+
+#: includes/SystemInfo.php:357
+msgid "Unlimited"
+msgstr ""
+
+#: includes/SystemInfo.php:366
+msgid "Memory limit"
+msgstr ""
+
+#: includes/SystemInfo.php:427
+msgid "Loaded"
+msgstr ""
+
+#: includes/SystemInfo.php:427
+#: includes/SystemInfo.php:435
+msgid "Missing"
+msgstr ""
+
+#: includes/SystemInfo.php:436
+msgid "None"
+msgstr ""
+
+#: includes/SystemInfo.php:461
+#: includes/SystemInfo.php:469
+msgid "Outbound HTTPS"
+msgstr ""
+
+#: includes/SystemInfo.php:462
+msgid "Available (curl)"
+msgstr ""
+
+#: includes/SystemInfo.php:462
+msgid "Available (openssl)"
+msgstr ""
+
+#: includes/SystemInfo.php:470
+msgid "Unavailable"
+msgstr ""
+
+#: includes/SystemInfo.php:471
+msgid "every call to Laposta needs one of curl or openssl; with neither, nothing this plugin does can reach the API"
+msgstr ""
+
+#: includes/SystemInfo.php:491
+msgid "required by this plugin"
+msgstr ""
+
+#: includes/SystemInfo.php:492
+msgid "advised"
+msgstr ""
+
+#: includes/SystemInfo.php:526
+msgid "Software"
+msgstr ""
+
+#: includes/SystemInfo.php:552
+#: includes/SystemInfo.php:556
+msgid "HTTPS"
+msgstr ""
+
+#: includes/SystemInfo.php:559
+msgid "not counted against a local or development install"
+msgstr ""
+
+#: includes/SystemInfo.php:560
+msgid "signup forms post a name and an email address; without HTTPS those travel in the clear"
+msgstr ""
+
+#: includes/SystemInfo.php:582
+#: includes/SystemInfo.php:592
+msgid "TLS library"
+msgstr ""
+
+#: includes/SystemInfo.php:643
+msgid "Request protocol"
+msgstr ""
+
+#: includes/SystemInfo.php:645
+msgid "as PHP was handed it; a proxy or CDN may serve a newer version to browsers"
+msgstr ""
+
+#: includes/SystemInfo.php:648
+msgid "Request TLS version"
+msgstr ""
+
+#: includes/SystemInfo.php:650
+msgid "not reported by this server; most stacks other than Apache do not set it"
+msgstr ""
+
+#: includes/SystemInfo.php:671
+msgid "Plugin version"
+msgstr ""
+
+#: includes/SystemInfo.php:672
+msgid "API key source"
+msgstr ""
+
+#: includes/SystemInfo.php:674
+msgid "Cache duration"
+msgstr ""
+
+#. translators: %d: number of minutes.
+#: includes/SystemInfo.php:677
+#, php-format
+msgid "%d minutes"
+msgstr ""
+
+#: includes/SystemInfo.php:681
+msgid "Last sync"
+msgstr ""
+
+#: includes/SystemInfo.php:682
+msgid "Signup rate limit"
+msgstr ""
+
+#: includes/SystemInfo.php:684
+msgid "Connection status"
+msgstr ""
+
+#. translators: 1: signups allowed from one visitor, 2: signups allowed on one form, 3: number of minutes in the window.
+#: includes/SystemInfo.php:704
+#, php-format
+msgid "%1$d per visitor, %2$d per form, per %3$d minutes"
+msgstr ""
+
+#: includes/SystemInfo.php:721
+msgid "Database — unreadable (the security salts changed)"
+msgstr ""
+
+#. translators: %s: environment variable name.
+#: includes/SystemInfo.php:725
+#, php-format
+msgid "Environment variable (%s)"
+msgstr ""
+
+#. translators: %s: wp-config.php constant name.
+#: includes/SystemInfo.php:729
+#, php-format
+msgid "wp-config.php constant (%s)"
+msgstr ""
+
+#: includes/SystemInfo.php:745
+msgid "Never"
+msgstr ""
+
+#. translators: 1: relative time, e.g. "12 mins"; 2: absolute date and time.
+#: includes/SystemInfo.php:750
+#, php-format
+msgid "%1$s ago (%2$s)"
+msgstr ""
+
+#. translators: %s: the time of the failed sync.
+#: includes/SystemInfo.php:757
+#, php-format
+msgid "%s — failed"
+msgstr ""
+
+#: includes/SystemInfo.php:772
+msgid "The stored API key could not be read"
+msgstr ""
+
+#: includes/SystemInfo.php:781
+msgid "Not checked yet"
+msgstr ""
+
+#: includes/SystemInfo.php:852
+msgid "Laposta was not reached — the request did not complete"
+msgstr ""
+
+#: includes/SystemInfo.php:855
+msgid "Laposta answered and turned the request down"
+msgstr ""
+
+#. translators: 1: form name, 2: signups counted, 3: the per-form cap, 4: window length in minutes.
+#: includes/Throttle.php:88
+#, php-format
+msgid "Signup form \"%1$s\" has taken %2$d of the %3$d signups it allows per %4$d minutes. Once the cap is reached the form turns every signup away until the window passes — raise the per-form limit on the Security tab if this is real traffic."
+msgstr ""
+
+#: src/block-form/edit.js:26
+msgid "— Choose a form —"
+msgstr ""
+
+#: src/block-form/edit.js:38
+msgid "No published signup forms yet. Create one under Wynko → Signup forms."
+msgstr ""
+
+#: src/block-form/edit.js:42
+msgid "The chosen form is no longer published, so nothing is shown. Pick another one in the block settings."
+msgstr ""
+
+#: src/block-form/edit.js:69
+msgid "Edit this form"
+msgstr ""
+
+#: src/block-form/edit.js:79
+msgid "Open signup forms"
+msgstr ""
+
+#: src/block/edit.js:28
+#: src/block/edit.js:48
+msgid "Date sent"
+msgstr ""
+
+#: src/block/edit.js:29
+#: src/block/edit.js:47
+msgid "Subject"
+msgstr ""
+
+#: src/block/edit.js:30
+#: src/block/edit.js:50
+msgid "Campaign name"
+msgstr ""
+
+#: src/block/edit.js:38
+msgid "Newest first"
+msgstr ""
+
+#: src/block/edit.js:39
+msgid "Oldest first"
+msgstr ""
+
+#: src/block/edit.js:42
+msgid "A–Z"
+msgstr ""
+
+#: src/block/edit.js:43
+msgid "Z–A"
+msgstr ""
+
+#: src/block/edit.js:49
+msgid "Subject and date sent"
+msgstr ""
+
+#: src/block/edit.js:51
+msgid "Campaign name and date sent"
+msgstr ""
+
+#: src/block/edit.js:91
+msgid "Number of campaigns"
+msgstr ""
+
+#: src/block/edit.js:109
+msgid "All lists"
+msgstr ""
+
+#: src/block/edit.js:116
+msgid "Order by"
+msgstr ""
+
+#: src/block/edit.js:128
+msgid "Direction"
+msgstr ""
+
+#: src/block/edit.js:140
+msgid "Item label"
+msgstr ""
+
+#: src/block/edit.js:152
+msgid "Your lists could not be loaded, so only “All lists” is available."
+msgstr ""
+
+#: src/block-form/block.json
+msgctxt "block title"
+msgid "Wynko: Signup form"
+msgstr ""
+
+#: src/block-form/block.json
+msgctxt "block description"
+msgid "Show a Laposta signup form."
+msgstr ""
+
+#: src/block/block.json
+msgctxt "block title"
+msgid "Wynko: Campaigns"
+msgstr ""
+
+#: src/block/block.json
+msgctxt "block description"
+msgid "List your most recent sent Laposta campaigns as links."
+msgstr ""

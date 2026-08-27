@@ -1,0 +1,56 @@
+name: Release
+
+# Fires when bin/release.sh pushes a version tag to the public repo. wynko-origin
+# (the private backup mirror) receives the same tags — see bin/release.sh — so
+# this is gated to the public repo the same way .github/workflows/ci.yml is,
+# just inverted: a Release object on a private repo is pointless noise, not a
+# risk, but it would still burn Actions minutes and could confuse anyone
+# looking at wynko-origin's Releases tab.
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    if: github.repository == 'FlexBorder/wynko'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Build the installable ZIP
+        id: package
+        run: |
+          zip_path="$(bin/package.sh "$GITHUB_SHA" | tail -n1)"
+          echo "zip_path=$zip_path" >>"$GITHUB_OUTPUT"
+
+      # bin/release.sh writes the drafted changelog entry as the release
+      # commit's body (see its `commit_args` construction), so the commit
+      # this tag points at already carries the release notes verbatim —
+      # nothing here re-derives or reformats them.
+      - name: Extract release notes from the tag commit's body
+        id: notes
+        run: |
+          notes_file="$(mktemp)"
+          git log -1 --pretty=%b "$GITHUB_SHA" >"$notes_file"
+          echo "notes_file=$notes_file" >>"$GITHUB_OUTPUT"
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file "${{ steps.notes.outputs.notes_file }}" \
+            "${{ steps.package.outputs.zip_path }}"

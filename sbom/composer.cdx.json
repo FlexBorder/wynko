@@ -1,0 +1,59 @@
+{
+    "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.6",
+    "version": 1,
+    "metadata": {
+        "tools": [
+            {
+                "name": "composer",
+                "version": "2.10.2"
+            },
+            {
+                "vendor": "cyclonedx",
+                "name": "cyclonedx-php-composer"
+            },
+            {
+                "vendor": "cyclonedx",
+                "name": "cyclonedx-library"
+            }
+        ],
+        "component": {
+            "bom-ref": "flexborder/wynko-1.0.0.0",
+            "type": "application",
+            "name": "wynko",
+            "version": "1.0.0",
+            "group": "flexborder",
+            "description": "Wynko \u2013 Campaigns & Sign-Up Forms for Laposta",
+            "author": "FlexBorder Co., Ltd",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "GPL-2.0-or-later",
+                        "acknowledgement": "declared"
+                    }
+                }
+            ],
+            "purl": "pkg:composer/flexborder/wynko@1.0.0",
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "https://flex-border.com/wynko",
+                    "comment": "as detected from Composer manifest 'homepage'"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:composer:package:type",
+                    "value": "wordpress-plugin"
+                }
+            ]
+        }
+    },
+    "components": [],
+    "dependencies": [
+        {
+            "ref": "flexborder/wynko-1.0.0.0"
+        }
+    ]
+}

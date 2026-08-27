@@ -1,0 +1,12 @@
+# Paths excluded from the public GitHub repository, which `bin/release.sh`
+# builds via `git archive` and pushes as a single squashed commit per
+# release. This is a different artifact from the plugin ZIP `bin/package.sh`
+# builds — see `.distignore` for that list. Here, everything a contributor
+# needs to build and test the plugin (bin/, tests/, CONTRIBUTING.md,
+# CLAUDE.md, docs/) stays public; only maintainer-internal material is
+# stripped. Every entry is anchored at the archive root.
+
+/docs/superpowers
+/TECHNICAL_DEBT.md
+/RELEASE_IDENTITY.md
+/.claude

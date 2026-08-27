@@ -1,0 +1,529 @@
+/**
+ * Wynko admin styles: one stylesheet for every Wynko screen.
+ */
+
+/* The settings screen's Save/Sync row. */
+.wynko-actions {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	margin-top: 1em;
+}
+
+/* The activity log's filter bar. A row of controls rather than a stacked form,
+   so it reads as the table's toolbar and not as something to fill in. */
+.wynko-log-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+	margin: 1em 0;
+}
+
+/* Settings that belong to the checkbox above them, indented under it rather
+   than standing beside it in the label column. The `hidden` attribute is
+   spelled out because a `display` declaration of our own would otherwise
+   out-specify the UA rule — the same reason the front end's help bubble
+   carries its own `[hidden]` rule. */
+.wynko-subfields {
+	margin: 0.8em 0 0.2em;
+	padding-left: 1em;
+	border-left: 3px solid #dcdcde;
+
+	&[hidden] {
+		display: none;
+	}
+}
+
+.wynko-subfield {
+	margin-bottom: 1em;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.wynko-subfield__label {
+	display: block;
+	margin-bottom: 0.3em;
+	font-weight: 600;
+}
+
+/* The wp-config.php lines under the API key field. Meant to be selected and
+   copied, so it keeps its line breaks and does not wrap mid-statement. */
+.wynko-code {
+	max-width: 40em;
+	margin: 0.5em 0;
+	padding: 0.75em 1em;
+	overflow-x: auto;
+	border-left: 4px solid #c3c4c7;
+	background: #f6f7f7;
+}
+
+/* A control that belongs to one report row. Inline with the reading it
+   re-checks, so the two read as one statement rather than as a button parked
+   at the bottom of the screen with nothing naming what it tests. */
+.wynko-report__action {
+	display: inline-block;
+	margin-left: 0.75em;
+}
+
+/* A placeholder box on a form whose labels leave no room for one. Still
+   present and still submitted — read-only, so what is stored survives a trip
+   through a label-only mode — but plainly not the control to type in. */
+.wynko-placeholder[readonly] {
+	border-style: dashed;
+	background: #f6f7f7;
+	color: #646970;
+}
+
+/* Same treatment for a label the form will not display, for the same reason. */
+.wynko-label[readonly] {
+	border-style: dashed;
+	background: #f6f7f7;
+	color: #646970;
+}
+
+/* A control the page has no question for yet. Hidden, not removed: it still
+   posts, because options.php writes every option in the submitted group and a
+   field that sends nothing would blank what is stored. */
+.wynko-hidden {
+	display: none;
+}
+
+/* The rename box in a list row: it takes the place of the name it replaces, so
+   the row does not jump when Quick edit opens. */
+.wynko-rename {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+	margin-bottom: 0.3em;
+
+	/* Two classes, because .wynko-hidden alone is one class like this rule and
+	   loses to it on order. Quick edit is what shows the box; without this it
+	   is open on every row from the first paint. */
+	&.wynko-hidden {
+		display: none;
+	}
+}
+
+/* A form whose signup window is nearly full. Colour alone would not carry it —
+   the cell says "390 of 400" beside it, which is the actual message. */
+.wynko-count-tight {
+	font-weight: 600;
+	color: #b32d2e;
+}
+
+/* The per-form signup counts, which render inside a settings field and so sit
+   within core's .form-table. Its th rule is a descendant selector and reaches
+   in here, forcing a 200px label column with the padding of a settings row;
+   the element in the selector outranks it whatever order the sheets load in.
+   The table.wynko-form-counts th/td rule that out-specifies it lives near the
+   end of this file, after every plain th/td rule, per
+   no-descending-specificity. */
+.wynko-form-counts {
+	max-width: 40em;
+	margin-top: 0.75em;
+}
+
+/* The alert recipients, indented under the checkbox that decides whether
+   anything is sent to them — the indent is what says the two belong together
+   now that they share one settings row. */
+.wynko-notify-emails {
+	margin: 0.75em 0 0 1.8em;
+	padding-left: 1em;
+	border-left: 3px solid #dcdcde;
+}
+
+.wynko-notify-emails > p:first-child {
+	margin-top: 0;
+	font-weight: 600;
+}
+
+/* The editor's title row: the form name reads as a heading until you click
+   it, with its shortcode parked beside it ready to copy. */
+.wynko-form-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1em;
+	margin: 1em 0 0.5em;
+}
+
+.wynko-form-title {
+	flex: 1 1 20em;
+	padding: 0.3em 0.5em;
+	border: 1px solid transparent;
+	background: transparent;
+	box-shadow: none;
+	font-size: 1.6em;
+	font-weight: 600;
+	line-height: 1.3;
+
+	&:hover {
+		border-color: #dcdcde;
+	}
+
+	&:focus {
+		border-color: #3582c4;
+		background: #fff;
+	}
+}
+
+.wynko-shortcode-box {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.4em 0.6em;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #f6f7f7;
+
+	&__label {
+		color: #646970;
+		font-size: 0.85em;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	input {
+		width: 15em;
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+}
+
+/* A field's folded options. Closed, the table is one line per field; open, two
+   named groups fill the row: what the visitor sees, then what the form will
+   take. The constraints are the site's limits, not Laposta's, and
+   FormValidator enforces them.
+
+   The tint is its own, not the #f6f7f7 the striped rows and the fixed email
+   and button rows already use: against those it was invisible, and the rule
+   underneath is what says where the fold ends. */
+.wynko-row__panel > td {
+	background: #f0f6fc;
+	box-shadow: inset 0 1px 0 #c5d9ed, inset 0 -1px 0 #c5d9ed;
+}
+
+.wynko-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+	padding: 1em 0;
+}
+
+.wynko-panel__group {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.wynko-panel__legend {
+	padding: 0 0 0.5em;
+	color: #1d2327;
+	font-size: 0.9em;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+/* A grid rather than wrapped flex: the controls then reach the end of the row
+   instead of bunching at its left, and they line up column by column. auto-fit
+   rather than auto-fill, or a group with three controls on a wide screen would
+   leave the fourth track standing empty — the gap this is here to close. */
+.wynko-panel__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(14em, 1fr));
+	gap: 0.75em 1.5em;
+	align-items: start;
+}
+
+.wynko-panel__control {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2em;
+	color: #50575e;
+
+	input[type="text"],
+	input[type="number"],
+	input[type="date"],
+	select {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
+.wynko-panel__label {
+	display: flex;
+	align-items: center;
+	gap: 0.2em;
+}
+
+/* A checkbox sits in the same two-part control as the text boxes — heading row,
+   then the input — so the grid aligns it without a measured padding. The label
+   is the word beside the box, which is why it wraps the input rather than
+   sitting in the heading. */
+.wynko-panel__check {
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+	min-height: 30px;
+
+	input[type="checkbox"] {
+		margin: 0;
+	}
+}
+
+/* Forms list and field table: content-sized columns, centred rows. The
+   wp-list-table "fixed" class is deliberately absent, so a column sizes to
+   what is in it rather than to an equal share of the table. Kept after the
+   .wynko-panel__control rules above: its .wynko-col-label input[type="text"]
+   out-specifies .wynko-panel__control's plain input[type="text"], and
+   stylelint's no-descending-specificity check wants specificity to only rise
+   as the file goes on. */
+.wynko-table {
+
+	td {
+		vertical-align: middle;
+	}
+
+	.wynko-col-order {
+		width: 6em;
+		white-space: nowrap;
+	}
+
+	.wynko-col-shown {
+		width: 8em;
+	}
+
+	.wynko-col-label input[type="text"] {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.wynko-col-panel {
+		width: 3em;
+		text-align: center;
+	}
+}
+
+/* The (?) beside a control's label and the text behind it. Anchored to the
+   button, sized by its own text, and out of the way of the pointer, so it
+   behaves the way a browser's own tooltip does. */
+.wynko-hint {
+	position: relative;
+	display: inline-flex;
+}
+
+.wynko-hint__toggle {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #787c82;
+	line-height: 1;
+	cursor: pointer;
+
+	.dashicons {
+		width: 1em;
+		height: 1em;
+		font-size: 1.2em;
+	}
+
+	&:hover,
+	&:focus,
+	&[aria-expanded="true"] {
+		color: #2271b1;
+	}
+}
+
+.wynko-hint__text {
+	position: absolute;
+	z-index: 100;
+	top: calc(100% + 6px);
+	left: 50%;
+	width: max-content;
+	max-width: min(22em, 60vw);
+	padding: 6px 10px;
+	transform: translateX(-50%);
+	border-radius: 3px;
+	background: #1d2327;
+	color: #fff;
+	font-size: 0.95em;
+	font-weight: 400;
+	line-height: 1.4;
+	text-transform: none;
+	letter-spacing: normal;
+	white-space: normal;
+	pointer-events: none;
+}
+
+.wynko-hint__text::before {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border: 5px solid transparent;
+	border-bottom-color: #1d2327;
+}
+
+.wynko-hint__text[hidden] {
+	display: none;
+}
+
+.wynko-panel-toggle {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #50575e;
+	cursor: pointer;
+
+	&:hover,
+	&[aria-expanded="true"] {
+		color: #2271b1;
+	}
+}
+
+/* Required is stated as a badge rather than a sentence: it is a property of
+   the field, not an instruction, and a sentence per row crowded the column. */
+.wynko-badge {
+	display: inline-block;
+	padding: 0.1em 0.6em;
+	border-radius: 9px;
+	font-size: 0.85em;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.wynko-badge--required {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+/* The email row is not a Laposta custom field and cannot be edited or moved,
+   so it reads as fixed furniture rather than another editable row. */
+.wynko-row--email {
+	background: #f6f7f7;
+
+	td {
+		color: #50575e;
+	}
+}
+
+/* The button belongs to the form rather than to the bound list, and always
+   renders last, so it reads as fixed furniture the same way. */
+.wynko-row--button {
+	background: #f6f7f7;
+
+	td {
+		color: #50575e;
+	}
+}
+
+.wynko-lock,
+.wynko-handle {
+	color: #a7aaad;
+}
+
+.wynko-handle {
+	cursor: move;
+}
+
+/* The arrow buttons are the keyboard and screen-reader path to reordering:
+   dragging alone would be a regression on the number box they replaced. */
+.wynko-move {
+	padding: 0;
+	color: #2271b1;
+	vertical-align: middle;
+
+	&[disabled] {
+		color: #c3c4c7;
+		cursor: default;
+	}
+}
+
+.wynko-row-placeholder {
+	height: 3em;
+	background: #f0f6fc;
+}
+
+/* Save and Delete read as one button row but remain two forms with two
+   actions and two nonces. Delete is pushed to the far end and outlined in
+   red so it cannot be mistaken for the primary action. */
+.wynko-form-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1em;
+	margin-top: 1.5em;
+	padding-top: 1em;
+	border-top: 1px solid #dcdcde;
+}
+
+.wynko-form-actions__delete .button-link-delete {
+	padding: 0 0.8em;
+	border: 1px solid #d63638;
+	border-radius: 3px;
+	color: #d63638;
+	line-height: 2.15384615;
+	text-decoration: none;
+
+	&:hover,
+	&:focus {
+		background: #d63638;
+		color: #fff;
+	}
+}
+
+/* The About tab's system report's column width — split out from the rule
+   below it (.wynko-report's .widefat th/td) because that one out-specifies
+   table.wynko-form-counts and this one doesn't; no-descending-specificity
+   wants each in the order its specificity allows. */
+.wynko-report th {
+	width: 16em;
+}
+
+table.wynko-form-counts {
+
+	th,
+	td {
+		width: auto;
+		padding: 8px 10px;
+		vertical-align: middle;
+		text-align: left;
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	thead th {
+		font-weight: 600;
+	}
+}
+
+/* The About tab's system report. Narrow enough that a label and its reading
+   stay on one line at a readable measure, rather than stretching across a wide
+   screen with the value marooned on the right. */
+.wynko-report {
+	max-width: 60em;
+	margin-bottom: 1em;
+}
+
+/* Middle, not top: the connection row is a line of text beside a button
+   taller than it, and core's top alignment left the reading floating above
+   the control it belongs to. Written through .widefat, which the table also
+   carries, so this out-specifies core's rule rather than tying on (0,1,1)
+   and depending on which stylesheet printed last. Kept last in the file: it
+   out-specifies every plain th/td rule above, and no-descending-specificity
+   wants specificity to only rise as the file goes on. */
+.wynko-report.widefat th,
+.wynko-report.widefat td {
+	vertical-align: middle;
+}

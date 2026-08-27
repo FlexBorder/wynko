@@ -1,0 +1,9 @@
+/vendor/
+/node_modules/
+/build/
+.phpunit.result.cache
+/.superpowers/
+.wp-env.override.json
+/dist/
+/.release/
+/.release.env

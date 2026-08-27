@@ -1,0 +1,74 @@
+# Files excluded from the distributed plugin ZIP, which `bin/package.sh` builds.
+# The release build ships vendor/ (composer install --no-dev) + build/ only;
+# the script generates both from a clean `git archive` before stripping these.
+# Every entry is anchored at the archive root.
+
+# VCS / CI / tooling
+/.git
+/.github
+/.githooks
+/.gitignore
+/.distignore
+/.editorconfig
+/.claude
+
+# Dev environment
+/.wp-env.json
+/.wp-env.override.json
+/.superpowers
+/.phpunit.result.cache
+/.release.env.example
+/.publishignore
+
+# Tests, scripts, static analysis
+/tests
+/bin
+/phpunit.xml.dist
+/phpcs.xml.dist
+/phpcs-security.xml.dist
+/phpstan.neon.dist
+/phpstan-bootstrap.php
+
+# Build sources (compiled output in build/ is shipped)
+/src
+/node_modules
+/package.json
+/package-lock.json
+/webpack.config.js
+
+# composer.json is deliberately NOT excluded: Plugin Check flags a shipped
+# vendor/ directory with no composer.json alongside it
+# (missing_composer_json_file), so it has to travel with the archive to
+# explain vendor/'s presence. composer.lock is excluded — it pins dev-tooling
+# resolution, not anything relevant once vendor/ is already built into the ZIP.
+/composer.lock
+
+# Docs meant for contributors, not end users. readme.txt is deliberately NOT
+# listed: it is the plugin's WordPress.org page and has to ship. LICENSE is not
+# listed either — the GPL requires it to travel with the distribution.
+/CONTRIBUTING.md
+/CLAUDE.md
+/RELEASE_IDENTITY.md
+/SECURITY.md
+/HANDBOOK_COMPLIANCE.md
+/TECHNICAL_DEBT.md
+/README.md
+/docs
+
+# sbom/ documents the plugin's dependency inventory for the repo (origin and
+# the public mirror), not for end users — it has no runtime purpose, so it
+# doesn't belong in the installable ZIP.
+/sbom
+
+# Compiled translations. WordPress.org generates and serves .po/.mo/JED JSON
+# for every locale from the .pot once the plugin is approved, and discourages
+# bundling them (they go stale against translate.wordpress.org's copies).
+# languages/wynko-for-laposta.pot is NOT listed — it's
+# the translation source, and bin/package.sh verifies it ships. .distignore
+# entries are literal paths (bin/package.sh strips them with `rm -rf`,
+# unglobbed), so a new locale's compiled files need a line here too —
+# `npm run i18n` is the only thing that creates them.
+/languages/wynko-for-laposta-nl_NL.po
+/languages/wynko-for-laposta-nl_NL.mo
+/languages/wynko-for-laposta-nl_NL-wynko-campaigns-editor-script.json
+/languages/wynko-for-laposta-nl_NL-wynko-form-editor-script.json

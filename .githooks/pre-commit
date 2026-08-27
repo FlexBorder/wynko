@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Wynko pre-commit hook: block commits that fail the security scan, the
+# WordPress Coding Standards check, the SBOM freshness check, the
+# WordPress.org readme/header guard, or the official Plugin Check tool.
+# Activated via `git config core.hooksPath .githooks`, which Composer runs
+# automatically on install/update (see composer.json scripts).
+#
+# bin/write-report.sh runs all five checks (even after one fails) and writes
+# their combined output to ../wynko-reports/ before this hook exits, so a
+# failing commit still leaves a readable record of what failed. Plugin Check
+# needs `npx @wordpress/env start` running first — the hook fails closed if
+# it isn't, it doesn't skip the check.
+#
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+
+"$root/bin/write-report.sh"

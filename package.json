@@ -1,0 +1,20 @@
+{
+    "name": "wynko",
+    "version": "1.0.0",
+    "private": true,
+    "engines": { "node": ">=24", "npm": "11.16.0" },
+    "scripts": {
+        "build": "wp-scripts build",
+        "start": "wp-scripts start",
+        "lint:js": "wp-scripts lint-js src",
+        "lint:js:fix": "wp-scripts lint-js src --fix",
+        "lint:style": "wp-scripts lint-style 'src/**/*.scss'",
+        "lint:style:fix": "wp-scripts lint-style 'src/**/*.scss' --fix",
+        "i18n": "bin/i18n.sh",
+        "sbom": "bin/sbom-generate.sh"
+    },
+    "devDependencies": {
+        "@wordpress/scripts": "^30.0.0",
+        "typescript": "^5.9.3"
+    }
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="Wynko-Security">
+	<description>Security-only ruleset. Hard-fails the pre-commit hook and the CI security job (see SECURITY.md).</description>
+
+	<file>wynko.php</file>
+	<file>uninstall.php</file>
+	<file>includes</file>
+	<file>config</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+
+	<!-- All WordPress.Security.* sniffs: EscapeOutput, NonceVerification,
+	     ValidatedSanitizedInput, SafeRedirect, etc. -->
+	<rule ref="WordPress.Security"/>
+</ruleset>

@@ -1,0 +1,12 @@
+{
+    "core": null,
+    "phpVersion": "8.5",
+    "mappings": {
+        "wp-content/plugins/wynko-for-laposta": "."
+    },
+    "config": {
+        "WP_DEBUG": true,
+        "WP_DEBUG_LOG": true,
+        "WP_ENVIRONMENT_TYPE": "development"
+    }
+}

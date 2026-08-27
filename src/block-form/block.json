@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "wynko/form",
+    "title": "Wynko: Signup form",
+    "category": "widgets",
+    "icon": "feedback",
+    "description": "Show a Laposta signup form.",
+    "textdomain": "wynko-for-laposta",
+    "attributes": {
+        "formId": { "type": "string", "default": "" }
+    },
+    "supports": { "html": false },
+    "editorScript": "file:./index.js",
+    "style": "wynko-form",
+    "editorStyle": "wynko-form"
+}

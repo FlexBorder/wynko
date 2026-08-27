@@ -1,0 +1,128 @@
+/**
+ * Structure only: what the markup cannot work without.
+ *
+ * The help tooltip is an overlay, so it needs a positioned ancestor, a
+ * stacking order and something opaque to sit on. An error message is in the
+ * flow instead, needing only its own line and a colour.
+ *
+ * The one layout opinion is that a label sits above its field, because no theme
+ * tested puts it there. Everything past that is the theme's, reached through
+ * custom properties.
+ */
+.wynko-form {
+	--wynko-bubble-bg: #1d2327;
+	--wynko-bubble-fg: #fff;
+	--wynko-bubble-radius: 3px;
+	--wynko-error-accent: #d63638;
+}
+
+.wynko-form__field {
+	position: relative;
+}
+
+/*
+ * A label sits above its control, because left to the theme it runs into the
+ * input on the same line and the form reads as broken. Only standalone labels
+ * carry this class: a label that wraps its own input must stay inline with it.
+ */
+.wynko-form__label {
+	display: block;
+}
+
+.wynko-form__error {
+	display: block;
+	color: var(--wynko-error-accent);
+	font-size: 0.875em;
+	line-height: 1.4;
+}
+
+/* The tooltip hangs off the button, not off the field, and is sized by its own
+   text the way a browser's own tooltip is — a percentage of a 1.4em button
+   would be unreadable. It takes no pointer events, so leaving the button
+   closes it even when the bubble is under the cursor. */
+.wynko-form__help-wrap {
+	position: relative;
+	display: inline-block;
+	vertical-align: baseline;
+}
+
+.wynko-form__help {
+	position: absolute;
+	z-index: 10;
+	top: 100%;
+	left: 50%;
+	box-sizing: border-box;
+	width: max-content;
+	max-width: min(20rem, 60vw);
+	margin-top: 6px;
+	padding: 6px 10px;
+	transform: translateX(-50%);
+	border-radius: var(--wynko-bubble-radius);
+	background: var(--wynko-bubble-bg);
+	color: var(--wynko-bubble-fg);
+	font-size: 0.875em;
+	line-height: 1.4;
+	white-space: normal;
+	text-align: left;
+	pointer-events: none;
+}
+
+/* The pointer that makes it read as a bubble rather than a floating box. */
+.wynko-form__help::before {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border: 5px solid transparent;
+	border-bottom-color: var(--wynko-bubble-bg);
+}
+
+.wynko-form__help[hidden] {
+	display: none;
+}
+
+.wynko-form__help-toggle {
+	margin-left: 0.35em;
+	padding: 0;
+	border: 1px solid currentcolor;
+	border-radius: 50%;
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-size: 0.8em;
+	line-height: 1.4;
+	width: 1.4em;
+	height: 1.4em;
+	cursor: pointer;
+}
+
+/*
+ * WordPress's own visually-hidden rule. A form can render in a theme that
+ * never defined it, and "placeholder only" mode depends on it: the label is
+ * hidden, never absent.
+ */
+.wynko-form .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	border: 0;
+	white-space: nowrap;
+}
+
+/*
+ * The bot trap, off-canvas rather than display:none or type="hidden", both of
+ * which a scraper worth trapping skips. It is also aria-hidden and out of the
+ * tab order, so nothing but a script reaches it.
+ */
+.wynko-form .wynko-form__hp {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}

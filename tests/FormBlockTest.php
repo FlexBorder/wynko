@@ -96,4 +96,18 @@ final class FormBlockTest extends TestCase {
 		);
 		$this->assertSame( Screen::list_url(), $data['listUrl'] );
 	}
+
+	public function test_wynko_form_block_content_filter_can_modify_the_output(): void {
+		$this->queue_fields();
+		add_filter(
+			'wynko_form_block_content',
+			static function ( $content ) {
+				return $content . '<!--filtered-->';
+			}
+		);
+
+		$html = Form::render( array( 'formId' => (string) $this->form_id ) );
+
+		$this->assertStringContainsString( '<!--filtered-->', $html );
+	}
 }

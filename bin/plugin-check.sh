@@ -72,7 +72,9 @@ done <.distignore
 # has — exclude them too so this run scopes the same way CI's plugin-check
 # job does. (vendor/, node_modules/, build/ are deliberately NOT here: CI
 # generates those too before running Plugin Check, so they're real scope.)
-dirs+=("dist" ".release")
+# artifacts/ is where the e2e suite writes its Playwright output and storage
+# state, including hidden files like .last-run.json.
+dirs+=("dist" ".release" "artifacts")
 files+=(".release.env")
 
 dirs_csv="$(IFS=,; echo "${dirs[*]}")"

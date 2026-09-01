@@ -13,6 +13,7 @@ use Wynko\Forms\FormData;
 use Wynko\Forms\Messages;
 use Wynko\Frontend\FormRenderer;
 use Wynko\Frontend\FormSubmitHandler;
+use Wynko\Support\FieldFingerprint;
 use Wynko\Support\Fields as FieldData;
 use Wynko\Support\LapostaErrors;
 use PHPUnit\Framework\TestCase;
@@ -77,6 +78,41 @@ final class FormRendererTest extends TestCase {
 		$this->assertStringContainsString( 'name="action" value="' . FormSubmitHandler::ACTION . '"', $html );
 		$this->assertStringContainsString( 'name="wynko_form_id" value="' . $this->form_id . '"', $html );
 		$this->assertStringContainsString( wp_create_nonce( FormSubmitHandler::nonce_action( $this->form_id ) ), $html );
+	}
+
+	public function test_it_carries_a_fingerprint_of_the_fields_it_was_rendered_from(): void {
+		$this->queue_fields();
+
+		$html = FormRenderer::render( $this->form_id );
+
+		$fields      = array(
+			array(
+				'field_id' => 'f_1',
+				'required' => true,
+			),
+			array(
+				'field_id' => 'f_2',
+				'required' => false,
+			),
+			array(
+				'field_id' => 'f_3',
+				'required' => false,
+			),
+			array(
+				'field_id' => 'f_4',
+				'required' => false,
+			),
+			array(
+				'field_id' => 'f_5',
+				'required' => false,
+			),
+		);
+		$fingerprint = FieldFingerprint::of( $fields );
+
+		$this->assertStringContainsString(
+			'name="' . FormSubmitHandler::FIELD_FINGERPRINT_FIELD . '" value="' . $fingerprint . '"',
+			$html
+		);
 	}
 
 	public function test_it_always_renders_a_required_email_input(): void {

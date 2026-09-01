@@ -264,4 +264,46 @@ final class NotifierTest extends TestCase {
 		$this->assertSame( 'info', $entries[0]['level'] );
 		$this->assertSame( 'Test email sent to 2 recipients.', $entries[0]['message'] );
 	}
+
+	public function test_wynko_notification_recipients_filter_can_modify_who_is_mailed(): void {
+		add_filter(
+			'wynko_notification_recipients',
+			static function ( $recipients ) {
+				return array( 'override@example.org' );
+			}
+		);
+
+		Log::error( 'boom' );
+
+		$this->assertSame( array( 'override@example.org' ), $this->sent()[0]['to'] );
+	}
+
+	public function test_wynko_notification_sent_fires_after_a_successful_alert(): void {
+		$fired = array();
+		add_action(
+			'wynko_notification_sent',
+			static function ( $to, $message ) use ( &$fired ) {
+				$fired[] = array( $to, $message );
+			}
+		);
+
+		Log::error( 'boom' );
+
+		$this->assertSame( array( array( array( 'ops@example.org' ), 'boom' ) ), $fired );
+	}
+
+	public function test_wynko_notification_sent_does_not_fire_on_a_failed_send(): void {
+		$GLOBALS['wynko_test_mail_result'] = false;
+		$fired                             = false;
+		add_action(
+			'wynko_notification_sent',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+
+		Log::error( 'boom' );
+
+		$this->assertFalse( $fired );
+	}
 }

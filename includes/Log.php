@@ -41,6 +41,16 @@ final class Log {
 			)
 		);
 		update_option( Config::option_key( 'log' ), Sanitizer::trim_log( $entries, Config::log_max() ), false );
+
+		/**
+		 * Fires after a log entry is recorded.
+		 *
+		 * @since 1.1.0
+		 * @param string $level   The entry's level.
+		 * @param string $message The entry's message, already translated.
+		 */
+		do_action( 'wynko_log_added', $level, $message );
+
 		Notifier::maybe_notify( $level, $message );
 	}
 

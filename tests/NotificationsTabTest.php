@@ -97,6 +97,19 @@ final class NotificationsTabTest extends TestCase {
 		$this->assertCount( 10, explode( ', ', $stored ) );
 	}
 
+	public function test_the_address_sanitiser_names_addresses_dropped_for_exceeding_the_cap(): void {
+		$typed = array();
+		for ( $i = 0; $i < 12; $i++ ) {
+			$typed[] = 'a' . $i . '@example.org';
+		}
+
+		NotificationsTab::sanitize_emails( implode( ',', $typed ) );
+
+		$errors = wynko_test_settings_errors();
+		$codes  = array_column( $errors, 'code' );
+		$this->assertContains( 'wynko_notify_overflow', $codes );
+	}
+
 	public function test_it_warns_when_switched_on_with_nobody_to_mail(): void {
 		update_option( 'wynko_notify_enabled', true );
 		update_option( 'wynko_notify_emails', '' );
@@ -280,7 +293,7 @@ final class NotificationsTabTest extends TestCase {
 
 		// The label, the field, and the button are inside the hidden container,
 		// so the label cannot be left showing on its own.
-		$this->assertStringContainsString( 'wynko-notify-emails wynko-hidden', $html );
+		$this->assertStringContainsString( 'wynko-notify-emails wynko-nested-fields wynko-hidden', $html );
 	}
 
 	public function test_the_recipients_field_shows_the_shape_it_wants(): void {

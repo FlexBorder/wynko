@@ -121,6 +121,18 @@ final class Cache {
 		update_option( Config::option_key( 'seen' ), $seen, false );
 
 		self::log_sync( $manual, $new_campaigns, $new_lists, $new_fields );
+
+		/**
+		 * Fires after a full campaigns/lists/fields sync completes successfully.
+		 *
+		 * @since 1.1.0
+		 * @param bool $manual        Whether an operator asked for this sync.
+		 * @param int  $new_campaigns Campaigns not seen before.
+		 * @param int  $new_lists     Lists not seen before.
+		 * @param int  $new_fields    Fields not seen before.
+		 */
+		do_action( 'wynko_campaigns_synced', $manual, $new_campaigns, $new_lists, $new_fields );
+
 		return $result;
 	}
 
@@ -393,5 +405,12 @@ final class Cache {
 		delete_transient( Config::transient_key() );
 		delete_transient( Config::lists_transient_key() );
 		delete_transient( Config::fields_transient_key() );
+
+		/**
+		 * Fires after Wynko's own campaign/list/field caches are busted.
+		 *
+		 * @since 1.1.0
+		 */
+		do_action( 'wynko_cache_busted' );
 	}
 }

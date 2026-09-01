@@ -124,4 +124,20 @@ final class GoneListsTest extends TestCase {
 		$this->assertSame( array(), $this->messages() );
 		$this->assertSame( array(), GoneLists::reported() );
 	}
+
+	public function test_wynko_list_gone_fires_once_for_a_newly_missing_list(): void {
+		$this->form_for( 'gone-1' );
+		$fired = array();
+		add_action(
+			'wynko_list_gone',
+			static function ( $list_id, $name, $forms ) use ( &$fired ) {
+				$fired[] = array( $list_id, $name, $forms );
+			}
+		);
+
+		GoneLists::check( array(), array( 'gone-1' => 1 ) );
+		GoneLists::check( array(), array( 'gone-1' => 1 ) );
+
+		$this->assertSame( array( array( 'gone-1', 'Newsletter', 1 ) ), $fired );
+	}
 }

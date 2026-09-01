@@ -2,7 +2,8 @@
     "core": null,
     "phpVersion": "8.5",
     "mappings": {
-        "wp-content/plugins/wynko-for-laposta": "."
+        "wp-content/plugins/wynko-for-laposta": ".",
+        "wp-content/mu-plugins": "./tests/e2e/mu-plugins"
     },
     "config": {
         "WP_DEBUG": true,

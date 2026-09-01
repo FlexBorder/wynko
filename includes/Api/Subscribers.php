@@ -52,6 +52,19 @@ final class Subscribers {
 			$body['options'] = array( 'ignore_doubleoptin' => true );
 		}
 
+		/**
+		 * Filters the request body for creating a Laposta subscriber.
+		 *
+		 * The lower-level twin of wynko_form_subscriber_data: this runs for
+		 * every code path that writes a subscriber, not just the form UI.
+		 *
+		 * @since 1.1.0
+		 * @param array<string,mixed> $body    The request body as built above.
+		 * @param string              $list_id Laposta list id.
+		 * @param string              $email   Subscriber email.
+		 */
+		$body = (array) apply_filters( 'wynko_subscriber_data', $body, $list_id, $email );
+
 		return Client::request( 'POST', 'member', array( 'body' => $body ) );
 	}
 }

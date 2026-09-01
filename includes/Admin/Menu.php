@@ -17,10 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Menu {
 
-	const PARENT = 'wynko-settings';
-	const FORMS  = 'wynko-forms';
-	const LOG    = 'wynko-log';
-	const CAP    = 'manage_options';
+	const PARENT       = 'wynko-settings';
+	const FORMS        = 'wynko-forms';
+	const INTEGRATIONS = 'wynko-integrations';
+	const LOG          = 'wynko-log';
+	const CAP          = 'manage_options';
 
 	/**
 	 * Where the menu sits: below core's last separator (99), with a gap above it
@@ -51,6 +52,11 @@ final class Menu {
 				'load'   => array(
 					array( \Wynko\Admin\Forms\FormsListPage::class, 'handle_bulk_action' ),
 				),
+			),
+			array(
+				'slug'   => self::INTEGRATIONS,
+				'title'  => __( 'Integrations', 'wynko-for-laposta' ),
+				'render' => array( IntegrationsPage::class, 'render_page' ),
 			),
 			array(
 				'slug'   => self::LOG,

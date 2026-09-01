@@ -171,4 +171,19 @@ final class ApiFieldsTest extends TestCase {
 		$this->assertSame( FieldData::FETCH_GONE, $result['reason'] );
 		$this->assertSame( 0, $GLOBALS['wynko_test_http_calls'] );
 	}
+
+	public function test_wynko_fields_filter_can_modify_the_cached_fields(): void {
+		add_filter(
+			'wynko_fields',
+			static function ( $fields, $list_id ) {
+				$fields[0]['custom_name'] = 'overridden_for_' . $list_id;
+				return $fields;
+			}
+		);
+		$this->queue_fields();
+
+		$result = Fields::for_list( 'list_a' );
+
+		$this->assertSame( 'overridden_for_list_a', $result['fields'][0]['custom_name'] );
+	}
 }

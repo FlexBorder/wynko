@@ -27,11 +27,21 @@ Everything the plugin does, one topic per page.
   through an environment variable or a `wp-config.php` constant.
 - [Multisite](multisite.md) — what is per-site, and what uninstalling removes.
 
+## Extending it
+
+- [Hooks and filters](hooks.md) — the actions and filters other code can use to
+  customize or react to what the plugin does.
+- [Roadmap](roadmap.md) — what's built, what's planned, and the open questions
+  behind each extensibility feature.
+
 ## For contributors
 
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — workflow, architecture, quality checks.
 - [SECURITY.md](../SECURITY.md) — the OWASP threat model the automated checks
   enforce, and how to report a vulnerability.
+- [Testing signup forms and caching](testing/signup-form-caching.md) — the
+  automated Playwright suite that exercises nonce, validation, and
+  field-drift scenarios against a real Laposta test account.
 
 ---
 

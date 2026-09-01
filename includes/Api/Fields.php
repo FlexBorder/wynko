@@ -79,6 +79,15 @@ final class Fields {
 				'error'  => false,
 				'reason' => FieldData::FETCH_OK,
 			);
+
+			/**
+			 * Filters one list's normalized field definitions, before caching.
+			 *
+			 * @since 1.1.0
+			 * @param array<int,array<string,mixed>> $fields  Normalized field definitions.
+			 * @param string                         $list_id Laposta list id.
+			 */
+			$result['fields'] = (array) apply_filters( 'wynko_fields', $result['fields'], $list_id );
 		}
 
 		$ttl               = $result['error'] ? Cache::negative_ttl() : Cache::ttl_seconds();

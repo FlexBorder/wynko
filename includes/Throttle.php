@@ -43,8 +43,20 @@ final class Throttle {
 		$ip_hits   = RateLimiter::prune( self::read( $ip_key ), $now, $window );
 		$form_hits = RateLimiter::prune( self::read( $form_key ), $now, $window );
 
-		if ( RateLimiter::exceeded( $ip_hits, Config::throttle_max( 'ip' ) )
-			|| RateLimiter::exceeded( $form_hits, Config::throttle_max( 'form' ) ) ) {
+		$allowed = ! ( RateLimiter::exceeded( $ip_hits, Config::throttle_max( 'ip' ) )
+			|| RateLimiter::exceeded( $form_hits, Config::throttle_max( 'form' ) ) );
+
+		/**
+		 * Filters whether a submission is allowed through the throttle.
+		 *
+		 * @since 1.1.0
+		 * @param bool   $allowed The default allow/deny decision.
+		 * @param int    $form_id Form post id.
+		 * @param string $ip      Submitting IP, '' when unreadable.
+		 */
+		$allowed = (bool) apply_filters( 'wynko_throttle_allowed', $allowed, $form_id, $ip );
+
+		if ( ! $allowed ) {
 			return false;
 		}
 
@@ -52,6 +64,32 @@ final class Throttle {
 		self::write( $ip_key, RateLimiter::record( $ip_hits, $now ), $window );
 		self::write( $form_key, $form_hits, $window );
 		self::warn_if_nearly_full( $form_id, count( $form_hits ) );
+
+		return true;
+	}
+
+	/**
+	 * Whether this IP is within its cap, recording it when it is. The per-IP
+	 * variant of allows(), for a caller with no Wynko form id to meter a
+	 * per-form counter against — the Contact Form 7 bridge, so far the only
+	 * one. Shares the same counter allows() writes, since the per-visitor cap
+	 * is already documented as counted "across all your forms."
+	 *
+	 * @param string $ip Submitting IP, '' when unreadable.
+	 * @return bool
+	 */
+	public static function allows_ip( string $ip ): bool {
+		$window = Config::throttle_window();
+		$now    = time();
+
+		$ip_key  = self::key( 'ip', '' === $ip ? 'unknown' : wp_hash( $ip ) );
+		$ip_hits = RateLimiter::prune( self::read( $ip_key ), $now, $window );
+
+		if ( RateLimiter::exceeded( $ip_hits, Config::throttle_max( 'ip' ) ) ) {
+			return false;
+		}
+
+		self::write( $ip_key, RateLimiter::record( $ip_hits, $now ), $window );
 
 		return true;
 	}

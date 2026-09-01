@@ -12,6 +12,7 @@ use Wynko\Forms\Button;
 use Wynko\Forms\FormData;
 use Wynko\Forms\Messages;
 use Wynko\Rest\FieldsController;
+use Wynko\Support\FieldFingerprint;
 use Wynko\Support\Fields as FieldData;
 use Wynko\Support\LapostaErrors;
 use Wynko\Urls;
@@ -92,6 +93,11 @@ final class FormRenderer {
 		$html .= sprintf( '<input type="hidden" name="action" value="%s" />', esc_attr( FormSubmitHandler::ACTION ) );
 		$html .= sprintf( '<input type="hidden" name="wynko_form_id" value="%d" />', (int) $form_id );
 		$html .= wp_nonce_field( FormSubmitHandler::nonce_action( $form_id ), FormSubmitHandler::NONCE_FIELD, true, false );
+		$html .= sprintf(
+			'<input type="hidden" name="%s" value="%s" />',
+			esc_attr( FormSubmitHandler::FIELD_FINGERPRINT_FIELD ),
+			esc_attr( FieldFingerprint::of( $definitions['fields'] ) )
+		);
 		$html .= self::honeypot();
 
 		$submitted = isset( $values['fields'] ) && is_array( $values['fields'] ) ? $values['fields'] : array();

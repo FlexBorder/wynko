@@ -63,6 +63,16 @@ final class GoneLists {
 					$forms
 				)
 			);
+
+			/**
+			 * Fires the first time a list still referenced by a form is found gone from Laposta.
+			 *
+			 * @since 1.1.0
+			 * @param string $list_id Laposta list id.
+			 * @param string $name    The list's last known name, '' when never seen.
+			 * @param int    $forms   How many published forms still use it.
+			 */
+			do_action( 'wynko_list_gone', $list_id, $name, $forms );
 		}
 
 		update_option( Config::option_key( 'gone_lists' ), $still, false );

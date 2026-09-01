@@ -10,6 +10,55 @@
 	margin-top: 1em;
 }
 
+/* The Integrations screen's own list highlights enabled rows the way Plugins
+   highlights active ones — disabled stays plain/white, so state reads at a
+   glance without repeating "Enabled"/"Disabled" in every row. Chained onto
+   .widefat.striped so it out-specifies the striped table's own alternating
+   nth-child background. */
+.widefat.striped tr.wynko-integration-row--enabled {
+	background: #f0f6fc;
+}
+
+/* Disabled rows must stay plain/white too, overriding striped's own
+   nth-child alternating background the same way the enabled rule above
+   does. */
+.widefat.striped tr.wynko-integration-row--disabled {
+	background: #fff;
+}
+
+/* The thick left border Plugins puts on an active row's own check-column
+   cell, not the row as a whole — matched here on the same cell so it lines
+   up with the table's actual left edge rather than sitting under the
+   scrollbar of a wide .column-description cell. */
+.wynko-integrations-table tr.wynko-integration-row--enabled th.check-column {
+	border-left: 4px solid #2271b1;
+}
+
+/* Plugins bolds an active row's title by leaving <strong>'s own default
+   weight alone and only overriding it for an inactive one — mirrored here:
+   the name cell always renders <strong>, so disabled is the one state that
+   needs an explicit override back to regular weight. */
+.wynko-integrations-table tr.wynko-integration-row--disabled .plugin-title strong {
+	font-weight: 400;
+}
+
+/* Unlike Plugins, this screen's row actions (Settings, Activate/Deactivate)
+   stay visible at rest rather than only on hover — core's own
+   .row-actions { left: -9999em; } is a bare, unscoped selector, so without
+   this override every row here would inherit that hidden-until-hover
+   behavior too. Two classes out-specify it regardless of source order. */
+.wynko-integrations-table .row-actions {
+	position: static;
+	left: auto;
+}
+
+/* The one table-wide explanation for why some rows have no Activate link,
+   printed once under the table rather than repeated per row. */
+.wynko-integrations-unavailable-notice {
+	text-align: center;
+	padding: 1.5rem;
+}
+
 /* The activity log's filter bar. A row of controls rather than a stacked form,
    so it reads as the table's toolbar and not as something to fill in. */
 .wynko-log-filter {
@@ -72,6 +121,15 @@
 	margin-left: 0.75em;
 }
 
+/* A report row whose value is several items rather than one line, e.g. one
+   signup form per line — SystemReport::value() switches to this in place of
+   plain text whenever a reading carries more than a single item. */
+.wynko-report__list {
+	margin: 0;
+	padding-left: 1.2em;
+	list-style: disc;
+}
+
 /* A placeholder box on a form whose labels leave no room for one. Still
    present and still submitted — read-only, so what is stored survives a trip
    through a label-only mode — but plainly not the control to type in. */
@@ -131,16 +189,19 @@
 	margin-top: 0.75em;
 }
 
-/* The alert recipients, indented under the checkbox that decides whether
-   anything is sent to them — the indent is what says the two belong together
-   now that they share one settings row. */
-.wynko-notify-emails {
+/* Fields nested under the checkbox that decides whether any of them mean
+   anything — the alert recipients under "Email me when an error is
+   recorded", the rate-limit caps under "Enable rate limiting". The indent
+   is what says a block belongs to the checkbox above it now that the two
+   share one settings row; every such block carries this class alongside its
+   own identity class (form.js still targets that one, never this one). */
+.wynko-nested-fields {
 	margin: 0.75em 0 0 1.8em;
 	padding-left: 1em;
 	border-left: 3px solid #dcdcde;
 }
 
-.wynko-notify-emails > p:first-child {
+.wynko-nested-fields > p:first-child {
 	margin-top: 0;
 	font-weight: 600;
 }
@@ -197,6 +258,118 @@
 		border: 0;
 		background: transparent;
 		box-shadow: none;
+	}
+
+	// The one-line shortcode box above is a compact inline strip; a block of
+	// several combined tags needs its own visible edges and full width
+	// instead, so the label sits above rather than beside a cramped textarea.
+	&--block {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.4em;
+
+		// No min-height: the rows attribute already sizes the box to the
+		// number of tags it holds, and a CSS floor would fight that on a
+		// short list while doing nothing for a long one.
+		textarea {
+			width: 100%;
+			border: 1px solid #8c8f94;
+			border-radius: 4px;
+			background: #fff;
+			box-shadow: none;
+			resize: vertical;
+		}
+
+		.wynko-copy {
+			align-self: flex-end;
+		}
+	}
+}
+
+.wynko-bridge-fields {
+	margin-bottom: 1em;
+
+	ul {
+		margin: 0;
+		list-style: none;
+	}
+
+	li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.3em 1em;
+		padding: 0.5em 0;
+		border-bottom: 1px solid #f0f0f1;
+
+		&:last-child {
+			border-bottom: 0;
+		}
+	}
+
+	// Narrow and right-anchored, not a full-width band: a field's name is
+	// what an admin scans for, and the tag beside it is a reference, not the
+	// row's main content. max-width plus min-width: 0 is what lets a long
+	// option list (a checkbox-type field's own tag can carry many) wrap
+	// inside that narrower box instead of forcing the row wide or, without
+	// min-width: 0, overflowing past it — a flex item's default min-width is
+	// its content's own intrinsic width, wrap or no wrap.
+	code {
+		flex: 0 1 auto;
+		min-width: 0;
+		max-width: 60%;
+		margin-left: auto;
+		overflow-wrap: anywhere;
+		color: #646970;
+	}
+}
+
+/* A third-party-plugin bridge's step-by-step walkthrough (Contact Form 7,
+   HTML Forms, …). Every step always renders — never hidden — so an admin
+   already on step 4 can still see and use an earlier step; --pending only
+   dims a step whose content depends on a list being picked in step 1, until
+   one is. */
+.wynko-bridge-steps {
+	max-width: 56em;
+	margin: 1.5em 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wynko-bridge-steps__step {
+	display: flex;
+	gap: 1em;
+	padding-bottom: 2em;
+	transition: opacity 0.15s ease;
+
+	&--pending {
+		opacity: 0.45;
+	}
+}
+
+.wynko-bridge-steps__badge {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 1.8em;
+	height: 1.8em;
+	border-radius: 50%;
+	background: #2271b1;
+	color: #fff;
+	font-size: 0.9em;
+	font-weight: 600;
+}
+
+.wynko-bridge-steps__body {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding-top: 0.15em;
+
+	h2 {
+		margin: 0 0 0.6em;
+		font-size: 1.05em;
 	}
 }
 
@@ -526,4 +699,17 @@ table.wynko-form-counts {
 .wynko-report.widefat th,
 .wynko-report.widefat td {
 	vertical-align: middle;
+}
+
+/* The divider line Plugins draws between rows via a bottom box-shadow on
+   every row's own cells rather than a table border rule, so it survives
+   .striped's alternating background instead of being painted over by it.
+   Kept last in the file for the same no-descending-specificity reason as
+   the rule above: (0,1,1) via .wynko-integrations-table out-specifies every
+   plain th/td rule earlier in the stylesheet. */
+.wynko-integrations-table tr.wynko-integration-row--enabled td,
+.wynko-integrations-table tr.wynko-integration-row--enabled th,
+.wynko-integrations-table tr.wynko-integration-row--disabled td,
+.wynko-integrations-table tr.wynko-integration-row--disabled th {
+	box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }

@@ -177,4 +177,34 @@ final class KeyStatusTest extends TestCase {
 		);
 		$this->assertSame( 0, wynko_test_http_calls() );
 	}
+
+	public function test_verify_fires_wynko_api_key_verified_on_a_live_probe(): void {
+		wynko_test_queue_response( 200, '{"data":[]}' );
+		$fired = array();
+		add_action(
+			'wynko_api_key_verified',
+			static function ( $fingerprint, $ok ) use ( &$fired ) {
+				$fired[] = array( $fingerprint, $ok );
+			}
+		);
+
+		KeyStatus::verify( 'a-key' );
+
+		$this->assertSame( array( array( KeyStatus::fingerprint( 'a-key' ), true ) ), $fired );
+	}
+
+	public function test_verify_does_not_fire_wynko_api_key_verified_from_the_cache(): void {
+		KeyStatus::record( 'a-key', true );
+		$fired = false;
+		add_action(
+			'wynko_api_key_verified',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+
+		KeyStatus::verify( 'a-key' );
+
+		$this->assertFalse( $fired );
+	}
 }

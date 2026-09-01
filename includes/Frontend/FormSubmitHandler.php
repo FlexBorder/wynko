@@ -14,6 +14,7 @@ use Wynko\Config;
 use Wynko\Forms\FormData;
 use Wynko\Log;
 use Wynko\Support\Fields as FieldData;
+use Wynko\Support\FieldFingerprint;
 use Wynko\Support\FormValidator;
 use Wynko\Support\LapostaErrors;
 use Wynko\Throttle;
@@ -52,12 +53,41 @@ final class FormSubmitHandler {
 	 */
 	const HONEYPOT_FIELD = 'wynko_website';
 
+	/**
+	 * The field-set fingerprint's name. FormRenderer stamps it into the
+	 * markup at render time; process() compares it against Wynko's current
+	 * view of the same list's fields to notice a rendered page a cache is
+	 * still serving after the field set it was built from has moved on.
+	 * See maybe_log_stale_render().
+	 */
+	const FIELD_FINGERPRINT_FIELD = 'wynko_ffp';
+
 	const STATUS_SUCCESS   = 'success';
 	const STATUS_INVALID   = 'invalid';
 	const STATUS_FAILED    = 'failed';
 	const STATUS_BAD_NONCE = 'bad_nonce';
 	const STATUS_NOT_FOUND = 'not_found';
 	const STATUS_THROTTLED = 'throttled';
+
+	/**
+	 * How long a submit nonce stays valid, in place of core's default (one day,
+	 * across a rolling two-tick window). A page-caching plugin routinely keeps
+	 * a page around longer than that, and this endpoint is already gated by
+	 * Throttle too, so trading a few extra days of a reusable-but-scoped token
+	 * for fewer cache-staleness failures is a reasonable trade. See nonce_life().
+	 */
+	const NONCE_LIFE = 3 * DAY_IN_SECONDS;
+
+	/**
+	 * How long maybe_log_stale_render() withholds a repeat log entry for the
+	 * same form, once it has logged one. A dedicated constant rather than
+	 * Cache::negative_ttl(): that one bounds a different thing (a forced
+	 * field refetch's own retry window), and tying this to it would make a
+	 * future change to one silently change the other. This is a diagnostic
+	 * signal for an administrator to notice once, not an amplification
+	 * control, so an hour is generous rather than tight.
+	 */
+	const STALE_RENDER_LOG_COOLDOWN = HOUR_IN_SECONDS;
 
 	/**
 	 * The nonce action for one form. Scoped to the id so one form's token
@@ -68,6 +98,18 @@ final class FormSubmitHandler {
 	 */
 	public static function nonce_action( int $form_id ): string {
 		return self::ACTION . '_' . $form_id;
+	}
+
+	/**
+	 * Filters `nonce_life` for this plugin's own submit actions only, leaving
+	 * core's and every other plugin's nonces untouched. Hooked in Plugin::boot().
+	 *
+	 * @param int    $life   The life core would otherwise use.
+	 * @param string $action The nonce action being ticked, '' when unscoped.
+	 * @return int
+	 */
+	public static function nonce_life( int $life, string $action = '' ): int {
+		return 0 === strpos( $action, self::ACTION . '_' ) ? self::NONCE_LIFE : $life;
 	}
 
 	/**
@@ -98,6 +140,33 @@ final class FormSubmitHandler {
 	}
 
 	/**
+	 * Stops a page carrying a one-shot result token from being cached, so a
+	 * later visitor to the exact same URL never gets served someone else's
+	 * redisplayed field values or outcome message.
+	 *
+	 * Hooked on template_redirect rather than called from FormRenderer, which
+	 * renders far too late — after wp_head(), with headers already sent, where
+	 * nocache_headers() silently no-ops. DONOTCACHEPAGE is set alongside it
+	 * because most page-cache plugins (WP Super Cache, W3 Total Cache, WP
+	 * Rocket, LiteSpeed) decide inside their own advanced-cache.php and act on
+	 * that constant rather than on response headers.
+	 *
+	 * @return void
+	 */
+	public static function maybe_nocache_result_page(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only: only decides whether this response may be cached, changes nothing.
+		if ( ! isset( $_GET[ self::RESULT_ARG ] ) || '' === $_GET[ self::RESULT_ARG ] ) {
+			return;
+		}
+
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Not this plugin's own global: a de facto standard constant that page-caching plugins (WP Super Cache, W3 Total Cache, WP Rocket, LiteSpeed) check for by this exact name; prefixing it would make it invisible to every one of them.
+			define( 'DONOTCACHEPAGE', true );
+		}
+		nocache_headers();
+	}
+
+	/**
 	 * Where the visitor lands afterwards: the form's configured redirect on
 	 * success, otherwise back where they came from carrying a one-shot token.
 	 *
@@ -107,16 +176,28 @@ final class FormSubmitHandler {
 	 */
 	public static function redirect_url( array $result, string $return_to ): string {
 		$form = FormData::load( (int) $result['form_id'] );
+		$url  = null;
 
 		if ( null !== $form && self::STATUS_SUCCESS === $result['status'] ) {
 			$redirect = $form->redirect_url();
 			if ( '' !== $redirect ) {
-				return $redirect;
+				$url = $redirect;
 			}
 		}
 
-		$base = '' !== $return_to ? $return_to : home_url( '/' );
-		return add_query_arg( self::RESULT_ARG, self::store_result( $result ), $base );
+		if ( null === $url ) {
+			$base = '' !== $return_to ? $return_to : home_url( '/' );
+			$url  = add_query_arg( self::RESULT_ARG, self::store_result( $result ), $base );
+		}
+
+		/**
+		 * Filters the URL a visitor is redirected to after submitting a form.
+		 *
+		 * @since 1.1.0
+		 * @param string               $url    The computed redirect URL.
+		 * @param array<string,mixed>  $result process() output.
+		 */
+		return (string) apply_filters( 'wynko_form_redirect_url', $url, $result );
 	}
 
 	/**
@@ -129,14 +210,16 @@ final class FormSubmitHandler {
 		$form_id = isset( $raw['wynko_form_id'] ) ? absint( $raw['wynko_form_id'] ) : 0;
 		$nonce   = isset( $raw[ self::NONCE_FIELD ] ) ? sanitize_text_field( (string) $raw[ self::NONCE_FIELD ] ) : '';
 
-		if ( ! wp_verify_nonce( $nonce, self::nonce_action( $form_id ) ) ) {
+		// Off by default; see Config::form_nonce_disabled()'s docblock and
+		// SecurityTab, which shows a standing warning while this is on.
+		if ( ! Config::form_nonce_disabled() && ! wp_verify_nonce( $nonce, self::nonce_action( $form_id ) ) ) {
 			return self::result( self::STATUS_BAD_NONCE, $form_id, array(), array(), LapostaErrors::SLUG_GENERIC );
 		}
 
 		// Above FormData::load() on purpose, so a refused submission costs a
 		// counter read and nothing else. A nonce is no throttle: it is reusable,
 		// and every anonymous visitor holds the same one.
-		if ( ! Throttle::allows( $form_id, self::client_ip() ) ) {
+		if ( ! Config::form_throttle_disabled() && ! Throttle::allows( $form_id, self::client_ip() ) ) {
 			// The name lookup sits inside the branch rather than before the
 			// check: loading a post for every hostile request is exactly the
 			// cost the throttle exists to avoid, and should_log() holds this to
@@ -187,6 +270,21 @@ final class FormSubmitHandler {
 			'fields' => self::sanitize_values( $posted ),
 		);
 
+		/**
+		 * Filters a submission's sanitized values before validation.
+		 *
+		 * @since 1.1.0
+		 * @param array{email:string,fields:array<string,mixed>} $values  Sanitized email and field values.
+		 * @param int                                            $form_id Form post id.
+		 */
+		/**
+		 * Typed to match the array shape built above; a filter may return anything.
+		 *
+		 * @var array{email:string,fields:array<string,mixed>} $values
+		 */
+		$values = (array) apply_filters( 'wynko_form_submitted_values', $values, $form_id );
+		$email  = (string) $values['email'];
+
 		$list_id = $form->list_id();
 		if ( '' === $list_id ) {
 			/* translators: %s: form name. */
@@ -199,6 +297,11 @@ final class FormSubmitHandler {
 			Log::error( sprintf( self::fetch_failure_message( (string) $definitions['reason'] ), $form->name() ) );
 			return self::result( self::STATUS_FAILED, $form_id, array(), $values, LapostaErrors::SLUG_GENERIC );
 		}
+
+		// Independent of whatever this submission's own outcome turns out to
+		// be: a stale rendering is a fact about the page, not about whether
+		// the visitor happened to fill it in correctly.
+		self::maybe_log_stale_render( $form, $raw, $definitions['fields'] );
 
 		// Without the synthetic email row: FormValidator checks the address via
 		// KEY_EMAIL and Laposta takes it as a top-level parameter, so leaving it
@@ -229,6 +332,21 @@ final class FormSubmitHandler {
 		}
 
 		$custom_fields = self::custom_fields( $visible, $values['fields'] );
+
+		/**
+		 * Filters the custom-field payload sent to Laposta for one submission.
+		 *
+		 * This is the hook a bridge from another plugin's own form (e.g. a
+		 * Contact Form 7 "Sign up for Newsletter" checkbox) uses to hand its own
+		 * field data into Wynko's existing submit pipeline.
+		 *
+		 * @since 1.1.0
+		 * @param array<string,mixed> $custom_fields Values keyed by custom_name.
+		 * @param int                 $form_id       Form post id.
+		 * @param string              $email         Submitted address.
+		 * @param string              $list_id       Laposta list id.
+		 */
+		$custom_fields = (array) apply_filters( 'wynko_form_subscriber_data', $custom_fields, $form_id, $email, $list_id );
 
 		// What the form actually put in front of the visitor. A Laposta complaint
 		// about anything outside this set is about a field they never saw.
@@ -344,6 +462,16 @@ final class FormSubmitHandler {
 					$response->get_error_message()
 				)
 			);
+
+			/**
+			 * Fires when a signup submission fails to reach Laposta.
+			 *
+			 * @since 1.1.0
+			 * @param int       $form_id  Form post id.
+			 * @param \WP_Error $response The failed Laposta response.
+			 */
+			do_action( 'wynko_form_submit_failed', $form_id, $response );
+
 			return self::result( self::STATUS_FAILED, $form_id, array(), $values, $slug );
 		}
 
@@ -366,6 +494,14 @@ final class FormSubmitHandler {
 		/* translators: %s: form name. */
 		Log::info( sprintf( __( 'New signup through "%s".', 'wynko-for-laposta' ), $form->name() ) );
 		$form->record_signup();
+
+		/**
+		 * Fires after a signup is confirmed successful.
+		 *
+		 * @since 1.1.0
+		 * @param FormData $form The form submitted to.
+		 */
+		do_action( 'wynko_form_submitted', $form );
 	}
 
 	/**
@@ -429,6 +565,66 @@ final class FormSubmitHandler {
 		}
 
 		set_transient( $key, time(), Cache::negative_ttl() );
+		return true;
+	}
+
+	/**
+	 * Notices a visitor's rendered page carrying an outdated field-set
+	 * fingerprint — the tell that a page cache or CDN served a copy of the
+	 * form from before Wynko's own view of the list's fields last changed.
+	 * Detection only: it changes nothing about the submission and makes no
+	 * extra remote call (it reuses $fields, already fetched for validation),
+	 * it only tells an administrator their cache may be worth purging.
+	 *
+	 * @param FormData                       $form   The form submitted to.
+	 * @param array<string,mixed>            $raw    Unslashed request data.
+	 * @param array<int,array<string,mixed>> $fields Current cached field definitions.
+	 * @return void
+	 */
+	private static function maybe_log_stale_render( FormData $form, array $raw, array $fields ): void {
+		$carried = isset( $raw[ self::FIELD_FINGERPRINT_FIELD ] )
+			? sanitize_text_field( (string) $raw[ self::FIELD_FINGERPRINT_FIELD ] )
+			: '';
+
+		// '' covers a page cached before this feature shipped, which carries
+		// no fingerprint field at all — not evidence of drift, just silence.
+		if ( '' === $carried || FieldFingerprint::of( $fields ) === $carried ) {
+			return;
+		}
+
+		if ( ! self::may_log_stale_render( $form->id() ) ) {
+			return;
+		}
+
+		// info, not warning: the field-drift log lines above are warnings
+		// because Laposta rejected a submission over them — a real,
+		// visitor-facing hiccup. This one is purely diagnostic: nothing
+		// failed, nobody was asked to do anything twice.
+		Log::info(
+			sprintf(
+				/* translators: %s: form name. */
+				__( 'A signup on "%s" carried an outdated field fingerprint; its rendered page appears to be a stale cached copy.', 'wynko-for-laposta' ),
+				$form->name()
+			)
+		);
+	}
+
+	/**
+	 * Whether maybe_log_stale_render() may write another entry for this
+	 * form, claiming it when it does. One entry is the point — an
+	 * administrator needs to see it once, not once per visitor on a busy
+	 * stale page.
+	 *
+	 * @param int $form_id Form post id.
+	 * @return bool
+	 */
+	private static function may_log_stale_render( int $form_id ): bool {
+		$key = Config::stale_render_transient_key( $form_id );
+		if ( false !== get_transient( $key ) ) {
+			return false;
+		}
+
+		set_transient( $key, time(), self::STALE_RENDER_LOG_COOLDOWN );
 		return true;
 	}
 

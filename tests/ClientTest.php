@@ -112,4 +112,47 @@ final class ClientTest extends TestCase {
 	public function test_a_429_says_it_is_a_rate_limit(): void {
 		$this->assertStringContainsString( 'rate limiting', Client::status_message( 429 ) );
 	}
+
+	public function test_wynko_api_status_message_filter_can_override_the_message(): void {
+		add_filter(
+			'wynko_api_status_message',
+			static function ( $message, $status ) {
+				return 'custom:' . $status;
+			}
+		);
+
+		$this->assertSame( 'custom:500', Client::status_message( 500 ) );
+	}
+
+	public function test_wynko_api_request_args_filter_can_modify_the_outgoing_request(): void {
+		add_filter(
+			'wynko_api_request_args',
+			static function ( $args ) {
+				$args['headers']['X-Test'] = 'yes';
+				return $args;
+			}
+		);
+		wynko_test_queue_response( 200, '{}' );
+
+		Client::request( 'GET', 'campaign', array( 'key' => 'k' ) );
+
+		$this->assertSame( 'yes', wynko_test_last_request()['args']['headers']['X-Test'] );
+	}
+
+	public function test_wynko_api_response_filter_receives_the_raw_response(): void {
+		add_filter(
+			'wynko_api_response',
+			static function ( $response ) {
+				return array(
+					'response' => array( 'code' => 200 ),
+					'body'     => '{"filtered":true}',
+				);
+			}
+		);
+		wynko_test_queue_response( 200, '{"filtered":false}' );
+
+		$result = Client::request( 'GET', 'campaign', array( 'key' => 'k' ) );
+
+		$this->assertSame( array( 'filtered' => true ), $result );
+	}
 }

@@ -36,14 +36,151 @@ final class SecurityTabTest extends TestCase {
 		$this->assertNotSame( SettingsPage::GROUP_NOTIFICATIONS, SettingsPage::GROUP_SECURITY );
 	}
 
-	public function test_it_owns_the_three_rate_limit_settings(): void {
+	public function test_it_owns_the_rate_limit_and_opt_out_settings(): void {
 		$this->assertSame(
-			array( 'throttle_window', 'throttle_ip_max', 'throttle_form_max' ),
+			array( 'disable_form_throttle', 'throttle_window', 'throttle_ip_max', 'throttle_form_max', 'disable_form_nonce' ),
 			array_keys( SecurityTab::settings() )
 		);
 		foreach ( SecurityTab::settings() as $sanitizer ) {
 			$this->assertIsCallable( array( SecurityTab::class, $sanitizer ) );
 		}
+	}
+
+	/**
+	 * Inverted the same way sanitize_disable_throttle() is: the box reads
+	 * "Enable nonce verification" and is checked by default, so a checked box
+	 * must save disable_form_nonce as false and an absent (unchecked) one as
+	 * true.
+	 */
+	public function test_the_nonce_checkbox_normalises_to_an_inverted_boolean(): void {
+		$this->assertFalse( SecurityTab::sanitize_disable_nonce( '1' ) );
+		$this->assertTrue( SecurityTab::sanitize_disable_nonce( null ) );
+	}
+
+	/**
+	 * Inverted relative to every other checkbox here: this one reads "Enable
+	 * rate limiting" and is checked by default, so a checked box must save
+	 * disable_form_throttle as false and an absent (unchecked) one as true.
+	 */
+	public function test_the_throttle_checkbox_normalises_to_an_inverted_boolean(): void {
+		$this->assertFalse( SecurityTab::sanitize_disable_throttle( '1' ) );
+		$this->assertTrue( SecurityTab::sanitize_disable_throttle( null ) );
+	}
+
+	/** On by default: a fresh install must show the box checked, nothing hidden. */
+	public function test_the_throttle_checkbox_is_checked_by_default(): void {
+		ob_start();
+		SecurityTab::field_throttle_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'id="wynko-throttle-enabled"', $html );
+		$this->assertStringContainsString( 'checked', $html );
+	}
+
+	public function test_disabling_throttle_via_the_option_unchecks_the_box(): void {
+		update_option( Config::option_key( 'disable_form_throttle' ), true );
+
+		ob_start();
+		SecurityTab::field_throttle_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'checked', $html );
+	}
+
+	/** On by default, same as the throttle checkbox. */
+	public function test_the_nonce_checkbox_is_checked_by_default(): void {
+		ob_start();
+		SecurityTab::field_nonce_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'id="wynko-nonce-enabled"', $html );
+		$this->assertStringContainsString( 'checked', $html );
+	}
+
+	public function test_disabling_nonce_via_the_option_unchecks_the_box(): void {
+		update_option( Config::option_key( 'disable_form_nonce' ), true );
+
+		ob_start();
+		SecurityTab::field_nonce_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'checked', $html );
+	}
+
+	/** Nothing changes for a site that never touches either setting. */
+	public function test_a_quiet_site_shows_no_warning(): void {
+		ob_start();
+		SecurityTab::field_throttle_enabled();
+		SecurityTab::field_nonce_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'notice-warning', $html );
+	}
+
+	/** The warning reuses core's own notice styling, right after the field it is about. */
+	public function test_disabling_the_nonce_shows_a_warning_right_after_its_own_checkbox(): void {
+		update_option( Config::option_key( 'disable_form_nonce' ), true );
+
+		ob_start();
+		SecurityTab::field_nonce_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( '<div class="notice notice-warning inline">', $html );
+		$this->assertStringContainsString( 'Nonce verification is off', $html );
+		$this->assertGreaterThan( strpos( $html, 'wynko-nonce-enabled' ), strpos( $html, 'Nonce verification is off' ) );
+	}
+
+	public function test_disabling_the_throttle_shows_a_warning_right_after_its_own_checkbox(): void {
+		update_option( Config::option_key( 'disable_form_throttle' ), true );
+
+		ob_start();
+		SecurityTab::field_throttle_enabled();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( '<div class="notice notice-warning inline">', $html );
+		$this->assertStringContainsString( 'Rate limiting is off', $html );
+		$this->assertGreaterThan( strpos( $html, 'wynko-throttle-enabled' ), strpos( $html, 'Rate limiting is off' ) );
+	}
+
+	/** The warning is scoped to this one field, never a visitor-facing or cross-screen notice. */
+	public function test_the_warning_is_not_part_of_the_cross_screen_admin_notice(): void {
+		update_option( Config::option_key( 'disable_form_nonce' ), true );
+		wynko_test_set_can_manage( true );
+
+		ob_start();
+		SecurityTab::render_admin_notice();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'Nonce verification is off', $html );
+	}
+
+	/**
+	 * The three caps are nested inside one wrapper, the same pattern
+	 * NotificationsTab uses for the recipients field under its own switch —
+	 * form.js hides it as one unit by toggling this one class, and
+	 * wynko-nested-fields is the shared indent styling both tabs' nested
+	 * blocks carry, so the visual treatment lives in one place rather than
+	 * being duplicated per feature.
+	 */
+	public function test_the_capped_fields_are_nested_under_one_wrapper(): void {
+		ob_start();
+		SecurityTab::field_throttle_fields();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( '<div class="wynko-throttle-fields wynko-nested-fields">', $html );
+		$this->assertStringContainsString( 'id="wynko-throttle-window"', $html );
+		$this->assertStringContainsString( 'id="wynko-throttle-ip-max"', $html );
+		$this->assertStringContainsString( 'id="wynko-throttle-form-max"', $html );
+	}
+
+	public function test_the_nested_wrapper_carries_the_hide_marker_when_disabled(): void {
+		update_option( Config::option_key( 'disable_form_throttle' ), true );
+
+		ob_start();
+		SecurityTab::field_throttle_fields();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( '<div class="wynko-throttle-fields wynko-nested-fields wynko-hidden">', $html );
 	}
 
 	public function test_each_cap_is_clamped_to_its_configured_bounds(): void {
@@ -64,6 +201,43 @@ final class SecurityTabTest extends TestCase {
 
 		$this->assertStringContainsString( 'tab=' . SettingsPage::TAB_SECURITY, $url );
 		$this->assertStringContainsString( 'wynko_throttle=reset', $url );
+	}
+
+	/**
+	 * The reset button belongs to the per-form counts table, not to the
+	 * screen's own Save changes row: it lives in the table's own footer,
+	 * reaching a form declared elsewhere on the page by its form="" attribute
+	 * rather than by being physically inside it (forms cannot nest in HTML).
+	 */
+	public function test_the_reset_button_is_part_of_the_counts_table(): void {
+		$this->a_form();
+
+		ob_start();
+		SecurityTab::field_throttle_fields();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'form="wynko-reset-throttle"', $html );
+		$this->assertGreaterThan( strpos( $html, '<tfoot>' ), strpos( $html, 'form="wynko-reset-throttle"' ) );
+		$this->assertLessThan( strpos( $html, '</table>' ), strpos( $html, 'form="wynko-reset-throttle"' ) );
+	}
+
+	/** With no forms there is nothing to reset, so the table — and its button — do not print at all. */
+	public function test_no_forms_means_no_counts_table_and_no_reset_button(): void {
+		ob_start();
+		SecurityTab::field_throttle_fields();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'wynko-form-counts', $html );
+		$this->assertStringNotContainsString( 'Reset signup limits', $html );
+	}
+
+	/** render() itself must never carry its own copy of the button any more. */
+	public function test_the_top_level_render_carries_no_reset_button_of_its_own(): void {
+		ob_start();
+		SecurityTab::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'Reset signup limits', $html );
 	}
 
 	/**

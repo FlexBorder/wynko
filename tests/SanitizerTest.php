@@ -137,4 +137,24 @@ final class SanitizerTest extends TestCase {
 	public function test_500_still_classifies_as_unexpected(): void {
 		$this->assertSame( Sanitizer::STATUS_UNEXPECTED, Sanitizer::classify_status( 500 ) );
 	}
+
+	public function test_single_line_strips_embedded_newlines(): void {
+		$this->assertSame(
+			'Evil Plugin == Section == [fail] forged',
+			Sanitizer::single_line( "Evil Plugin\n== Section ==\n[fail] forged" )
+		);
+	}
+
+	public function test_single_line_strips_other_control_characters(): void {
+		$this->assertSame( 'a b', Sanitizer::single_line( "a\tb" ) );
+		$this->assertSame( 'a b', Sanitizer::single_line( "a\rb" ) );
+	}
+
+	public function test_single_line_trims_surrounding_whitespace(): void {
+		$this->assertSame( 'value', Sanitizer::single_line( "  value  \n" ) );
+	}
+
+	public function test_single_line_leaves_an_ordinary_string_untouched(): void {
+		$this->assertSame( 'Acme Bridge 1.2.3', Sanitizer::single_line( 'Acme Bridge 1.2.3' ) );
+	}
 }

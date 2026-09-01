@@ -10,6 +10,75 @@ import { delegateHelp } from '../shared/help-toggle';
 
 const config = window.wynkoForm || {};
 
+// Mirrors FormSubmitHandler::STATUS_NOT_FOUND — a bad nonce and an unknown
+// form deliberately answer alike, so this string covers both.
+const STATUS_NOT_FOUND = 'not_found';
+
+/**
+ * The header that stops core from downgrading a cookie-authenticated request
+ * to user 0. Every REST call this file makes must send it: the submit nonce
+ * is user-scoped, so if the nonce-refresh request and the retried submit
+ * resolve to different users, a freshly minted nonce still fails to verify.
+ *
+ * @return {Object} Headers for a same-origin REST call.
+ */
+function restHeaders() {
+	return config.restNonce ? { 'X-WP-Nonce': config.restNonce } : {};
+}
+
+/**
+ * Posts one submission.
+ *
+ * @param {HTMLFormElement} form   The form element.
+ * @param {string}          formId The submitted form's id.
+ * @return {Promise<Object>} The parsed JSON payload.
+ */
+async function postForm( form, formId ) {
+	const response = await window.fetch(
+		`${ config.restRoot }forms/${ formId }/submit`,
+		{
+			method: 'POST',
+			body: new window.FormData( form ),
+			credentials: 'same-origin',
+			headers: restHeaders(),
+		}
+	);
+	return response.json();
+}
+
+/**
+ * Refetches a live nonce for one form and writes it into its hidden field.
+ *
+ * The page's own copy may be stale — baked into HTML a caching plugin served
+ * older than the nonce's own lifetime — but this route runs live on every
+ * request, so its answer never is.
+ *
+ * @param {HTMLFormElement} form   The form element.
+ * @param {string}          formId The form's id.
+ * @return {Promise<boolean>} Whether a fresh nonce was written.
+ */
+async function refreshNonce( form, formId ) {
+	const field = form.querySelector( '[name="wynko_nonce"]' );
+	if ( ! field ) {
+		return false;
+	}
+
+	try {
+		const response = await window.fetch(
+			`${ config.restRoot }forms/${ formId }/nonce`,
+			{ credentials: 'same-origin', headers: restHeaders() }
+		);
+		const payload = await response.json();
+		if ( ! payload.nonce ) {
+			return false;
+		}
+		field.value = payload.nonce;
+		return true;
+	} catch ( error ) {
+		return false;
+	}
+}
+
 /**
  * Handles one submission.
  *
@@ -38,21 +107,20 @@ async function submit( event ) {
 	container.setAttribute( 'aria-busy', 'true' );
 
 	try {
-		const response = await window.fetch(
-			`${ config.restRoot }forms/${ formId }/submit`,
-			{
-				method: 'POST',
-				body: new window.FormData( form ),
-				credentials: 'same-origin',
-				// Without this core treats a cookie-authenticated request as
-				// user 0, and the form's own user-scoped nonce then verifies
-				// against the wrong user and fails.
-				headers: config.restNonce
-					? { 'X-WP-Nonce': config.restNonce }
-					: {},
-			}
-		);
-		const payload = await response.json();
+		let payload = await postForm( form, formId );
+
+		// The page's embedded nonce may simply be older than a page-caching
+		// plugin kept the page around — indistinguishable, by design, from a
+		// form that no longer exists (see FormSubmitHandler::handle()'s
+		// prober-oracle note). Since this page just rendered the form, the
+		// safer read for the one real visitor is "stale", so a fresh nonce is
+		// worth one retry before treating it as gone for good.
+		if (
+			STATUS_NOT_FOUND === payload.status &&
+			( await refreshNonce( form, formId ) )
+		) {
+			payload = await postForm( form, formId );
+		}
 
 		if ( payload.redirect ) {
 			window.location.assign( payload.redirect );

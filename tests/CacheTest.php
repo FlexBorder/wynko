@@ -340,4 +340,48 @@ final class CacheTest extends TestCase {
 
 		$this->assertStringContainsString( 'last refresh failed', Cache::last_refresh_sentence() );
 	}
+
+	public function test_wynko_campaigns_synced_fires_after_a_successful_fill(): void {
+		wynko_test_queue_response( 200, '{"data":[]}' );
+		$fired = array();
+		add_action(
+			'wynko_campaigns_synced',
+			static function ( $manual, $new_campaigns, $new_lists, $new_fields ) use ( &$fired ) {
+				$fired[] = array( $manual, $new_campaigns, $new_lists, $new_fields );
+			}
+		);
+
+		Cache::refresh();
+
+		$this->assertSame( array( array( true, 0, 0, 0 ) ), $fired );
+	}
+
+	public function test_wynko_campaigns_synced_does_not_fire_on_a_failed_fill(): void {
+		wynko_test_queue_response( 401, '{}' );
+		$fired = false;
+		add_action(
+			'wynko_campaigns_synced',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+
+		Cache::refresh();
+
+		$this->assertFalse( $fired );
+	}
+
+	public function test_wynko_cache_busted_fires_after_bust(): void {
+		$fired = false;
+		add_action(
+			'wynko_cache_busted',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+
+		Cache::bust();
+
+		$this->assertTrue( $fired );
+	}
 }

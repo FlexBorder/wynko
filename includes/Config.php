@@ -361,6 +361,18 @@ final class Config {
 	}
 
 	/**
+	 * Returns the cooldown transient guarding one form's stale-rendered-page
+	 * log entry. The form id is already a bounded integer, so — unlike
+	 * resync_transient_key() — nothing needs hashing.
+	 *
+	 * @param int $form_id Form post id.
+	 * @return string
+	 */
+	public static function stale_render_transient_key( int $form_id ): string {
+		return (string) self::data()['stale_render']['transient_prefix'] . $form_id;
+	}
+
+	/**
 	 * Returns the transient marking that one form's near-cap warning has
 	 * already been given. Carries the epoch every counter key carries, so
 	 * clearing the counters re-arms the warning along with them.
@@ -448,6 +460,26 @@ final class Config {
 		$bounds = self::bounds( $name );
 
 		return Sanitizer::clamp_int( self::get( $name ), $bounds['min'], $bounds['max'], (int) self::default_for( $name ) );
+	}
+
+	/**
+	 * Whether an administrator has switched off the submit endpoint's nonce
+	 * check. Off by default; see SecurityTab for the warning shown when on.
+	 *
+	 * @return bool
+	 */
+	public static function form_nonce_disabled(): bool {
+		return (bool) self::get( 'disable_form_nonce' );
+	}
+
+	/**
+	 * Whether an administrator has switched off the submit endpoint's rate
+	 * limiting. Off by default; see SecurityTab for the warning shown when on.
+	 *
+	 * @return bool
+	 */
+	public static function form_throttle_disabled(): bool {
+		return (bool) self::get( 'disable_form_throttle' );
 	}
 
 	/**

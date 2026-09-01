@@ -8,7 +8,7 @@
  * Plugin Name:       Wynko for Laposta
  * Plugin URI:        https://getwynko.com/?utm_source=wp-plugin&utm_medium=wynko&utm_campaign=plugins-page
  * Description:       Create native signup forms connected to your Laposta lists, and display your latest campaigns anywhere on your site.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            FlexBorder
  * Author URI:        https://flex-border.com
  * Requires at least: 6.4
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WYNKO_VERSION', '1.0.0' );
+define( 'WYNKO_VERSION', '1.1.0' );
 define( 'WYNKO_FILE', __FILE__ );
 define( 'WYNKO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WYNKO_URL', plugin_dir_url( __FILE__ ) );

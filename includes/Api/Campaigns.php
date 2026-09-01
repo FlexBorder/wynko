@@ -28,6 +28,12 @@ final class Campaigns {
 		if ( is_wp_error( $decoded ) ) {
 			return $decoded;
 		}
-		return CampaignData::normalize( $decoded );
+		/**
+		 * Filters the normalized campaign list before it reaches the cache and blocks.
+		 *
+		 * @since 1.1.0
+		 * @param array<int,array<string,mixed>> $campaigns Normalized campaigns.
+		 */
+		return apply_filters( 'wynko_campaigns', CampaignData::normalize( $decoded ) );
 	}
 }

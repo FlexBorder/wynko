@@ -45,14 +45,23 @@ final class Client {
 		$class = Sanitizer::classify_status( $status );
 		if ( Sanitizer::STATUS_INVALID_KEY === $class ) {
 			/* translators: %d: HTTP status code. */
-			return sprintf( __( 'Invalid API key (HTTP %d)', 'wynko-for-laposta' ), $status );
-		}
-		if ( Sanitizer::STATUS_RATE_LIMITED === $class ) {
+			$message = sprintf( __( 'Invalid API key (HTTP %d)', 'wynko-for-laposta' ), $status );
+		} elseif ( Sanitizer::STATUS_RATE_LIMITED === $class ) {
 			/* translators: %d: HTTP status code. */
-			return sprintf( __( 'Laposta is rate limiting this site (HTTP %d); requests will succeed again shortly.', 'wynko-for-laposta' ), $status );
+			$message = sprintf( __( 'Laposta is rate limiting this site (HTTP %d); requests will succeed again shortly.', 'wynko-for-laposta' ), $status );
+		} else {
+			/* translators: %d: HTTP status code. */
+			$message = sprintf( __( 'Unexpected response from Laposta (HTTP %d)', 'wynko-for-laposta' ), $status );
 		}
-		/* translators: %d: HTTP status code. */
-		return sprintf( __( 'Unexpected response from Laposta (HTTP %d)', 'wynko-for-laposta' ), $status );
+
+		/**
+		 * Filters the human-readable message for a classified Laposta HTTP status.
+		 *
+		 * @since 1.1.0
+		 * @param string $message The generated message.
+		 * @param int    $status  HTTP status code.
+		 */
+		return (string) apply_filters( 'wynko_api_status_message', $message, $status );
 	}
 
 	/**
@@ -81,7 +90,27 @@ final class Client {
 			$request_args['body'] = $args['body'];
 		}
 
+		/**
+		 * Filters the arguments sent to wp_remote_request() for a Laposta API call.
+		 *
+		 * @since 1.1.0
+		 * @param array<string,mixed> $request_args Args as built above.
+		 * @param string              $method       HTTP method.
+		 * @param string              $path         Path relative to Config::api_base().
+		 */
+		$request_args = (array) apply_filters( 'wynko_api_request_args', $request_args, $method, $path );
+
 		$response = wp_remote_request( Config::api_base() . '/' . ltrim( $path, '/' ), $request_args );
+
+		/**
+		 * Filters the raw response from a Laposta API call, before it is decoded.
+		 *
+		 * @since 1.1.0
+		 * @param array<string,mixed>|WP_Error $response The wp_remote_request() result.
+		 * @param string                       $method   HTTP method.
+		 * @param string                       $path     Path relative to Config::api_base().
+		 */
+		$response = apply_filters( 'wynko_api_response', $response, $method, $path );
 
 		if ( is_wp_error( $response ) ) {
 			/* translators: %s: underlying HTTP error message. */

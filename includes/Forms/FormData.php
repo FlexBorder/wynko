@@ -155,6 +155,15 @@ final class FormData {
 		$overrides = $this->field_overrides();
 		$merged    = FieldData::merge_overrides( $defs, $overrides );
 
+		/**
+		 * Filters a form's merged field definitions.
+		 *
+		 * @since 1.1.0
+		 * @param array<int,array<string,mixed>> $merged Merged field definitions.
+		 * @param int                            $form_id Form post id.
+		 */
+		$merged = (array) apply_filters( 'wynko_form_fields', $merged, $this->id() );
+
 		// merge_overrides() appends whatever the stored order does not mention,
 		// which would drop the address to the bottom of a form saved before email
 		// had a row of its own.

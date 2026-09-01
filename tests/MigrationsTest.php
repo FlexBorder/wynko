@@ -66,4 +66,19 @@ final class MigrationsTest extends TestCase {
 
 		$this->assertSame( $sealed, get_option( Config::option_key( 'api_key' ) ) );
 	}
+
+	public function test_wynko_migrations_completed_fires_once_migrations_run(): void {
+		$fired = array();
+		add_action(
+			'wynko_migrations_completed',
+			static function ( $version ) use ( &$fired ) {
+				$fired[] = $version;
+			}
+		);
+
+		Migrations::maybe_run();
+		Migrations::maybe_run();
+
+		$this->assertSame( array( Migrations::SCHEMA_VERSION ), $fired );
+	}
 }

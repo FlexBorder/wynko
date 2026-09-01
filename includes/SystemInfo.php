@@ -7,7 +7,11 @@
 
 namespace Wynko;
 
+use Wynko\Admin\Forms\FormsListPage;
+use Wynko\Integrations\Registry;
+use Wynko\Support\Crypto;
 use Wynko\Support\Requirements;
+use Wynko\Support\Sanitizer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,8 +31,22 @@ final class SystemInfo {
 	const REACHABLE_NO      = 'no';
 	const REACHABLE_UNKNOWN = 'unknown';
 
+	/**
+	 * Row statuses for a feature that is either on or off, rather than a
+	 * version against a threshold — SystemReport::icon() gives these a plain
+	 * yes/no icon instead of Requirements::STATUS_*'s check/warning-triangle
+	 * pairing, and they carry no weight in SystemInfo::environment()'s
+	 * verdict: a signup-form protection an administrator chose to turn off is
+	 * not an environment shortfall.
+	 */
+	const PROTECTION_ENABLED  = 'protection_enabled';
+	const PROTECTION_DISABLED = 'protection_disabled';
+
 	/** The connection row's own control: re-probe the API. */
 	const ACTION_PING = 'ping';
+
+	/** The API key row's own control, shown only for a stored key that is not encrypted: jump to where the API tab explains why and how to fix it. */
+	const ACTION_ENCRYPT_HELP = 'encrypt_help';
 
 	/**
 	 * Builds one report row.
@@ -131,15 +149,29 @@ final class SystemInfo {
 	 * @return array<int,array{title:string,rows:array<int,array{label:string,value:string,note:string,status:string,action:string}>}>
 	 */
 	public static function sections(): array {
-		return array_merge(
+		$sections = array_merge(
 			self::environment_sections(),
 			array(
 				array(
 					'title' => __( 'Plugin', 'wynko-for-laposta' ),
 					'rows'  => self::plugin_rows(),
 				),
+				array(
+					'title' => __( 'Security', 'wynko-for-laposta' ),
+					'rows'  => self::security_rows(),
+				),
 			)
 		);
+
+		$integrations = self::integration_rows();
+		if ( array() !== $integrations ) {
+			$sections[] = array(
+				'title' => __( 'Integrations', 'wynko-for-laposta' ),
+				'rows'  => $integrations,
+			);
+		}
+
+		return $sections;
 	}
 
 	/**
@@ -268,7 +300,90 @@ final class SystemInfo {
 			self::row( __( 'Environment type', 'wynko-for-laposta' ), (string) wp_get_environment_type() ),
 			self::row( __( 'Debug mode', 'wynko-for-laposta' ), self::yes_no( defined( 'WP_DEBUG' ) && WP_DEBUG ) ),
 			self::row( __( 'Site language', 'wynko-for-laposta' ), (string) get_bloginfo( 'language' ) ),
+			self::caching_row(),
 		);
+	}
+
+	/**
+	 * Returns whether a page-caching plugin is active, and which one where
+	 * that can be told. Read from the same mechanism WordPress core itself
+	 * uses to decide whether to load one: get_dropins() only reports
+	 * advanced-cache.php when WP_CACHE is on and the file exists, so its
+	 * declared name is a stronger signal than checking the constant alone —
+	 * every mainstream page-caching plugin (WP Super Cache, WP Rocket, W3
+	 * Total Cache, LiteSpeed Cache, and the rest) writes that drop-in with a
+	 * proper plugin header for exactly this purpose.
+	 *
+	 * @return array{label:string,value:string,note:string,status:string,action:string}
+	 */
+	private static function caching_row(): array {
+		if ( ! function_exists( 'get_dropins' ) ) {
+			return self::row( __( 'Page caching', 'wynko-for-laposta' ), self::unknown() );
+		}
+
+		$dropins = get_dropins();
+		if ( ! isset( $dropins['advanced-cache.php'] ) ) {
+			return self::row( __( 'Page caching', 'wynko-for-laposta' ), self::yes_no( false ) );
+		}
+
+		$name = self::dropin_name( 'advanced-cache.php', (string) ( $dropins['advanced-cache.php']['Name'] ?? '' ) );
+
+		return self::row( __( 'Page caching', 'wynko-for-laposta' ), '' === $name ? self::yes_no( true ) : $name );
+	}
+
+	/**
+	 * Returns one active drop-in's real name — its declared plugin header
+	 * where it has one, otherwise a guess from a short list of well-known
+	 * signature strings inside the file itself, '' when neither identifies
+	 * it.
+	 *
+	 * The header alone is not enough: get_plugin_data() falls back to the
+	 * bare filename when a drop-in carries no real header, which is true of
+	 * most page-caching plugins' advanced-cache.php — it is a thin,
+	 * auto-generated loader rather than the plugin's own file (confirmed
+	 * against WP Super Cache's, which opens with a bare `// WP SUPER CACHE`
+	 * comment and nothing a plugin-header parser recognises). A name that
+	 * turns out to just be the filename is treated as no name at all.
+	 *
+	 * @param string $file        Drop-in filename, e.g. 'advanced-cache.php'.
+	 * @param string $header_name Its get_dropins() 'Name', '' if it has none.
+	 * @return string
+	 */
+	private static function dropin_name( string $file, string $header_name ): string {
+		$header_name = trim( $header_name );
+		if ( '' !== $header_name && $file !== $header_name ) {
+			return $header_name;
+		}
+
+		if ( ! defined( 'WP_CONTENT_DIR' ) || ! is_readable( WP_CONTENT_DIR . '/' . $file ) ) {
+			return '';
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a local drop-in file WordPress itself already reported as active, not a remote resource.
+		$head = (string) file_get_contents( WP_CONTENT_DIR . '/' . $file, false, null, 0, 4096 );
+
+		$signals = array(
+			'WP SUPER CACHE'    => 'WP Super Cache',
+			'WP Rocket'         => 'WP Rocket',
+			'W3 Total Cache'    => 'W3 Total Cache',
+			'W3TC'              => 'W3 Total Cache',
+			'LiteSpeed Cache'   => 'LiteSpeed Cache',
+			'Cache Enabler'     => 'Cache Enabler',
+			'WP Fastest Cache'  => 'WP Fastest Cache',
+			'Comet Cache'       => 'Comet Cache',
+			'Swift Performance' => 'Swift Performance',
+			'Breeze'            => 'Breeze',
+			'SG Optimizer'      => 'SiteGround Optimizer',
+			'WP-Optimize'       => 'WP-Optimize',
+		);
+
+		foreach ( $signals as $needle => $vendor ) {
+			if ( false !== stripos( $head, $needle ) ) {
+				return $vendor;
+			}
+		}
+
+		return '';
 	}
 
 	/**
@@ -524,11 +639,88 @@ final class SystemInfo {
 		return array_merge(
 			array(
 				self::row( __( 'Software', 'wynko-for-laposta' ), '' === $software ? self::unknown() : $software ),
+				self::cdn_row(),
 				self::https_row(),
 				self::tls_library_row(),
 			),
 			self::request_rows()
 		);
+	}
+
+	/**
+	 * Returns which CDN or reverse proxy this request passed through, guessed
+	 * from headers vendors are each known to add. Informational rather than a
+	 * verdict — a site is not wrong for using one, or for not using one — and
+	 * the note says outright that the guess is unverified: none of these
+	 * headers are authenticated, so a client that reaches the origin directly
+	 * can send any of them itself.
+	 *
+	 * @return array{label:string,value:string,note:string,status:string,action:string}
+	 */
+	private static function cdn_row(): array {
+		$found = self::detected_cdn();
+
+		return self::row(
+			__( 'CDN / proxy', 'wynko-for-laposta' ),
+			'' === $found ? self::yes_no( false ) : $found,
+			'' === $found ? '' : __( 'guessed from request headers — unverified, and any of them can be spoofed', 'wynko-for-laposta' )
+		);
+	}
+
+	/**
+	 * Matches this request's headers against the identifying header each
+	 * vendor is known to add, most specific first, so two that both set
+	 * X-Forwarded-For still resolve to the one that actually named itself.
+	 * '' when nothing matches, including a bare forwarding header with
+	 * nothing more specific behind it — which only says some proxy is in
+	 * front, not which one, so it falls through to "Unidentified reverse
+	 * proxy" rather than a guessed vendor name.
+	 *
+	 * @return string
+	 */
+	private static function detected_cdn(): string {
+		$signals = array(
+			'HTTP_CF_RAY'           => 'Cloudflare',
+			'HTTP_CF_CONNECTING_IP' => 'Cloudflare',
+			'HTTP_X_AMZ_CF_ID'      => 'Amazon CloudFront',
+			'HTTP_FASTLY_CLIENT_IP' => 'Fastly',
+			'HTTP_X_SUCURI_ID'      => 'Sucuri',
+			'HTTP_X_SUCURI_CACHE'   => 'Sucuri',
+			'HTTP_X_AZURE_REF'      => 'Azure Front Door',
+			'HTTP_X_KEYCDN_SHIELD'  => 'KeyCDN',
+			'HTTP_X_MAXCDN_CACHE'   => 'StackPath (MaxCDN)',
+		);
+
+		foreach ( $signals as $header => $name ) {
+			if ( '' !== self::server_value( $header ) ) {
+				return $name;
+			}
+		}
+
+		if ( false !== stripos( self::server_value( 'HTTP_VIA' ), 'varnish' ) ) {
+			return 'Varnish';
+		}
+
+		if ( '' !== self::server_value( 'HTTP_X_FORWARDED_FOR' ) || '' !== self::server_value( 'HTTP_VIA' ) ) {
+			return __( 'Unidentified reverse proxy', 'wynko-for-laposta' );
+		}
+
+		return '';
+	}
+
+	/**
+	 * Reads one $_SERVER value the way every reading in this class does:
+	 * sanitized, and only ever read for what it is — a header that arrived
+	 * with this name — never trusted as authenticated fact. One place for the
+	 * isset/unslash/sanitize dance server_rows() and cdn detection both need,
+	 * rather than repeating it per header.
+	 *
+	 * @param string $key $_SERVER key.
+	 * @return string
+	 */
+	private static function server_value( string $key ): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only environment/header reading, not submitted form input; no state changes here.
+		return isset( $_SERVER[ $key ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) ) : '';
 	}
 
 	/**
@@ -653,6 +845,51 @@ final class SystemInfo {
 	}
 
 	/**
+	 * Returns one row per registered integration, or an empty array when none
+	 * are registered — sections() leaves the whole "Integrations" section out
+	 * in that case rather than printing an empty one. Informational rather
+	 * than a verdict, so it carries no status icon: a third-party integration
+	 * being disabled is not a problem this report should flag.
+	 *
+	 * The name()/author()/version() values can originate from a third-party plugin or
+	 * theme's Integration implementation rather than from Wynko itself; the
+	 * HTML rendering path gets newline safety for free from WordPress's own
+	 * output escaping, but these rows also feed SystemReport's plain-text
+	 * export, which has no such escaping — so each is run through
+	 * Sanitizer::single_line() here to stop a forged multi-line value from
+	 * injecting fake report content there.
+	 *
+	 * @return array<int,array{label:string,value:string,note:string,status:string,action:string}>
+	 */
+	private static function integration_rows(): array {
+		$rows = array();
+		foreach ( Registry::all() as $slug => $integration ) {
+			$name    = Sanitizer::single_line( $integration->name() );
+			$author  = Sanitizer::single_line( $integration->author() );
+			$version = Sanitizer::single_line( $integration->version() );
+			$rows[]  = self::row(
+				$name,
+				Integrations::is_enabled( $slug )
+					? __( 'enabled', 'wynko-for-laposta' )
+					: __( 'disabled', 'wynko-for-laposta' ),
+				'' === $author
+					? sprintf(
+						/* translators: %s: version number. */
+						__( 'version %s', 'wynko-for-laposta' ),
+						$version
+					)
+					: sprintf(
+						/* translators: 1: version number, 2: integration author or plugin name. */
+						__( 'version %1$s — provided by %2$s', 'wynko-for-laposta' ),
+						$version,
+						$author
+					)
+			);
+		}
+		return $rows;
+	}
+
+	/**
 	 * Returns the plugin's own state: version, where its key comes from, and
 	 * the last cached verdict about that key.
 	 *
@@ -669,7 +906,7 @@ final class SystemInfo {
 
 		return array(
 			self::row( __( 'Plugin version', 'wynko-for-laposta' ), defined( 'WYNKO_VERSION' ) ? (string) WYNKO_VERSION : self::unknown() ),
-			self::row( __( 'API key source', 'wynko-for-laposta' ), self::key_source_label( $source ) ),
+			self::api_key_row( $source ),
 			self::row(
 				__( 'Cache duration', 'wynko-for-laposta' ),
 				sprintf(
@@ -679,7 +916,6 @@ final class SystemInfo {
 				)
 			),
 			self::row( __( 'Last sync', 'wynko-for-laposta' ), self::last_sync_label() ),
-			self::row( __( 'Signup rate limit', 'wynko-for-laposta' ), self::throttle_label() ),
 			self::row(
 				__( 'Connection status', 'wynko-for-laposta' ),
 				self::connection_label( $source, $verdict ),
@@ -709,6 +945,65 @@ final class SystemInfo {
 	}
 
 	/**
+	 * Returns the submit endpoint's two protections and rate-limit standing:
+	 * whether the nonce check and the throttle are switched on, the
+	 * configured caps, and how much of the per-form cap the open window has
+	 * actually used — the setting alone says nothing about whether it is
+	 * anywhere near being tested.
+	 *
+	 * @return array<int,array{label:string,value:string,note:string,status:string,action:string}>
+	 */
+	private static function security_rows(): array {
+		$nonce_enabled    = ! Config::form_nonce_disabled();
+		$throttle_enabled = ! Config::form_throttle_disabled();
+
+		return array(
+			self::row(
+				__( 'Nonce verification', 'wynko-for-laposta' ),
+				self::yes_no( $nonce_enabled ),
+				'',
+				$nonce_enabled ? self::PROTECTION_ENABLED : self::PROTECTION_DISABLED
+			),
+			self::row(
+				__( 'Rate limiting', 'wynko-for-laposta' ),
+				self::yes_no( $throttle_enabled ),
+				'',
+				$throttle_enabled ? self::PROTECTION_ENABLED : self::PROTECTION_DISABLED
+			),
+			self::row( __( 'Signup rate limit', 'wynko-for-laposta' ), self::throttle_label() ),
+			self::row( __( 'Signups in the current window', 'wynko-for-laposta' ), self::throttle_usage_label() ),
+		);
+	}
+
+	/**
+	 * Returns how much of the per-form cap each published form has actually
+	 * used in the window that is open now, one figure per form — the setting
+	 * alone says what the ceiling is, not whether traffic is anywhere near it.
+	 *
+	 * Joined with newlines rather than commas: SystemReport::render() reads a
+	 * newline in a value as "one item per line" and renders it as a list, and
+	 * SystemReport::text() prints one indented line per item, both preferable
+	 * to a single long comma-separated line once a site has more than a
+	 * couple of forms.
+	 *
+	 * @return string
+	 */
+	private static function throttle_usage_label(): string {
+		$forms = FormsListPage::forms();
+		if ( array() === $forms ) {
+			return __( 'No signup forms yet', 'wynko-for-laposta' );
+		}
+
+		$max   = Config::throttle_max( 'form' );
+		$parts = array();
+		foreach ( $forms as $form ) {
+			$parts[] = sprintf( '%1$s: %2$d/%3$d', $form->display_name(), Throttle::form_hits( $form->id() ), $max );
+		}
+
+		return implode( "\n", $parts );
+	}
+
+	/**
 	 * Returns where the key is coming from, in the operator's terms rather than
 	 * the resolver's slugs. An unreadable stored key outranks the source: the
 	 * key is in the database, it just cannot be opened.
@@ -732,6 +1027,42 @@ final class SystemInfo {
 			return __( 'Database', 'wynko-for-laposta' );
 		}
 		return __( 'No API key configured', 'wynko-for-laposta' );
+	}
+
+	/**
+	 * Returns the API key source row, with an encrypted/not-encrypted reading
+	 * appended when the key is actually in the database — the only place that
+	 * question means anything, since an environment variable or wp-config.php
+	 * constant was never in the database to begin with.
+	 *
+	 * @param string $source ApiKey::source() slug.
+	 * @return array{label:string,value:string,note:string,status:string,action:string}
+	 */
+	private static function api_key_row( string $source ): array {
+		$label = self::key_source_label( $source );
+
+		// An unreadable envelope is already its own message from
+		// key_source_label() above; it is not cleanly "encrypted" (it is
+		// sealed) or "not encrypted" (it once opened), so it is left alone
+		// rather than forced into either reading.
+		if ( 'option' !== $source || 'ok' !== ApiKey::stored_state() ) {
+			return self::row( __( 'API key source', 'wynko-for-laposta' ), $label );
+		}
+
+		$encrypted = Crypto::is_envelope( trim( (string) Config::get( 'api_key' ) ) );
+
+		return self::row(
+			__( 'API key source', 'wynko-for-laposta' ),
+			sprintf(
+				/* translators: 1: where the key comes from, e.g. "Database"; 2: "Encrypted" or "Not encrypted". */
+				__( '%1$s — %2$s', 'wynko-for-laposta' ),
+				$label,
+				$encrypted ? __( 'Encrypted', 'wynko-for-laposta' ) : __( 'Not encrypted', 'wynko-for-laposta' )
+			),
+			'',
+			$encrypted ? self::PROTECTION_ENABLED : self::PROTECTION_DISABLED,
+			$encrypted ? '' : self::ACTION_ENCRYPT_HELP
+		);
 	}
 
 	/**

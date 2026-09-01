@@ -8,8 +8,11 @@
 namespace Wynko\Tests;
 
 use Wynko\Admin\SystemReport;
+use Wynko\ApiKey;
+use Wynko\Config;
 use Wynko\Log;
 use Wynko\Support\Requirements;
+use Wynko\SystemInfo;
 use PHPUnit\Framework\TestCase;
 
 /** Covers the text export's shape, the filename, and the on-screen table. */
@@ -63,6 +66,88 @@ final class SystemReportTest extends TestCase {
 
 		$this->assertStringContainsString( '[warn]', $text );
 		$this->assertStringContainsString( "Server interface: fpm-fcgi\n", $text );
+	}
+
+	/**
+	 * A fixture whose value carries several items, the same shape
+	 * SystemInfo's "Signups in the current window" row can take.
+	 *
+	 * @return array<int,array{title:string,rows:array<int,array{label:string,value:string,note:string,status:string,action:string}>}>
+	 */
+	private function list_fixture(): array {
+		return array(
+			array(
+				'title' => 'Security',
+				'rows'  => array(
+					array(
+						'label'  => 'Signups in the current window',
+						'value'  => "Newsletter signup: 3/400\nFooter signup: 1/400",
+						'note'   => '',
+						'status' => Requirements::STATUS_INFO,
+						'action' => '',
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * render() always reads SystemInfo::sections() live rather than taking a
+	 * fixture, so the list-rendering path is exercised through a real
+	 * multi-item row: two published forms give "Signups in the current
+	 * window" more than one line.
+	 */
+	public function test_render_shows_a_multi_item_value_as_a_bulleted_list(): void {
+		wynko_test_insert_post(
+			array(
+				'post_title'  => 'Newsletter signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+		wynko_test_insert_post(
+			array(
+				'post_title'  => 'Footer signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( '<ul class="wynko-report__list">', $html );
+		$this->assertStringContainsString( '<li>Newsletter signup', $html );
+		$this->assertStringContainsString( '<li>Footer signup', $html );
+	}
+
+	/** A single form keeps the row on one plain line, no list markup. */
+	public function test_render_keeps_a_single_item_value_as_plain_text(): void {
+		wynko_test_insert_post(
+			array(
+				'post_title'  => 'Newsletter signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'wynko-report__list', $html );
+		$this->assertStringContainsString( 'Newsletter signup: 0/', $html );
+	}
+
+	public function test_the_text_export_lists_a_multi_item_value_as_indented_lines(): void {
+		$text = SystemReport::text( $this->list_fixture() );
+
+		$this->assertStringContainsString( "Signups in the current window:\n", $text );
+		$this->assertStringContainsString( '  - Newsletter signup: 3/400', $text );
+		$this->assertStringContainsString( '  - Footer signup: 1/400', $text );
+		// The label line itself must not also carry the old "Label: value" shape.
+		$this->assertStringNotContainsString( 'Signups in the current window: Newsletter', $text );
 	}
 
 	public function test_a_failed_row_is_marked_as_a_failure(): void {
@@ -120,6 +205,37 @@ final class SystemReportTest extends TestCase {
 
 		$this->assertStringContainsString( 'wynko-report__action', $html );
 		$this->assertStringContainsString( 'value="wynko_api_ping"', $html );
+	}
+
+	/** Both protections default to on, so a fresh install's Security table shows green checks. */
+	public function test_a_fresh_install_shows_both_protections_with_the_enabled_icon(): void {
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Security', $html );
+		$this->assertStringContainsString( 'Nonce verification', $html );
+		$this->assertStringContainsString( 'Rate limiting', $html );
+		$this->assertStringNotContainsString( 'dashicons-no-alt', $html );
+	}
+
+	public function test_a_disabled_protection_shows_the_red_x_icon(): void {
+		$GLOBALS['wynko_test_options']['wynko_disable_form_nonce'] = true;
+
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'dashicons-no-alt', $html );
+	}
+
+	public function test_a_disabled_protection_is_marked_off_in_the_text_export(): void {
+		$GLOBALS['wynko_test_options']['wynko_disable_form_throttle'] = true;
+
+		$text = SystemReport::text( SystemInfo::sections() );
+
+		$this->assertStringContainsString( 'Rate limiting: No', $text );
+		$this->assertStringContainsString( '[off]', $text );
 	}
 
 	public function test_the_export_refuses_a_user_without_the_capability(): void {
@@ -199,5 +315,32 @@ final class SystemReportTest extends TestCase {
 	public function test_the_ping_returns_to_the_about_tab(): void {
 		$this->assertStringContainsString( 'tab=about', SystemReport::ping_redirect_url( 'ok' ) );
 		$this->assertStringContainsString( 'wynko_ping=ok', SystemReport::ping_redirect_url( 'ok' ) );
+	}
+
+	/** A plaintext stored key's row offers a way to the API tab's own explanation. */
+	public function test_a_plaintext_key_offers_a_link_to_the_api_tabs_encryption_help(): void {
+		$GLOBALS['wynko_test_options']['wynko_api_key'] = 'plain-secret-key';
+
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'How to encrypt it', $html );
+		$this->assertStringContainsString( 'tab=api', $html );
+	}
+
+	/** Nothing to link to once the key already opens. */
+	public function test_an_encrypted_key_offers_no_encryption_help_link(): void {
+		if ( ! defined( 'SECURE_AUTH_KEY' ) ) {
+			define( 'SECURE_AUTH_KEY', 'test-auth-key' );
+			define( 'SECURE_AUTH_SALT', 'test-auth-salt' );
+		}
+		$GLOBALS['wynko_test_options']['wynko_api_key'] = ApiKey::store( 'a-real-key' );
+
+		ob_start();
+		SystemReport::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'How to encrypt it', $html );
 	}
 }

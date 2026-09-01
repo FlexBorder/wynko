@@ -75,6 +75,36 @@ final class FormSaveTest extends TestCase {
 		$this->assertSame( FormEditPage::SAVE_NOT_FOUND, FormEditPage::save( $other, $this->raw() ) );
 	}
 
+	public function test_wynko_form_config_saved_fires_after_a_successful_save(): void {
+		$this->queue_fields();
+		$fired = array();
+		add_action(
+			'wynko_form_config_saved',
+			static function ( $form_id, $tab ) use ( &$fired ) {
+				$fired[] = array( $form_id, $tab );
+			}
+		);
+
+		FormEditPage::save( $this->form_id, $this->raw() );
+
+		$this->assertSame( array( array( $this->form_id, Screen::TAB_EDITOR ) ), $fired );
+	}
+
+	public function test_wynko_form_config_saved_does_not_fire_on_a_refused_save(): void {
+		$other = wynko_test_insert_post( array( 'post_type' => 'page' ) );
+		$fired = false;
+		add_action(
+			'wynko_form_config_saved',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+
+		FormEditPage::save( $other, $this->raw() );
+
+		$this->assertFalse( $fired );
+	}
+
 	public function test_save_orders_the_fields_by_the_submitted_order(): void {
 		$this->queue_fields();
 

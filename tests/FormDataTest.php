@@ -512,4 +512,21 @@ final class FormDataTest extends TestCase {
 		update_post_meta( $id, Config::form_meta_key( 'list_id' ), $list_id );
 		return (int) $id;
 	}
+
+	public function test_wynko_form_fields_filter_can_add_a_field(): void {
+		add_filter(
+			'wynko_form_fields',
+			static function ( $fields, $form_id ) {
+				$fields[] = array(
+					'field_id'    => 'injected',
+					'custom_name' => 'injected',
+				);
+				return $fields;
+			}
+		);
+
+		$fields = FormData::load( $this->form_id )->fields( $this->defs() );
+
+		$this->assertSame( 'injected', end( $fields )['custom_name'] );
+	}
 }

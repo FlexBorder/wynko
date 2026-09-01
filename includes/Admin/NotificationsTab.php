@@ -206,7 +206,7 @@ final class NotificationsTab {
 		// the submitted group, so a field that does not post would blank the
 		// stored addresses on the next save.
 		printf(
-			'<div class="wynko-notify-emails%s">',
+			'<div class="wynko-notify-emails wynko-nested-fields%s">',
 			Notifier::enabled() ? '' : ' wynko-hidden'
 		);
 		printf(
@@ -256,7 +256,8 @@ final class NotificationsTab {
 	/**
 	 * Normalises the submitted list and stores only deliverable addresses.
 	 * Rejects are named rather than dropped silently: a typo the operator
-	 * cannot see is a feature that quietly does not work.
+	 * cannot see is a feature that quietly does not work — the same is true
+	 * of addresses trimmed off for exceeding the cap, so both are reported.
 	 *
 	 * @param mixed $value Submitted list.
 	 * @return string
@@ -264,10 +265,15 @@ final class NotificationsTab {
 	public static function sanitize_emails( $value ): string {
 		// Split before sanitising, never after: sanitize_text_field() collapses
 		// newlines and tabs to spaces, which would fuse a pasted multi-line list
-		// into one blob that is then rejected wholesale.
-		$parsed  = array_map( 'sanitize_text_field', Recipients::parse( (string) $value, Config::notify_max_recipients() ) );
-		$valid   = array();
-		$invalid = array();
+		// into one blob that is then rejected wholesale. Parsed uncapped here so
+		// the addresses trimmed off by the cap can be named below, rather than
+		// vanishing inside Recipients::parse()'s own truncation.
+		$max      = Config::notify_max_recipients();
+		$all      = array_map( 'sanitize_text_field', Recipients::parse( (string) $value, PHP_INT_MAX ) );
+		$parsed   = array_slice( $all, 0, $max );
+		$overflow = array_slice( $all, $max );
+		$valid    = array();
+		$invalid  = array();
 		foreach ( $parsed as $address ) {
 			if ( false !== is_email( $address ) ) {
 				$valid[] = $address;
@@ -285,6 +291,22 @@ final class NotificationsTab {
 						/* translators: %s: the addresses that were not stored, comma-separated. */
 						__( 'Not a valid email address, so it was not saved: %s', 'wynko-for-laposta' ),
 						Recipients::join( $invalid )
+					)
+				),
+				'error'
+			);
+		}
+
+		if ( array() !== $overflow ) {
+			add_settings_error(
+				Config::option_key( 'notify_emails' ),
+				'wynko_notify_overflow',
+				esc_html(
+					sprintf(
+						/* translators: 1: maximum number of alert recipients. 2: the addresses that were not stored, comma-separated. */
+						__( 'Only the first %1$d addresses are kept. Not saved: %2$s', 'wynko-for-laposta' ),
+						$max,
+						Recipients::join( $overflow )
 					)
 				),
 				'error'

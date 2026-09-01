@@ -82,6 +82,10 @@ return array(
 	// public signup can trigger. The window is Cache::negative_ttl(), already
 	// this plugin's "do not hammer the API" bound.
 	'resync'           => array( 'transient_prefix' => 'wynko_resync_' ),
+	// One stale-rendered-page log entry per form per cooldown window — see
+	// FormSubmitHandler::STALE_RENDER_LOG_COOLDOWN, a deliberately separate
+	// window from resync's above.
+	'stale_render'     => array( 'transient_prefix' => 'wynko_stale_render_' ),
 	// Signup forms. The CPT is internal (no default post UI), so its slug, its
 	// meta keys, and the shortcode tag are configuration like any option key.
 	'forms'            => array(
@@ -138,11 +142,11 @@ return array(
 		),
 	),
 	'options'          => array(
-		'api_key'           => array(
+		'api_key'                    => array(
 			'key'     => 'wynko_api_key',
 			'default' => '',
 		),
-		'cache_minutes'     => array(
+		'cache_minutes'              => array(
 			'key'     => 'wynko_cache_minutes',
 			'env'     => true,
 			'default' => 60,
@@ -151,13 +155,13 @@ return array(
 				'max' => 1440,
 			),
 		),
-		'log'               => array(
+		'log'                        => array(
 			'key'     => 'wynko_log',
 			'default' => array(),
 		),
 		// The lowest severity that gets recorded. Ordered most severe first, to
 		// match Support\Sanitizer::LOG_LEVELS, which owns the ranking.
-		'log_level'         => array(
+		'log_level'                  => array(
 			'key'     => 'wynko_log_level',
 			'env'     => true,
 			'default' => 'info',
@@ -166,7 +170,7 @@ return array(
 		// How long one signup rate-limit window lasts, in minutes. Stored in
 		// minutes because that is what the settings screen asks for; the
 		// counters work in seconds, and Config converts.
-		'throttle_window'   => array(
+		'throttle_window'            => array(
 			'key'     => 'wynko_throttle_window',
 			'env'     => true,
 			'default' => 10,
@@ -178,7 +182,7 @@ return array(
 		// Signups allowed from one address per window, generous because one
 		// office or school shares a single REMOTE_ADDR. The floor is 1, since a
 		// cap of zero would close every form on the site.
-		'throttle_ip_max'   => array(
+		'throttle_ip_max'            => array(
 			'key'     => 'wynko_throttle_ip_max',
 			'env'     => true,
 			'default' => 15,
@@ -192,7 +196,7 @@ return array(
 		// exhausting a tight form cap blocks every legitimate signup on that
 		// form for the window, from any address — which is a cheaper attack
 		// than the spam the cap exists to stop.
-		'throttle_form_max' => array(
+		'throttle_form_max'          => array(
 			'key'     => 'wynko_throttle_form_max',
 			'env'     => true,
 			'default' => 400,
@@ -201,24 +205,40 @@ return array(
 				'max' => 100000,
 			),
 		),
+		// Site-owner escape hatches for the submit endpoint's two protections,
+		// off by default so nothing changes until an admin opts out. Every
+		// hosting setup is different — a caching layer or proxy neither of us
+		// anticipated may need one switched off to test — but disabling either
+		// is a real trade-off, which is why SecurityTab shows a standing warning
+		// whenever one is on.
+		'disable_form_nonce'         => array(
+			'key'     => 'wynko_disable_form_nonce',
+			'env'     => true,
+			'default' => false,
+		),
+		'disable_form_throttle'      => array(
+			'key'     => 'wynko_disable_form_throttle',
+			'env'     => true,
+			'default' => false,
+		),
 		// Critical-email alerts, off until somebody opts in: an update must
 		// never start sending mail on its own. Deploying notify_emails is an
 		// opt-in too — see Notifier::forced().
-		'notify_enabled'    => array(
+		'notify_enabled'             => array(
 			'key'     => 'wynko_notify_enabled',
 			'env'     => true,
 			'default' => false,
 		),
 		// Comma-separated addresses, stored already normalised by the
 		// settings-page sanitiser.
-		'notify_emails'     => array(
+		'notify_emails'              => array(
 			'key'     => 'wynko_notify_emails',
 			'env'     => true,
 			'default' => '',
 		),
 		// When campaigns were last fetched: array{at:int,ok:bool}, written by
 		// Cache::fill() on both the silent and the explicit path.
-		'last_sync'         => array(
+		'last_sync'                  => array(
 			'key'     => 'wynko_last_sync',
 			'default' => array(),
 		),
@@ -226,7 +246,7 @@ return array(
 		// dismissed: array{seq:int,at:int,message:string,dismissed:int}. The
 		// ordering is a counter rather than the clock, so a failure recorded in
 		// the same second as a dismissal is still shown.
-		'alert_failure'     => array(
+		'alert_failure'              => array(
 			'key'     => 'wynko_alert_failure',
 			'default' => array(),
 		),
@@ -234,7 +254,7 @@ return array(
 		// requirements notice for. A fingerprint rather than a flag: dismissing
 		// silences this environment, and a host upgrade or downgrade produces a
 		// different one, which raises the notice again on its own.
-		'env_dismissed'     => array(
+		'env_dismissed'              => array(
 			'key'     => 'wynko_env_dismissed',
 			'default' => '',
 		),
@@ -242,25 +262,25 @@ return array(
 		// genuinely new. An option rather than a transient on purpose: the
 		// campaign transient expiring is precisely what triggers a sync, so
 		// diffing against it would report the whole account as new every time.
-		'seen'              => array(
+		'seen'                       => array(
 			'key'     => 'wynko_seen',
 			'default' => array(),
 		),
 		// The last known name of every list a published signup form is bound
 		// to, so a list that vanishes can be named rather than reported as an
 		// opaque id.
-		'list_names'        => array(
+		'list_names'                 => array(
 			'key'     => 'wynko_list_names',
 			'default' => array(),
 		),
 		// List ids already reported as removed from Laposta, so the alarm fires
 		// once rather than on every sync for as long as the list stays gone.
-		'gone_lists'        => array(
+		'gone_lists'                 => array(
 			'key'     => 'wynko_gone_lists',
 			'default' => array(),
 		),
 		// Per-block attribute, not a stored option; kept here so the bound lives in one place.
-		'campaign_count'    => array(
+		'campaign_count'             => array(
 			'default' => 5,
 			'bounds'  => array(
 				'min' => 1,
@@ -269,17 +289,31 @@ return array(
 		),
 		// Per-block attributes; the renderer's whitelist and the editor's
 		// controls share these values, so they live here once.
-		'campaign_order_by' => array(
+		'campaign_order_by'          => array(
 			'default' => 'date',
 			'allowed' => array( 'date', 'subject', 'name' ),
 		),
-		'campaign_order'    => array(
+		'campaign_order'             => array(
 			'default' => 'desc',
 			'allowed' => array( 'asc', 'desc' ),
 		),
-		'campaign_label'    => array(
+		'campaign_label'             => array(
 			'default' => 'subject',
 			'allowed' => array( 'subject', 'date', 'subject_date', 'name', 'name_date' ),
+		),
+		// Slugs of integrations an administrator has switched on. Availability
+		// (e.g. Contact Form 7 itself being active) is checked separately at
+		// boot time — this option only records intent.
+		'integrations_enabled'       => array(
+			'key'     => 'wynko_integrations_enabled',
+			'default' => array(),
+		),
+		// Integrations demoted at boot time because their own dependency
+		// vanished: array<int,array{slug:string,name:string}>, drained by
+		// IntegrationAutoDisabledNotice the next time an admin sees it.
+		'integrations_auto_disabled' => array(
+			'key'     => 'wynko_integrations_auto_disabled',
+			'default' => array(),
 		),
 	),
 );

@@ -38,6 +38,14 @@ final class Migrations {
 		self::seal_stored_key();
 
 		update_option( self::SCHEMA_OPTION, self::SCHEMA_VERSION, true );
+
+		/**
+		 * Fires after this site's per-site migrations complete.
+		 *
+		 * @since 1.1.0
+		 * @param int $schema_version The schema version just migrated to.
+		 */
+		do_action( 'wynko_migrations_completed', self::SCHEMA_VERSION );
 	}
 
 	/**

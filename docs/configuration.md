@@ -31,9 +31,10 @@ ignored rather than applied, so a typo cannot silently reconfigure a site.
 Block attributes (how many campaigns to show, how to sort and label them) are
 per-block, not site settings, and have no variable.
 
-This version allows **one** signup form per site. Multiple forms are the planned
-commercial feature, and the cap is not a setting: no variable, no constant, and
-no stored option raises it on a site that is being run.
+Signup forms are stored posts, not settings — a site has as many as it needs,
+each with its own bound list, fields, and messages, edited under
+**Wynko → Signup forms**. None of that is environment-configurable; there is no
+variable or constant for a form.
 
 ---
 

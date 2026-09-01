@@ -76,7 +76,7 @@ final class MenuTest extends TestCase {
 		$screens = Menu::screens();
 		$slugs   = array_column( $screens, 'slug' );
 
-		$this->assertSame( array( Menu::PARENT, Menu::FORMS, Menu::LOG ), $slugs );
+		$this->assertSame( array( Menu::PARENT, Menu::FORMS, Menu::INTEGRATIONS, Menu::LOG ), $slugs );
 		foreach ( $screens as $screen ) {
 			$this->assertIsCallable( $screen['render'] );
 			$this->assertNotSame( '', $screen['title'] );

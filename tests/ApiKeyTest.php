@@ -211,4 +211,16 @@ final class ApiKeyTest extends TestCase {
 		$this->assertSame( 'option', ApiKey::source() );
 		$this->assertSame( '', ApiKey::constant_name() );
 	}
+
+	public function test_wynko_api_key_filter_can_override_the_resolved_key(): void {
+		update_option( Config::option_key( 'api_key' ), 'option-key' );
+		add_filter(
+			'wynko_api_key',
+			static function () {
+				return 'overridden-key';
+			}
+		);
+
+		$this->assertSame( 'overridden-key', ApiKey::resolve() );
+	}
 }

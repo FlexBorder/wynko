@@ -116,4 +116,18 @@ final class LogTest extends TestCase {
 
 		$this->assertSame( array(), Log::all() );
 	}
+
+	public function test_wynko_log_added_fires_with_the_level_and_message(): void {
+		$fired = array();
+		add_action(
+			'wynko_log_added',
+			static function ( $level, $message ) use ( &$fired ) {
+				$fired[] = array( $level, $message );
+			}
+		);
+
+		Log::warning( 'careful' );
+
+		$this->assertSame( array( array( 'warning', 'careful' ) ), $fired );
+	}
 }

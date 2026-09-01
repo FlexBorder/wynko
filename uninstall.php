@@ -30,6 +30,9 @@ function wynko_delete_plugin_data(): void {
 	delete_option( 'wynko_env_dismissed' );
 	delete_option( 'wynko_list_names' );
 	delete_option( 'wynko_gone_lists' );
+	delete_option( 'wynko_integrations_enabled' );
+	delete_option( 'wynko_integrations_auto_disabled' );
+	delete_option( 'wynko_cf7_checkbox_label' );
 	delete_option( 'wynko_schema' );
 	delete_option( 'wynko_max_forms' );
 	// The counters themselves are prefixed transients with a ten-minute life,

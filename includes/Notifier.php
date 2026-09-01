@@ -96,6 +96,15 @@ final class Notifier {
 			// recording the failure only there reports it where nobody is
 			// looking. AlertNotice puts it on every admin screen instead.
 			AlertNotice::record( $failure );
+		} else {
+			/**
+			 * Fires after a critical-email alert is sent.
+			 *
+			 * @since 1.1.0
+			 * @param array<int,string> $to      The addresses it was sent to.
+			 * @param string            $message The error message it carried.
+			 */
+			do_action( 'wynko_notification_sent', $to, $message );
 		}
 		self::$sending = false;
 	}
@@ -142,7 +151,7 @@ final class Notifier {
 	public static function recipients(): array {
 		$parsed = Recipients::parse( (string) Config::get( 'notify_emails' ), Config::notify_max_recipients() );
 
-		return array_values(
+		$recipients = array_values(
 			array_filter(
 				$parsed,
 				static function ( string $address ): bool {
@@ -150,6 +159,14 @@ final class Notifier {
 				}
 			)
 		);
+
+		/**
+		 * Filters the alert email's recipient addresses.
+		 *
+		 * @since 1.1.0
+		 * @param array<int,string> $recipients Deliverable stored addresses.
+		 */
+		return array_values( array_map( 'strval', (array) apply_filters( 'wynko_notification_recipients', $recipients ) ) );
 	}
 
 	/**

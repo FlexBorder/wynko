@@ -87,6 +87,11 @@ final class Assets {
 					// The mirror of the line above, for a label the form will
 					// not display; same copy FieldRows puts on the read-only box.
 					'labelOff'       => __( 'This form shows placeholders instead of labels, so this label is not displayed.', 'wynko-for-laposta' ),
+					// Bulk deactivate can span several different integrations at
+					// once, so this stays generic rather than naming any one of
+					// them — the per-row Deactivate link's own confirm() names
+					// the specific consequence instead.
+					'bulkDeactivate' => __( 'Deactivating may stop a form that relies on one of the checked integrations from working as expected. Deactivate the checked integrations anyway?', 'wynko-for-laposta' ),
 				),
 			)
 		);

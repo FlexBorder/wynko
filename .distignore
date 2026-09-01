@@ -35,6 +35,7 @@
 /package.json
 /package-lock.json
 /webpack.config.js
+/.eslintrc.js
 
 # composer.json is deliberately NOT excluded: Plugin Check flags a shipped
 # vendor/ directory with no composer.json alongside it
@@ -52,6 +53,7 @@
 /SECURITY.md
 /HANDBOOK_COMPLIANCE.md
 /TECHNICAL_DEBT.md
+/RISK_REGISTER.md
 /README.md
 /docs
 

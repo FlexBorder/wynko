@@ -6,14 +6,18 @@
     "scripts": {
         "build": "wp-scripts build",
         "start": "wp-scripts start",
-        "lint:js": "wp-scripts lint-js src",
-        "lint:js:fix": "wp-scripts lint-js src --fix",
+        "lint:js": "wp-scripts lint-js src tests/e2e",
+        "lint:js:fix": "wp-scripts lint-js src tests/e2e --fix",
         "lint:style": "wp-scripts lint-style 'src/**/*.scss'",
         "lint:style:fix": "wp-scripts lint-style 'src/**/*.scss' --fix",
         "i18n": "bin/i18n.sh",
-        "sbom": "bin/sbom-generate.sh"
+        "sbom": "bin/sbom-generate.sh",
+        "test:e2e": "wp-scripts test-playwright --config=tests/e2e/playwright.config.js",
+        "test:e2e:install": "npx playwright install chromium --with-deps"
     },
     "devDependencies": {
+        "@playwright/test": "1.62.1",
+        "@wordpress/e2e-test-utils-playwright": "1.52.0",
         "@wordpress/scripts": "^30.0.0",
         "typescript": "^5.9.3"
     }

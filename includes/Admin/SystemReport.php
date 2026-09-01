@@ -47,13 +47,51 @@ final class SystemReport {
 					'<tr><th scope="row">%s</th><td>%s%s%s%s</td></tr>',
 					esc_html( $row['label'] ),
 					self::icon( $row['status'] ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returns one of three fixed markup literals, no caller input.
-					esc_html( $row['value'] ),
+					self::value( $row['value'] ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escapes every item itself; see value().
 					'' === $row['note'] ? '' : ' <span class="description">(' . esc_html( $row['note'] ) . ')</span>',
 					self::row_action( $row['action'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Builds its own escaped markup from a fixed slug; see row_action().
 				);
 			}
 			echo '</tbody></table>';
 		}
+	}
+
+	/**
+	 * Returns one row's value, escaped. A value carrying newlines — several
+	 * items SystemInfo packed into one reading, such as one line per signup
+	 * form — renders as a bulleted list instead of one long comma-separated
+	 * line; anything else renders exactly as it did before this existed.
+	 *
+	 * @param string $value A row's 'value'.
+	 * @return string
+	 */
+	private static function value( string $value ): string {
+		if ( false === strpos( $value, "\n" ) ) {
+			return esc_html( $value );
+		}
+
+		$items = array_map( 'esc_html', self::list_items( $value ) );
+
+		return '<ul class="wynko-report__list"><li>' . implode( '</li><li>', $items ) . '</li></ul>';
+	}
+
+	/**
+	 * Splits one newline-carrying value into its items, dropping any blank
+	 * line. The one place both render() (via value()) and text() turn a
+	 * multi-item reading into a list, so the split logic lives once.
+	 *
+	 * @param string $value A row's 'value', already known to carry a newline.
+	 * @return array<int,string>
+	 */
+	private static function list_items( string $value ): array {
+		return array_values(
+			array_filter(
+				explode( "\n", $value ),
+				static function ( string $line ): bool {
+					return '' !== $line;
+				}
+			)
+		);
 	}
 
 	/**
@@ -65,19 +103,27 @@ final class SystemReport {
 	 * @return string
 	 */
 	private static function row_action( string $action ): string {
-		if ( SystemInfo::ACTION_PING !== $action ) {
-			return '';
+		if ( SystemInfo::ACTION_PING === $action ) {
+			return sprintf(
+				'<form class="wynko-report__action" method="post" action="%s">'
+				. '<input type="hidden" name="action" value="%s" />%s'
+				. '<button type="submit" class="button button-secondary">%s</button></form>',
+				esc_url( admin_url( 'admin-post.php' ) ),
+				esc_attr( self::ACTION_PING ),
+				wp_nonce_field( self::ACTION_PING, '_wpnonce', true, false ),
+				esc_html__( 'Test connection now', 'wynko-for-laposta' )
+			);
 		}
 
-		return sprintf(
-			'<form class="wynko-report__action" method="post" action="%s">'
-			. '<input type="hidden" name="action" value="%s" />%s'
-			. '<button type="submit" class="button button-secondary">%s</button></form>',
-			esc_url( admin_url( 'admin-post.php' ) ),
-			esc_attr( self::ACTION_PING ),
-			wp_nonce_field( self::ACTION_PING, '_wpnonce', true, false ),
-			esc_html__( 'Test connection now', 'wynko-for-laposta' )
-		);
+		if ( SystemInfo::ACTION_ENCRYPT_HELP === $action ) {
+			return sprintf(
+				'<a class="wynko-report__action button button-secondary" href="%s">%s</a>',
+				esc_url( SettingsPage::tab_url( SettingsPage::TAB_API ) ),
+				esc_html__( 'How to encrypt it', 'wynko-for-laposta' )
+			);
+		}
+
+		return '';
 	}
 
 	/**
@@ -108,12 +154,22 @@ final class SystemReport {
 	 * Returns the status icon for one row. An informational row gets none: a
 	 * tick beside "Multisite: no" would read as a verdict.
 	 *
-	 * @param string $status A Requirements::STATUS_* constant.
+	 * A protection row gets a plain yes/no pairing rather than the
+	 * check/warning-triangle one a version threshold gets: "off" is a
+	 * definite, chosen state, not a shortfall against some other number, and
+	 * a triangle beside it would read as a version that fell short rather
+	 * than a switch someone flipped.
+	 *
+	 * @param string $status A Requirements::STATUS_* constant, or one of
+	 *                       SystemInfo::PROTECTION_*.
 	 * @return string
 	 */
 	private static function icon( string $status ): string {
-		if ( Requirements::STATUS_OK === $status ) {
+		if ( Requirements::STATUS_OK === $status || SystemInfo::PROTECTION_ENABLED === $status ) {
 			return '<span class="dashicons dashicons-yes-alt" style="color:#00a32a;"></span> ';
+		}
+		if ( SystemInfo::PROTECTION_DISABLED === $status ) {
+			return '<span class="dashicons dashicons-no-alt" style="color:#d63638;"></span> ';
 		}
 		if ( Requirements::STATUS_BELOW_REQUIRED === $status ) {
 			return '<span class="dashicons dashicons-warning" style="color:#d63638;"></span> ';
@@ -137,8 +193,20 @@ final class SystemReport {
 			$lines[] = '';
 			$lines[] = '== ' . $section['title'] . ' ==';
 			foreach ( $section['rows'] as $row ) {
-				$note    = '' === $row['note'] ? '' : ' (' . $row['note'] . ')';
-				$lines[] = $row['label'] . ': ' . $row['value'] . self::marker( $row['status'] ) . $note;
+				$note = '' === $row['note'] ? '' : ' (' . $row['note'] . ')';
+
+				// A multi-item reading (see SystemReport::value()'s docblock)
+				// prints as its own indented lines under the label, rather
+				// than as one line so long it wraps mid-item.
+				if ( false === strpos( $row['value'], "\n" ) ) {
+					$lines[] = $row['label'] . ': ' . $row['value'] . self::marker( $row['status'] ) . $note;
+					continue;
+				}
+
+				$lines[] = $row['label'] . ':' . self::marker( $row['status'] ) . $note;
+				foreach ( self::list_items( $row['value'] ) as $item ) {
+					$lines[] = '  - ' . $item;
+				}
 			}
 		}
 
@@ -158,6 +226,9 @@ final class SystemReport {
 		}
 		if ( Requirements::STATUS_BELOW_ADVISED === $status ) {
 			return '  [warn]';
+		}
+		if ( SystemInfo::PROTECTION_DISABLED === $status ) {
+			return '  [off]';
 		}
 		return '';
 	}

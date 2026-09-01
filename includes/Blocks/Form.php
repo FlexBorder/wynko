@@ -127,6 +127,14 @@ final class Form {
 				: '';
 		}
 
-		return FormRenderer::render( $form_id );
+		/**
+		 * Filters the form block's rendered HTML.
+		 *
+		 * @since 1.1.0
+		 * @param string               $content    Rendered block HTML.
+		 * @param array<string,mixed>  $attributes Block attributes.
+		 * @param int                  $form_id    The rendered form's post id.
+		 */
+		return (string) apply_filters( 'wynko_form_block_content', FormRenderer::render( $form_id ), $attributes, $form_id );
 	}
 }

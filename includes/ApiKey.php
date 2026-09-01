@@ -179,7 +179,13 @@ final class ApiKey {
 	 * @return string
 	 */
 	public static function resolve(): string {
-		return self::resolved()['key'];
+		/**
+		 * Filters the resolved Laposta API key.
+		 *
+		 * @since 1.1.0
+		 * @param string $key The key resolved from env, a constant, or the option.
+		 */
+		return (string) apply_filters( 'wynko_api_key', self::resolved()['key'] );
 	}
 
 	/**

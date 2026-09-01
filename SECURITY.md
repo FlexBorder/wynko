@@ -32,12 +32,12 @@ surface. Each row below is a rule that new code must satisfy.
 
 | OWASP | Surface in this plugin | Required control |
 |-------|------------------------|------------------|
-| **A01 Broken Access Control** | Settings page, `admin-post` sync, the About tab's system-report export and connection re-test (`admin_post_wynko_system_report`, `admin_post_wynko_api_ping`), the activity log's download and clear (`admin_post_wynko_export_log`, `admin_post_wynko_clear_log`), the Notifications tab's test send (`admin_post_wynko_notify_test`), the signup rate-limit reset (`admin_post_wynko_reset_throttle`), the requirements notice's dismissal (`admin_post_wynko_env_dismiss`), the signup forms' create, save, rename, and delete actions (`admin_post_wynko_new_form`, `_save_form`, `_rename_form`, `_delete_form`), the public signup submit action (`admin-post[_nopriv]_wynko_submit_form`), the `wynko/v1` REST routes, future webhook routes | Every state-changing handler checks `current_user_can()` for the right capability, except the public signup submit endpoints, which are deliberately unauthenticated and rely on a form-scoped nonce plus `Throttle`'s per-IP and per-form rate limit instead. REST routes define a real `permission_callback`; a bare `permission_callback => '__return_true'` is allowed **only** for an endpoint that is public by design *and* verifies a form-scoped nonce as its first action — today that is `POST wynko/v1/forms/<id>/submit` and nothing else. Anything else using it is a bug. Webhook routes authenticate the caller (Laposta signature / shared secret) before doing anything. |
+| **A01 Broken Access Control** | Settings page, `admin-post` sync, the About tab's system-report export and connection re-test (`admin_post_wynko_system_report`, `admin_post_wynko_api_ping`), the activity log's download and clear (`admin_post_wynko_export_log`, `admin_post_wynko_clear_log`), the Notifications tab's test send (`admin_post_wynko_notify_test`), the signup rate-limit reset (`admin_post_wynko_reset_throttle`), the requirements notice's dismissal (`admin_post_wynko_env_dismiss`), the signup forms' create, save, rename, and delete actions (`admin_post_wynko_new_form`, `_save_form`, `_rename_form`, `_delete_form`), the public signup submit action (`admin-post[_nopriv]_wynko_submit_form`), the `wynko/v1` REST routes, future webhook routes | Every state-changing handler checks `current_user_can()` for the right capability, except the public signup submit endpoints, which are deliberately unauthenticated and rely on a form-scoped nonce plus `Throttle`'s per-IP and per-form rate limit instead. REST routes define a real `permission_callback`; a bare `permission_callback => '__return_true'` is allowed **only** for an endpoint that is public by design *and* verifies a form-scoped nonce as its first action — today that is `POST wynko/v1/forms/<id>/submit` and nothing else. Anything else using it is a bug. Webhook routes authenticate the caller (Laposta signature / shared secret) before doing anything. Both of the submit endpoint's own protections are additionally admin-controlled, off-by-default exceptions to this: `Config::form_nonce_disabled()` and `Config::form_throttle_disabled()` (Security tab, `SecurityTab::field_disable_nonce()`/`field_disable_throttle()`), added as a caching/proxy-setup escape hatch rather than as a recommended posture. Neither setting changes anything for a site that leaves them off; either one on shows a standing warning on that tab only, naming the exact cost of the trade. |
 | **A02 Cryptographic / secrets** | Laposta API key | Never echoed back to the page (masked placeholder, or the source's *name* only); never written to logs; only a SHA-256 fingerprint of it is cached (`wynko_key_status`). Encrypted at rest — see below. A key stored in the database is deleted on uninstall (`uninstall.php`); a key supplied by an `WYNKO_API_KEY` / `WYNKO_API_KEY_{blog_id}` environment variable or `wp-config.php` constant is never written to the database, so it is outside the plugin's lifecycle and is not removed on uninstall. When either is set, the settings page refuses to store a shadowing option, but a value saved beforehand is retained (inert) in the database; `register_setting()` only runs behind `is_admin()`, so WP-CLI or a direct `update_option()` call can still write `wynko_api_key` — it is inert, since `ApiKey::resolve()` always prefers the higher-precedence source. |
 | **A03 Injection & XSS** | Every request input; all admin/front-end output; a signup field's `pattern`; critical-email recipients | Sanitize + validate all input (`sanitize_*`, `wp_unslash`); escape all output at the point of output (`esc_html`, `esc_attr`, `esc_url`). No raw SQL — use the options/transients API. A field's `pattern` is the one input the *server* executes rather than prints: it is compile-tested by `Support\Fields::compile_pattern()` when the form is saved and a form carrying one that will not compile is refused whole, so `preg_match()` never meets an unusable pattern during a submission — where its warning would be silent, and on an admin screen would raise core's `php-error` body class. It is always wrapped anchored (`/\A(?:…)\z/u`) so it cannot match a substring, and a pattern that fails to compile matches nothing rather than waving a value through. Writing one needs `manage_options`, the same capability that can install code; a deliberately catastrophic regex is therefore a trusted-author risk, not a privilege boundary, and is not defended against. Critical-email recipients are the one typed input that becomes a mail *header*, and the control that keeps a newline — and therefore an injected header — out of `$to` is `Support\Recipients::parse()`, not `is_email()`: `parse()` treats `\r` and `\n` as list separators and `trim()`s every piece, so a smuggled header becomes its own list entry rather than riding along inside one. Core's `is_email()` is the *deliverability* filter applied after that (its local-part regex is unanchored against a trailing newline, so it must never be relied on alone). Both run at save time and again at send time, and a submitted string never reaches the mailer whole. Narrowing `parse()`'s separator class, or adding a caller that hands pre-split addresses straight to `is_email()`, reopens this. The alert body is `text/plain`, so a log message carrying remote text from Laposta is inert rather than escaped. |
 | **A05 Security Misconfiguration** | Direct file access | Every PHP file guards with `if ( ! defined( 'ABSPATH' ) ) { exit; }`. |
 | **A08 CSRF (WP-specific)** | Every state-changing form/handler | Nonces required (`wp_nonce_field` + `check_admin_referer` / `wp_verify_nonce`). This includes handlers whose only effect is cosmetic — dismissing the requirements notice writes an option, so it is nonced like any other write. Deleting a form keeps its own form, action, and nonce, separate from the save it sits beside, so a save can never trigger a delete — the two are adjacent by CSS only. Bulk deletion from the forms list runs on the list screen itself under `WP_List_Table`'s own `bulk-wynko_forms` nonce, and `FormsListPage::bulk_delete()` re-checks the capability and calls `FormData::load()` on every id, so an arbitrary post id cannot be destroyed through it. |
-| **A09 Logging failures** | Activity log | Log security-relevant events (key rejected/accepted, connection probes, sync outcomes, signup outcomes) — but never secrets and never personal data. A signup entry names the form and the outcome; it never carries the submitted address or field values, because the log is downloadable as a `.txt` by any `manage_options` user. The recording threshold (`wynko_log_level`) may suppress `info` and `warning`, never `error`. The three publicly reachable failure modes — a bad nonce, an unknown form, and a throttled request — are deliberately not logged, so anonymous probe traffic cannot push real entries past the cap. A duplicate signup is logged at `warning`, never `error`: the visitor is told it succeeded, so it must not reach `Notifier`. `Notifier` mails an `error` entry onward to the configured addresses, capped at one per hour; the alert carries the log message, the site URL, and the time, and — like the log itself — never the API key, any part of it, or its fingerprint. |
+| **A09 Logging failures** | Activity log | Log security-relevant events (key rejected/accepted, connection probes, sync outcomes, signup outcomes) — but never secrets and never personal data. A signup entry names the form and the outcome; it never carries the submitted address or field values, because the log is downloadable as a `.txt` by any `manage_options` user. The recording threshold (`wynko_log_level`) may suppress `info` and `warning`, never `error`. The three publicly reachable failure modes — a bad nonce, an unknown form, and a throttled request — are deliberately not logged, so anonymous probe traffic cannot push real entries past the cap. A duplicate signup is logged at `warning`, never `error`: the visitor is told it succeeded, so it must not reach `Notifier`. `Notifier` mails an `error` entry onward to the configured addresses, capped at one per hour; the alert carries the log message, the site URL, and the time, and — like the log itself — never the API key, any part of it, or its fingerprint. An integration turning off follows the same rule in reverse: `Integrations::set_enabled()` logs at `error` (reaching `Notifier`) when `Integrations::demote_unavailable()` turned it off because its own dependency vanished — an event the site owner did not choose and a form may now be silently broken — and at `info` (never mailed) when an administrator chose it through the Integrations screen, since that is expected and needs no alert. |
 | **A10 SSRF** | Outbound calls to Laposta | `Wynko\Api\Client` only ever calls paths under the fixed `Config::api_base()` host. No user-supplied hostnames or redirects. A failed signup carrying Laposta's field-drift signature can cause one forced field refetch, to that same fixed host: the exposure is request volume, bounded by a per-list cooldown of `Cache::negative_ttl()` (`FormSubmitHandler::may_resync()`) and by `Throttle`'s per-IP and per-form caps, which run first. |
 
 ## Encryption of the stored API key
@@ -109,6 +109,126 @@ Before merging code that adds any of the following, confirm the matching control
   same reason the system report is. `.txt` rather than CSV, so no cell can be
   read as a spreadsheet formula. It contains no key material (A02) and no
   submitted subscriber data (A09).
+- **The Integrations screen's activate/deactivate actions**
+  (`admin_post_wynko_toggle_integration` for one row's link,
+  `admin_post_wynko_bulk_toggle_integration` for the checkbox/bulk-actions
+  form) each check `Menu::CAP`. The single-row link is a GET request
+  protected by a per-slug nonce (`IntegrationsPage::nonce_action()`), scoped
+  the same way `FormSubmitHandler::nonce_action()` scopes a form's own
+  token; the bulk form is a POST protected by one page-wide nonce
+  (`IntegrationsPage::ACTION_BULK`), since it can name many slugs in one
+  request. Both funnel into `Integrations::set_enabled()`, which validates
+  every slug against `Integrations\Registry::all()` before it is written to
+  `wynko_integrations_enabled`, so a forged or stale slug is ignored rather
+  than stored; the bulk handler additionally ignores any `bulk_action`
+  value other than `activate`/`deactivate` rather than guessing intent.
+  Turning one *on* is refused when `Integration::is_available()` is false,
+  closing the same door a forged single-row or bulk request would otherwise
+  have into an integration the screen's own Activate link already hides —
+  the UI omitting the link is cosmetic, not the actual gate.
+  `Integrations::demote_unavailable()` (running on `init`, not gated behind
+  `is_admin()`) applies the same demotion itself when a previously-enabled
+  integration's dependency disappears between requests, so stored intent
+  never claims "on" for something that cannot run — hooked on `init` rather
+  than folded into `Integrations::boot()`'s own `plugins_loaded` callback,
+  since demotion logs a translated message and WordPress does not consider
+  a text domain safe to load before `init` (a real incident: doing so
+  produced a `_doing_it_wrong` notice whose output broke a redirect later in
+  the same request).
+  `Integration::name()`, `description()`, `author()`, `author_uri()`,
+  `documentation_uri()`, `version()`, and `deactivation_warning()` can now
+  originate from code Wynko did not write — registering one requires being
+  an active plugin or theme, a trust level that already grants arbitrary
+  PHP execution, so this is not a new privilege boundary, but every string
+  is still `esc_html()`-escaped at the point of output (`slug()` is
+  `esc_attr()`-escaped wherever it lands in an attribute, and the two URI
+  methods are `esc_url()`-escaped before landing in an `href`, with
+  `target="_blank" rel="noopener noreferrer"` on both so a malicious
+  integration's linked page cannot reach back into the admin tab via
+  `window.opener`) per the "new admin string" rule below, since a hostile
+  or careless third party is still a realistic source of bad markup even
+  without a new capability. `deactivation_warning()` lands inside the
+  Deactivate link's own `onclick="return confirm(...)"`, not as markup, so
+  it goes through `wp_json_encode()` then `esc_attr()` — JSON-encoding
+  first neutralizes quotes and `</script`-style breakouts before the
+  attribute escape runs, the same two-step FormsTable's own delete
+  confirmation uses.
+- **The auto-disabled-integration notice's dismissal**
+  (`admin_post_wynko_integrations_auto_disabled_dismiss`,
+  `IntegrationAutoDisabledNotice::handle_dismiss()`) checks `Menu::CAP` and
+  its own nonce, and posts nothing but the action — same shape as the
+  requirements notice's own dismissal above. What it drains
+  (`wynko_integrations_auto_disabled`) holds only slugs, written by
+  `Integrations::demote_unavailable()`; the notice resolves each slug to a
+  display name against `Integrations\Registry::all()` at render time
+  (falling back to the bare slug for one no longer registered at all),
+  already `esc_html()`-escaped at output per the "new admin string" rule
+  below. Its dismiss control is styled as WordPress's own notice "X"
+  (`is-dismissible` plus a real `.notice-dismiss` link to the action above)
+  rather than a labelled button — cosmetic only, the capability and nonce
+  checks are unchanged.
+- **The Contact Form 7 bridge's own settings save**
+  (`admin_post_wynko_cf7_save`, `ContactForm7Integration::handle_save()`)
+  checks `Menu::CAP` and its own nonce — this is Wynko's own bundled code,
+  not a genuine third party, so it owes the exact same contract as every
+  other admin-post action in this plugin rather than the looser "the
+  integration's own responsibility" standard a real third-party
+  integration's settings screen is held to. There is only one value to
+  validate and store: the checkbox's shared label text
+  (`sanitize_text_field()`). There is no list id and no per-form
+  allow-list to validate, because there is nothing to select on this
+  screen — it is a read-only builder that prints, per known Laposta list, a
+  `[checkbox wynko-optin-{list_id} …]` tag (the list id coming from
+  `Api\Lists::for_editor()`, already-known-good data, not a submission) for
+  the admin to copy into a CF7 form's own template by hand. A form is
+  opted in by containing that tag, not by anything saved through this
+  handler — this bridge renders nothing and edits no CF7 form itself.
+- **The Contact Form 7 bridge's write path itself**
+  (`ContactForm7Integration::maybe_subscribe()`, hooked to CF7's own
+  `wpcf7_before_send_mail`) is not a new unauthenticated endpoint — it rides
+  on a submission CF7 has already validated and accepted, on an existing
+  WordPress action, not a new REST route or `admin-post` handler. It is,
+  however, a second path to the write `Throttle` exists to meter: "each
+  accepted POST makes Laposta send a confirmation email... to any address
+  the caller names" is exactly as true of a CF7-originated write as a
+  native one, and CF7 has no rate limiting of its own. `maybe_subscribe()`
+  therefore calls `Throttle::allows_ip()` — the per-IP counter `allows()`
+  already shares across every Wynko form — before calling
+  `Subscribers::create()`, and does nothing on a throttled request. The
+  call's result is never surfaced back into CF7's own success/error flow:
+  CF7 has no `reveal_duplicate`-style setting, so letting a duplicate or a
+  failed write change what CF7 shows the visitor would make the bridge a
+  membership oracle on a form with no control to turn that off. Only the
+  activity log sees the outcome, at `warning`, never `error`, so it never
+  reaches `Notifier`. A required Laposta custom field with no matching
+  `wynko-{custom_name}` tag on the CF7 form aborts the whole attempt the
+  same way — logged, never sent as a partial write Laposta would reject.
+- **The HTML Forms bridge's own settings screen** — its only state-changing
+  action is `admin_post_wynko_hf_sync`
+  (`HtmlFormsIntegration::handle_sync()`), which checks `Menu::CAP` and its
+  own nonce the same way the Contact Form 7 bridge's own Refresh action
+  does. There is nothing else to submit: like the CF7 bridge, this is a
+  read-only builder that prints, per known Laposta list, the raw HTML to
+  paste into an HTML Forms form's own markup (the list id coming from
+  `Api\Lists::for_editor()`, already-known-good data, not a submission) — it
+  renders nothing and edits no HTML Forms form itself.
+- **The HTML Forms bridge's write path itself**
+  (`HtmlFormsIntegration::maybe_subscribe()`, hooked to HTML Forms' own
+  `hf_form_success`) carries the same shape as the Contact Form 7 bridge's:
+  not a new unauthenticated endpoint, since it rides on a submission HTML
+  Forms has already validated and accepted, on an existing WordPress action.
+  It calls `Throttle::allows_ip()` before `Subscribers::create()` for the
+  same reason — HTML Forms has no rate limiting of its own, and each
+  accepted submission can make Laposta send a confirmation email to
+  whichever address the caller names. The submitter's address is read from
+  a fixed `wynko-email` field name rather than a form-reported email type
+  (HTML Forms has no typed-field system for this bridge to ask), so an
+  admin who never adds that field to a form's markup gets no writes from
+  it at all — the same fail-closed shape as a missing required custom
+  field, which aborts the whole attempt, logged, never sent as a partial
+  write Laposta would reject. The call's result is likewise never surfaced
+  back into HTML Forms' own success/error flow, only the activity log, at
+  `warning`, never `error`.
 - **The forms list's inline rename** (`admin_post_wynko_rename_form`) checks
   `Menu::CAP` and its own nonce, reads the id and the name from `$_POST` only,
   and `sanitize_text_field()`s the name before `wp_update_post()` — the title is
@@ -199,7 +319,7 @@ Before merging code that adds any of the following, confirm the matching control
   expires in five minutes, and is deleted on first read. Never put the terms
   checkbox in it: a legal agreement is not something the plugin re-ticks on
   someone's behalf.
-- **The `wynko/v1` REST routes.** Two exist. Both are registered on
+- **The `wynko/v1` REST routes.** Three exist. All are registered on
   `rest_api_init` outside the `is_admin()` gate, because a REST request does not
   reliably report as admin.
 
@@ -207,6 +327,7 @@ Before merging code that adds any of the following, confirm the matching control
   |---|---|---|---|---|
   | `GET wynko/v1/forms/<id>/fields` | `permission_callback` requires `Menu::CAP` (`manage_options`) | REST cookie nonce (`X-WP-Nonce`), checked by core before routing | `absint` on the id, `sanitize_text_field` on `list_id` | `Admin\Forms\FieldRows` escapes each value where it writes it |
   | `POST wynko/v1/forms/<id>/submit` | public by design — a visitor is not logged in; metered by `Throttle` per IP and per form | form-scoped `wp_verify_nonce`, the first thing `FormSubmitHandler::process()` does | `FormSubmitHandler::process()`, unchanged from the redirect path | `Frontend\FormRenderer`, unchanged |
+  | `GET wynko/v1/forms/<id>/nonce` | public by design; read-only, mints nothing that is not already public | none to verify — it *issues* one | `absint` on the id | Returns one JSON string; nothing to escape |
 
   The fields route returns **markup**, not data, so the editor's field table has
   one source. It is read-only and administrator-only, and exposes nothing the
@@ -238,6 +359,40 @@ Before merging code that adds any of the following, confirm the matching control
   request carrying `_wpnonce` against the `wp_rest` action globally, before
   routing. A form-scoped nonce under that name is rejected with a 403 and never
   reaches the handler. Do not rename it back.
+
+- **A page-caching plugin can outlive the nonce it cached.** `FormRenderer`
+  bakes the submit nonce into the same HTML a full-page cache stores; a
+  visitor whose page is older than the nonce's own life submits a token that
+  no longer verifies. Three things narrow this without weakening the nonce
+  itself: `FormSubmitHandler::nonce_life()` extends `nonce_life` to
+  `NONCE_LIFE` (3 days) for this plugin's own submit actions only, so the
+  window before it can even happen is wider than a typical cache TTL;
+  `GET wynko/v1/forms/<id>/nonce` lets the in-place JS path fetch a live
+  replacement and retry once when a submission answers `not_found`, rather
+  than dead-ending; and the no-JS `admin-post` fallback has no live channel to
+  do the same, so it still hits the same 404 a genuinely unknown form gets, in
+  the now-narrower case of no JavaScript plus a cache older than three days
+  (see `TECHNICAL_DEBT.md` for the tracked ID). None of this is a substitute
+  for the nonce — `Config::form_nonce_disabled()` above is the explicit,
+  admin-controlled opt-out, and turning it on is the only way this endpoint
+  loses CSRF protection.
+
+- **The one-shot result page must never be cached.** A no-JS submission
+  redirects back to the form's own page carrying `?wynko_result=<token>`;
+  `FormRenderer::result_for()` reads and destroys that transient, rendering
+  the visitor's own redisplayed field values and outcome message into the
+  page. `FormSubmitHandler::maybe_nocache_result_page()`, hooked on
+  `template_redirect` (not called from `FormRenderer`, which runs after
+  headers are already sent and would make `nocache_headers()` a silent
+  no-op), sends `nocache_headers()` and sets `DONOTCACHEPAGE` whenever that
+  query arg is present — the constant matters as much as the headers, since
+  WP Super Cache, W3 Total Cache, WP Rocket, and LiteSpeed all decide inside
+  their own `advanced-cache.php` and act on it rather than on response
+  headers alone. Without this, a cache configured to store query-string URLs
+  would serve one visitor's submitted values to everyone who later loads that
+  exact link — an information-disclosure bug, not merely a UX one, and the
+  reason this exists even though the URL is one-shot from the transient's own
+  point of view.
 
 - **A new admin string handed to core for display** → escape it yourself, at the
   call, wherever core echoes it raw. Core does that deliberately in several

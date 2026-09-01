@@ -4,7 +4,7 @@ Tags:              laposta, newsletter, email marketing, signup form, campaigns
 Requires at least: 6.4
 Tested up to:      7.1
 Requires PHP:      8.0
-Stable tag:        1.0.0
+Stable tag:        1.1.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,10 @@ No embed codes. No iframes. Just your own site, with your own styling.
 Pick a Laposta list, and Wynko builds the form from that list's own fields. If Laposta says a field is required, it's required here too. If a dropdown has five options in Laposta, it has those same five options on your site. You can't accidentally build a form that Laposta will reject, because the form is always built from what Laposta actually accepts.
 
 Wynko ships only the bare structural CSS. Colours, fonts and spacing come from your theme, and you can adjust them with CSS custom properties if you want to fine-tune.
+
+= Subscribe from forms you already have =
+
+Wynko also bridges other form plugins to Laposta. Bundled integrations for **Contact Form 7** and **HTML Forms** — off until you switch one on under **Wynko → Integrations** — let an existing form subscribe people to a list by adding a single checkbox. Any plugin or theme can register its own integration the same way, so the list isn't limited to those two.
 
 = Campaigns block =
 
@@ -75,7 +79,7 @@ Wynko contacts Laposta:
 
 * **When you save or verify your API key** — your API key is sent to confirm it works before it's stored.
 * **When campaign data is fetched or refreshed** — to list your most recently sent campaigns.
-* **When a visitor submits a signup form** — the email address and any other field values that visitor typed in are sent to Laposta, along with the visitor's IP address and referring URL, so the subscriber can be added to the chosen list. No other data is sent, and nothing is sent unless a visitor actually submits the form.
+* **When a visitor submits a signup form** — the email address and the other field values that visitor typed in are sent to Laposta, along with the visitor's IP address and the path of the page they submitted from, so the subscriber can be added to the chosen list. Nothing else about the visitor is sent, and nothing is sent at all unless a visitor actually submits the form. A signup made through a bundled integration sends the same kind of data for the same reason.
 
 Wynko doesn't store signups on your own site, and its own server-side code makes no request to any host other than Laposta's.
 
@@ -170,7 +174,11 @@ Nothing beyond what it passes to Laposta. Signups aren't saved on your site. The
 
 = How many signup forms can I have? =
 
-One per site in this version.
+As many as you need. Each is bound to its own Laposta list and has its own fields, messages and settings.
+
+= Can I subscribe people from a form built in another plugin? =
+
+Yes. Wynko bundles integrations for Contact Form 7 and HTML Forms, switched off until you enable one under **Wynko → Integrations**. Add a checkbox to your existing form and accepted submissions are subscribed to the Laposta list you choose. The system is open, so any plugin or theme can add support for another form plugin. Integrations you didn't get from Wynko are supported by whoever wrote them.
 
 = Will it slow my site down? =
 
@@ -181,6 +189,16 @@ No. Campaign data is cached for 60 minutes by default (you can change this), so 
 Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spacing to your theme. CSS custom properties are there if you want more control. The campaigns block ships no front-end CSS at all.
 
 == Changelog ==
+
+= 1.1.0 =
+* New: bundled Contact Form 7 and HTML Forms integrations — subscribe people to a Laposta list from a form you already have by adding a single checkbox. Off by default; enable under Wynko → Integrations.
+* New: Integrations admin screen, plus a wynko_register_integrations filter so any plugin or theme can bridge another form plugin to Laposta.
+* New: developer hooks and filters across the signup and activity-log flow — see the Hooks and filters documentation.
+* Signup forms: Wynko now warns, on the settings screen and in the activity log, when a page or CDN cache is serving a stale copy of a form, and cross-checks every submitted field against the live form template.
+* Signup forms: hardened for cached pages — a no-JS fallback and automatic nonce refresh keep submissions working when the page is served from cache.
+* Security tab: rate-limiting controls reorganised — the toggle moved, per-field caps nested under it, clearer warnings.
+* System Report: now detects page-cache and CDN layers and reports the signup-form security posture.
+* Fixed: notification recipients could be dropped when the address list went over the 10-address cap.
 
 = 1.0.0 =
 * Initial release.

@@ -38,6 +38,9 @@ final class UninstallTest extends TestCase {
 		update_option( 'wynko_throttle_window', 20 );
 		update_option( 'wynko_throttle_ip_max', 30 );
 		update_option( 'wynko_throttle_form_max', 900 );
+		update_option( 'wynko_integrations_enabled', array( 'contact-form-7' ) );
+		update_option( 'wynko_integrations_auto_disabled', array( 'contact-form-7' ) );
+		update_option( 'wynko_cf7_checkbox_label', 'Sign up' );
 		set_transient( 'wynko_throttle_pressure_notice', array( 'Footer signup' ), 86400 );
 		set_transient( 'wynko_notify_sent', 1, 3600 );
 		set_transient( 'wynko_fields', array( 'list_a' => array() ), 60 );
@@ -69,6 +72,9 @@ final class UninstallTest extends TestCase {
 		$this->assertFalse( get_option( 'wynko_throttle_window', false ) );
 		$this->assertFalse( get_option( 'wynko_throttle_ip_max', false ) );
 		$this->assertFalse( get_option( 'wynko_throttle_form_max', false ) );
+		$this->assertFalse( get_option( 'wynko_integrations_enabled', false ) );
+		$this->assertFalse( get_option( 'wynko_integrations_auto_disabled', false ) );
+		$this->assertFalse( get_option( 'wynko_cf7_checkbox_label', false ) );
 		$this->assertFalse( get_transient( 'wynko_throttle_pressure_notice' ) );
 		$this->assertFalse( get_transient( 'wynko_notify_sent' ) );
 		$this->assertFalse( get_transient( 'wynko_fields' ) );

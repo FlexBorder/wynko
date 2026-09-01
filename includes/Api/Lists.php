@@ -68,6 +68,15 @@ final class Lists {
 			),
 			'error'   => false,
 		);
+
+		/**
+		 * Filters the list options for the form editor and block inspector, before caching.
+		 *
+		 * @since 1.1.0
+		 * @param array<int,array{value:string,label:string}> $options Laposta list options.
+		 */
+		$result['options'] = (array) apply_filters( 'wynko_lists', $result['options'] );
+
 		set_transient( Config::lists_transient_key(), $result, Cache::ttl_seconds() );
 		Cache::stamp( true );
 		return $result;

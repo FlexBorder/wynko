@@ -94,4 +94,19 @@ final class ApiListsTest extends TestCase {
 
 		$this->assertSame( array(), Log::all() );
 	}
+
+	public function test_wynko_lists_filter_can_modify_the_cached_options(): void {
+		add_filter(
+			'wynko_lists',
+			static function ( $options ) {
+				$options[0]['label'] = 'Overridden';
+				return $options;
+			}
+		);
+		$this->queue_lists();
+
+		$result = Lists::for_editor();
+
+		$this->assertSame( 'Overridden', $result['options'][0]['label'] );
+	}
 }

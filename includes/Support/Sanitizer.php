@@ -154,4 +154,20 @@ final class Sanitizer {
 		}
 		return self::STATUS_UNEXPECTED;
 	}
+
+	/**
+	 * Strips control characters (newlines included) from a string that must
+	 * stay on one line wherever it lands, plain-text exports included — an
+	 * HTML rendering path gets this for free from WordPress's own output
+	 * escaping, but a plain-text one has no equivalent, so a value that can
+	 * originate from outside this plugin (e.g. a third-party integration's
+	 * declared name) needs it stripped explicitly before it can forge extra
+	 * lines there.
+	 *
+	 * @param string $value Raw text.
+	 * @return string
+	 */
+	public static function single_line( string $value ): string {
+		return (string) preg_replace( '/[\x00-\x1F\x7F]+/', ' ', trim( $value ) );
+	}
 }

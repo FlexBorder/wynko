@@ -142,7 +142,17 @@ final class Campaigns {
 		}
 
 		$wrapper = function_exists( 'get_block_wrapper_attributes' ) ? get_block_wrapper_attributes() : 'class="wp-block-wynko-campaigns"';
-		return sprintf( '<ul %s>%s</ul>', $wrapper, $items );
+		$content = sprintf( '<ul %s>%s</ul>', $wrapper, $items );
+
+		/**
+		 * Filters the campaigns block's rendered HTML.
+		 *
+		 * @since 1.1.0
+		 * @param string               $content    Rendered block HTML.
+		 * @param array<string,mixed>  $attributes Block attributes.
+		 * @param array<int,mixed>     $campaigns  The campaigns rendered.
+		 */
+		return (string) apply_filters( 'wynko_campaigns_block_content', $content, $attributes, $campaigns );
 	}
 
 	/**

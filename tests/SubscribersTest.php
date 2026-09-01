@@ -110,4 +110,18 @@ final class SubscribersTest extends TestCase {
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 204, $result->get_error_data()['code'] );
 	}
+
+	public function test_wynko_subscriber_data_filter_can_modify_the_request_body(): void {
+		add_filter(
+			'wynko_subscriber_data',
+			static function ( $body, $list_id, $email ) {
+				$body['tags'] = array( $list_id, $email );
+				return $body;
+			}
+		);
+
+		$this->create();
+
+		$this->assertSame( array( 'list_a', 'visitor@example.org' ), $this->body()['tags'] );
+	}
 }

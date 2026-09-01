@@ -53,6 +53,7 @@ $GLOBALS['wynko_test_mail']             = array();
 $GLOBALS['wynko_test_mail_result']      = true;
 $GLOBALS['wynko_test_mail_reason']      = 'Invalid address: (From): wordpress@localhost';
 $GLOBALS['wynko_test_php_version']      = null;
+$GLOBALS['wynko_test_dropins']          = array();
 
 require_once __DIR__ . '/stubs/PhpVersion.php';
 require_once __DIR__ . '/stubs/Wpdb.php';
@@ -92,6 +93,7 @@ function wynko_test_reset_store(): void {
 	$GLOBALS['wynko_test_mail_result']      = true;
 	$GLOBALS['wynko_test_mail_reason']      = 'Invalid address: (From): wordpress@localhost';
 	$GLOBALS['wynko_test_php_version']      = null;
+	$GLOBALS['wynko_test_dropins']          = array();
 	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restores this bootstrap's own double between tests.
 	$GLOBALS['wpdb'] = new WYNKO_Test_Wpdb();
 }
@@ -234,6 +236,10 @@ if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
 
 if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
 	define( 'HOUR_IN_SECONDS', 3600 );
+}
+
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+	define( 'DAY_IN_SECONDS', 86400 );
 }
 
 if ( ! function_exists( 'get_option' ) ) {
@@ -617,6 +623,12 @@ if ( ! function_exists( 'is_wp_error' ) ) {
 	function add_filter( $hook, $callback, $priority = 10, $args = 1 ) {
 		return add_action( $hook, $callback, $priority, $args );
 	}
+	function apply_filters( $hook, $value, ...$args ) {
+		foreach ( (array) ( $GLOBALS['wynko_test_callbacks'][ $hook ] ?? array() ) as $callback ) {
+			$value = call_user_func_array( $callback, array_merge( array( $value ), $args ) );
+		}
+		return $value;
+	}
 	function is_admin() {
 		return ! empty( $GLOBALS['wynko_test_is_admin'] );
 	}
@@ -670,6 +682,9 @@ if ( ! function_exists( 'is_wp_error' ) ) {
 	}
 	function wp_get_environment_type() {
 		return $GLOBALS['wynko_test_environment_type'] ?? 'production';
+	}
+	function get_dropins() {
+		return $GLOBALS['wynko_test_dropins'] ?? array();
 	}
 	function get_bloginfo( $show = '', $filter = 'raw' ) {
 		$values = array(

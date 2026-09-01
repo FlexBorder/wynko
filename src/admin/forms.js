@@ -151,6 +151,80 @@ document.addEventListener( 'click', ( event ) => {
 } );
 
 /**
+ * Rebuilds a third-party-plugin bridge's combined-snippet textarea and its
+ * Copy button from whichever field checkboxes are currently checked (the
+ * opt-in checkbox is one of them, always checked and disabled, last in the
+ * list). Shared by every bridge's own settings screen (Contact Form 7, HTML
+ * Forms, …), one at a time. Runs entirely from data already in the page —
+ * every snippet's text sits in a data-tag attribute, in the same order the
+ * server rendered them — so no request is made.
+ *
+ * Queries the whole document rather than a shared wrapper: the checkboxes
+ * (step 2) and the textarea (step 3) live in separate `<li>` steps on that
+ * screen, not a common container, and only one such pair is ever on a page
+ * at once.
+ */
+function syncBridgeCombinedTags() {
+	const textarea = document.querySelector( '.wynko-bridge-combined' );
+	const box = textarea && textarea.closest( '.wynko-shortcode-box' );
+	const button = box && box.querySelector( '.wynko-copy' );
+	if ( ! textarea || ! button ) {
+		return;
+	}
+
+	const tags = [];
+	document
+		.querySelectorAll( '.wynko-bridge-field:checked' )
+		.forEach( ( checkbox ) => tags.push( checkbox.dataset.tag || '' ) );
+
+	const combined = tags.join( '\n' );
+	textarea.value = combined;
+	button.dataset.copy = combined;
+}
+
+document.addEventListener( 'change', ( event ) => {
+	if ( event.target.closest( '.wynko-bridge-field' ) ) {
+		syncBridgeCombinedTags();
+	}
+} );
+
+/**
+ * The Integrations screen's "select all" checkbox: checks or unchecks every
+ * row so a bulk action can be applied to all of them in one go, the same
+ * behaviour the Plugins screen's own header checkbox has.
+ */
+document.addEventListener( 'change', ( event ) => {
+	if ( event.target.id !== 'wynko-integrations-select-all' ) {
+		return;
+	}
+
+	document
+		.querySelectorAll( '.wynko-integration-row-checkbox' )
+		.forEach( ( checkbox ) => {
+			checkbox.checked = event.target.checked;
+		} );
+} );
+
+/**
+ * Confirms before applying a bulk "Deactivate" on the Integrations screen —
+ * the checked rows can span several different integrations, so this stays
+ * generic rather than naming any one of their consequences (the per-row
+ * Deactivate link's own confirm() does that instead). Bulk "Activate" and an
+ * unselected action are left alone.
+ */
+document.addEventListener( 'submit', ( event ) => {
+	const bulkAction = event.target.querySelector( '#wynko-bulk-action' );
+	if ( ! bulkAction || 'deactivate' !== bulkAction.value ) {
+		return;
+	}
+
+	// eslint-disable-next-line no-alert
+	if ( ! window.confirm( i18n.bulkDeactivate ) ) {
+		event.preventDefault();
+	}
+} );
+
+/**
  * Opens or closes one row's rename box on the forms list.
  *
  * The box is server-rendered inside the row and hidden, so only the showing is
@@ -485,6 +559,11 @@ document.addEventListener( 'change', ( event ) => {
 	if ( notify ) {
 		syncNotifyEmails( notify );
 	}
+
+	const throttle = event.target.closest( '#wynko-throttle-enabled' );
+	if ( throttle ) {
+		syncThrottleFields( throttle );
+	}
 } );
 
 /**
@@ -534,6 +613,21 @@ function syncNotifyEmails( box ) {
 	const emails = document.querySelector( '.wynko-notify-emails' );
 	if ( emails ) {
 		emails.classList.toggle( 'wynko-hidden', ! box.checked );
+	}
+}
+
+/**
+ * Hides the window/per-visitor/per-form caps and their counts table while
+ * rate limiting is off — a cap that no longer applies is not worth leaving
+ * on screen. Same pattern as syncNotifyEmails(): one nested block, one class
+ * to toggle.
+ *
+ * @param {HTMLInputElement} box The rate-limiting on/off checkbox.
+ */
+function syncThrottleFields( box ) {
+	const fields = document.querySelector( '.wynko-throttle-fields' );
+	if ( fields ) {
+		fields.classList.toggle( 'wynko-hidden', ! box.checked );
 	}
 }
 
@@ -597,6 +691,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const notify = document.querySelector( '#wynko-notify-enabled' );
 	if ( notify ) {
 		syncNotifyEmails( notify );
+	}
+
+	const throttle = document.querySelector( '#wynko-throttle-enabled' );
+	if ( throttle ) {
+		syncThrottleFields( throttle );
 	}
 
 	const select = document.querySelector( '.wynko-list-select' );

@@ -114,6 +114,7 @@ Never commit straight to `main`; never merge a branch whose checks or
 | `bin/sbom-check.sh` | The exact SBOM freshness check the pre-commit hook runs (no-op unless a lock file is staged); `bin/merge-to-main.sh` and CI instead run `--regenerate` unconditionally, with npm pinned to the version the committed SBOM was generated with. |
 | `bin/write-report.sh` | Runs all ten pre-commit checks above and writes their combined output to `../wynko-reports/`. This is what the pre-commit hook actually calls. |
 | `bin/wp-org-check.sh` | WordPress.org readiness guard (readme/header fields — see below). Runs in the pre-commit hook, `bin/merge-to-main.sh`, the `plugin-check` CI job on every push/PR, and again from `bin/release.sh` before a release. |
+| `npm run test:e2e` | The `tests/e2e/` Playwright suite (signup forms + caching) against a live Laposta test account; needs `npx @wordpress/env start` first plus `WYNKO_TEST_API_KEY` / `WYNKO_TEST_LIST_ID`. Runs nightly and on demand via `.github/workflows/e2e.yml`, and as a hard gate in `bin/release.sh`. Not in the pre-commit hook or `bin/merge-to-main.sh`. |
 | `bin/plugin-check.sh` | The official [Plugin Check](https://wordpress.org/plugins/plugin-check/) tool, all categories, strict — every finding blocks, not just errors. Runs in the pre-commit hook and `bin/merge-to-main.sh` (both need `npx @wordpress/env start` first) and, via the `WordPress/plugin-check-action`, in CI. |
 | `bin/merge-to-main.sh` | The merge gate — a full local mirror of every CI job except `security-review-attestation`. See "Branching & commit flow" above. |
 | `composer sbom:check` | The same check, run unconditionally. CI + pre-release. |
@@ -292,7 +293,9 @@ Upgrade what should be upgraded; record what you consciously leave behind.
 
 Then, from a clean `origin/main`, with `RELEASE_GPG_KEY_ID` and
 `RELEASE_SSH_HOST` set (see [Remotes & release identity](#remotes--release-identity)
-and, for maintainers, `RELEASE_IDENTITY.md`):
+and, for maintainers, `RELEASE_IDENTITY.md`), plus `WYNKO_TEST_API_KEY` and
+`WYNKO_TEST_LIST_ID` for the e2e gate (the live Laposta test account — see
+`RELEASE_IDENTITY.md`), and Docker running:
 
 ```bash
 bin/release.sh
@@ -310,7 +313,12 @@ places version numbers live in sync instead of you editing them by hand:
 `bin/release.sh`:
 
 1. Runs `bin/wp-org-check.sh` and refuses to proceed on a known WP.org
-   submission blocker (e.g. `readme.txt`'s `Contributors:` still says `TODO`).
+   submission blocker (e.g. `readme.txt`'s `Contributors:` still says `TODO`),
+   then runs the full `tests/e2e/` suite (Playwright + wp-env, against the
+   live Laposta test account) and refuses to proceed if it fails. This takes
+   several minutes and needs `WYNKO_TEST_API_KEY` / `WYNKO_TEST_LIST_ID` set;
+   a clean `test.skip` (a caching plugin wp-env can't drive headlessly) is
+   fine, a real failure is not.
 2. Lists commits since the last release tag, computes a suggested semver bump
    from their Conventional Commit types, and lets you confirm or override it.
 3. Drafts a new `== Changelog ==` entry for `readme.txt` and **stops for your

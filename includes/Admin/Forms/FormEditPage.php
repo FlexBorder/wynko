@@ -354,6 +354,15 @@ final class FormEditPage {
 			$form->save_button( self::clean_button( $raw['wynko_button'] ?? array() ) );
 		}
 
+		/**
+		 * Fires after a signup form's editor configuration is saved.
+		 *
+		 * @since 1.1.0
+		 * @param int    $form_id Form post id.
+		 * @param string $tab     The tab that was saved.
+		 */
+		do_action( 'wynko_form_config_saved', $form_id, $tab );
+
 		return self::SAVE_OK;
 	}
 

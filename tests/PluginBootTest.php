@@ -63,9 +63,24 @@ final class PluginBootTest extends TestCase {
 		$this->assertContains( 'admin_post_wynko_alert_dismiss|Wynko\Admin\AlertNotice::handle_dismiss', $hooks );
 		$this->assertContains( 'admin_notices|Wynko\Admin\EnvironmentNotice::render', $hooks );
 		$this->assertContains( 'admin_post_wynko_env_dismiss|Wynko\Admin\EnvironmentNotice::handle_dismiss', $hooks );
+		$this->assertContains( 'admin_notices|Wynko\Admin\IntegrationAutoDisabledNotice::render', $hooks );
+		$this->assertContains( 'admin_post_wynko_integrations_auto_disabled_dismiss|Wynko\Admin\IntegrationAutoDisabledNotice::handle_dismiss', $hooks );
 		$this->assertContains( 'admin_post_wynko_new_form|Wynko\Admin\Forms\FormEditPage::handle_new', $hooks );
 		$this->assertContains( 'admin_post_wynko_save_form|Wynko\Admin\Forms\FormEditPage::handle_save', $hooks );
 		$this->assertContains( 'admin_post_wynko_delete_form|Wynko\Admin\Forms\FormEditPage::handle_delete', $hooks );
+		$this->assertContains( 'admin_post_wynko_toggle_integration|Wynko\Admin\IntegrationsPage::handle_toggle', $hooks );
+		$this->assertContains( 'admin_post_wynko_bulk_toggle_integration|Wynko\Admin\IntegrationsPage::handle_bulk_toggle', $hooks );
+		$this->assertContains( 'admin_post_wynko_cf7_sync|Wynko\Integrations\ContactForm7\ContactForm7Integration::handle_sync', $hooks );
+		$this->assertContains( 'admin_post_wynko_hf_sync|Wynko\Integrations\HtmlForms\HtmlFormsIntegration::handle_sync', $hooks );
 		$this->assertContains( 'enqueue_block_editor_assets|Wynko\Blocks\Form::enqueue_editor_data', $hooks );
+	}
+
+	public function test_the_bundled_integrations_filter_and_boot_dispatch_are_registered(): void {
+		Plugin::boot();
+
+		$hooks = wynko_test_hooks();
+		$this->assertContains( 'wynko_register_integrations|Wynko\Integrations::register_bundled', $hooks );
+		$this->assertContains( 'plugins_loaded|Wynko\Integrations::boot', $hooks );
+		$this->assertContains( 'init|Wynko\Integrations::demote_unavailable', $hooks );
 	}
 }

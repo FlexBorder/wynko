@@ -104,6 +104,15 @@ final class KeyStatus {
 		$code    = $ok ? '' : (string) $result->get_error_code();
 		self::record( $key, $ok, $message, $code );
 
+		/**
+		 * Fires after a live API-key verification.
+		 *
+		 * @since 1.1.0
+		 * @param string $fingerprint SHA-256 of the verified key, never the key itself.
+		 * @param bool   $ok          Whether the key authenticated.
+		 */
+		do_action( 'wynko_api_key_verified', self::fingerprint( $key ), $ok );
+
 		self::log_probe( $ok, $message );
 
 		return array(

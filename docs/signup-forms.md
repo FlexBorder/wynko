@@ -76,6 +76,55 @@ There is no offline queue, no per-submission store, and no captcha yet — a
 submission that Laposta refuses is reported to the visitor and logged, not
 retried.
 
+## Caching plugins and CDNs
+
+A signup form is safe to leave on a fully cached page — a landing page
+behind WP Super Cache, WP Rocket, W3 Total Cache, LiteSpeed Cache, or a CDN
+is the normal case, not something to work around. The plugin already
+guards the two places a cache could otherwise cause trouble:
+
+- The security check embedded in the form's markup stays valid for several
+  days, well past a typical cache lifetime, so a cached page's copy keeps
+  working long after it was generated. If a visitor still lands on a page
+  cached longer than that — an unusually long cache TTL, or the very rare
+  case of JavaScript being off — the form asks them to submit once more
+  rather than accepting anything unsafe; with JavaScript on, this happens
+  automatically and the visitor never notices.
+- The page shown right after a submission (without JavaScript) is never
+  cached, however your caching plugin is configured, so one visitor's
+  submitted details are never shown to the next.
+
+If **Wynko → Settings → Security** shows a form protection switched off,
+that is always an intentional, administrator-made choice — nothing here
+turns one off on its own.
+
+Per-visitor rate limiting counts by IP address. Behind a CDN or reverse
+proxy that doesn't forward the visitor's real address, every submission can
+look like it comes from the proxy itself, which can make the per-visitor
+cap block real signups site-wide rather than one visitor's. If signups
+start being refused in bursts on a site that sits behind one of these,
+check its documentation for forwarding the visitor's real IP.
+
+If a signup form still gives trouble that looks caching- or proxy-related
+after the above, **Wynko → Settings → Security** carries an opt-out for
+each of the two protections above, meant for testing that possibility —
+each is off by default and shows a plain-language warning while switched
+on.
+
+If Laposta gains a new field that is *optional*, a page a caching plugin
+or CDN is still serving from before that change has no way to show it —
+nothing about a submission fails, so nothing raises a loud alert. Wynko
+notices this quietly instead: each rendered form carries a small marker
+of the fields it was built from, and a submission carrying an outdated
+marker adds a note to the activity log ("...carried an outdated field
+fingerprint..."), at most once an hour per form. That note is the signal
+to purge that page from the cache — the form itself keeps working exactly
+as it did.
+
+An automated suite exercises this signal, and the other caching-related
+behaviors above, against a real Laposta test account — see
+[Testing signup forms and caching](testing/signup-form-caching.md).
+
 ---
 
 Back to the [README](../README.md) · [All documentation](README.md)

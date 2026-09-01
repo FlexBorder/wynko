@@ -11,6 +11,7 @@ use Wynko\Config;
 use Wynko\Forms\FormData;
 use Wynko\Frontend\FormSubmitHandler;
 use Wynko\Log;
+use Wynko\Support\FieldFingerprint;
 use Wynko\Support\LapostaErrors;
 use Wynko\Support\Sanitizer;
 use Wynko\Throttle;
@@ -518,6 +519,112 @@ final class FormSubmitHandlerTest extends TestCase {
 		$this->assertSame( 0, wynko_test_http_calls() );
 	}
 
+	/**
+	 * The fingerprint queue_fields()'s two fields currently hash to, standing
+	 * in for what a freshly rendered page would have carried.
+	 *
+	 * @return string
+	 */
+	private function current_field_fingerprint(): string {
+		return FieldFingerprint::of(
+			array(
+				array(
+					'field_id' => 'f_1',
+					'required' => true,
+				),
+				array(
+					'field_id' => 'f_2',
+					'required' => false,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Whether Log::all() carries a stale-render entry — filtered by wording
+	 * rather than just level, since a plain successful signup also logs an
+	 * unrelated info entry (count_signup()'s "New signup through...").
+	 *
+	 * @return int
+	 */
+	private function stale_render_log_count(): int {
+		return count(
+			array_filter(
+				Log::all(),
+				static function ( array $entry ): bool {
+					return Sanitizer::LEVEL_INFO === $entry['level']
+						&& false !== strpos( $entry['message'], 'outdated field fingerprint' );
+				}
+			)
+		);
+	}
+
+	public function test_a_submission_carrying_the_current_fingerprint_logs_nothing(): void {
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::FIELD_FINGERPRINT_FIELD => $this->current_field_fingerprint() ) ) );
+
+		$this->assertSame( 0, $this->stale_render_log_count() );
+	}
+
+	public function test_a_stale_fingerprint_logs_an_info_entry_naming_the_form(): void {
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::FIELD_FINGERPRINT_FIELD => 'not-the-current-hash' ) ) );
+
+		$this->assertSame( 1, $this->stale_render_log_count() );
+
+		$stale = array_values(
+			array_filter(
+				Log::all(),
+				static function ( array $entry ): bool {
+					return false !== strpos( $entry['message'], 'outdated field fingerprint' );
+				}
+			)
+		);
+		$this->assertStringContainsString( 'Newsletter signup', $stale[0]['message'] );
+	}
+
+	public function test_a_submission_with_no_fingerprint_field_logs_nothing(): void {
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		$raw = $this->raw();
+		unset( $raw[ FormSubmitHandler::FIELD_FINGERPRINT_FIELD ] );
+		FormSubmitHandler::process( $raw );
+
+		$this->assertSame( 0, $this->stale_render_log_count() );
+	}
+
+	public function test_a_second_stale_submission_within_the_cooldown_does_not_log_again(): void {
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+		FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::FIELD_FINGERPRINT_FIELD => 'stale-hash' ) ) );
+
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+		FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::FIELD_FINGERPRINT_FIELD => 'stale-hash' ) ) );
+
+		$this->assertSame( 1, $this->stale_render_log_count() );
+	}
+
+	public function test_a_stale_fingerprint_is_logged_even_when_validation_fails(): void {
+		$this->queue_fields();
+
+		FormSubmitHandler::process(
+			$this->raw(
+				array(
+					FormSubmitHandler::FIELD_FINGERPRINT_FIELD => 'stale-hash',
+					'wynko_field' => array(),
+				)
+			)
+		);
+
+		$this->assertSame( 1, $this->stale_render_log_count() );
+	}
+
 	private function stored_result( int $form_id ): string {
 		return FormSubmitHandler::store_result(
 			array(
@@ -1016,5 +1123,175 @@ final class FormSubmitHandlerTest extends TestCase {
 			'{"field":{"field_id":"f_1","name":"First name","custom_name":"first_name","datatype":"text","required":true}},' .
 			'{"field":{"field_id":"f_3","name":"Birthday","custom_name":"birthday","datatype":"date","required":true}}' .
 			']}';
+	}
+
+	public function test_wynko_form_submitted_values_filter_can_change_the_submitted_email(): void {
+		add_filter(
+			'wynko_form_submitted_values',
+			static function ( $values ) {
+				$values['email'] = 'filtered@example.org';
+				return $values;
+			}
+		);
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		FormSubmitHandler::process( $this->raw() );
+
+		$sent = wynko_test_last_request();
+		$this->assertStringContainsString( 'filtered@example.org', wp_json_encode( $sent['args']['body'] ) );
+	}
+
+	public function test_wynko_form_subscriber_data_filter_can_add_a_custom_field(): void {
+		add_filter(
+			'wynko_form_subscriber_data',
+			static function ( $custom_fields ) {
+				$custom_fields['source'] = 'bridge';
+				return $custom_fields;
+			}
+		);
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		FormSubmitHandler::process( $this->raw() );
+
+		$sent = wynko_test_last_request();
+		$this->assertStringContainsString( 'bridge', wp_json_encode( $sent['args']['body'] ) );
+	}
+
+	public function test_wynko_form_submit_failed_fires_on_a_failed_submission(): void {
+		$fired = false;
+		add_action(
+			'wynko_form_submit_failed',
+			static function ( $form_id ) use ( &$fired ) {
+				$fired = $form_id;
+			}
+		);
+		$this->queue_fields();
+		wynko_test_queue_response( 503, '' );
+
+		FormSubmitHandler::process( $this->raw() );
+
+		$this->assertSame( $this->form_id, $fired );
+	}
+
+	public function test_wynko_form_submitted_fires_on_a_successful_submission(): void {
+		$fired = false;
+		add_action(
+			'wynko_form_submitted',
+			static function () use ( &$fired ) {
+				$fired = true;
+			}
+		);
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		FormSubmitHandler::process( $this->raw() );
+
+		$this->assertTrue( $fired );
+	}
+
+	public function test_maybe_nocache_result_page_does_nothing_without_a_token(): void {
+		unset( $_GET[ FormSubmitHandler::RESULT_ARG ] );
+
+		FormSubmitHandler::maybe_nocache_result_page();
+
+		$this->assertFalse( $GLOBALS['wynko_test_nocache'] );
+	}
+
+	public function test_maybe_nocache_result_page_sends_no_cache_headers_when_a_token_is_present(): void {
+		$_GET[ FormSubmitHandler::RESULT_ARG ] = $this->stored_result( $this->form_id );
+
+		FormSubmitHandler::maybe_nocache_result_page();
+
+		unset( $_GET[ FormSubmitHandler::RESULT_ARG ] );
+		$this->assertTrue( $GLOBALS['wynko_test_nocache'] );
+	}
+
+	public function test_maybe_nocache_result_page_ignores_an_empty_token(): void {
+		$_GET[ FormSubmitHandler::RESULT_ARG ] = '';
+
+		FormSubmitHandler::maybe_nocache_result_page();
+
+		unset( $_GET[ FormSubmitHandler::RESULT_ARG ] );
+		$this->assertFalse( $GLOBALS['wynko_test_nocache'] );
+	}
+
+	/**
+	 * The whole reason this exists: a page-caching plugin routinely outlives
+	 * core's own default nonce life, and this endpoint is metered by Throttle
+	 * too, so the trade is worth it. Scoped so nothing else on the site is
+	 * affected.
+	 */
+	public function test_nonce_life_is_extended_for_this_forms_submit_action(): void {
+		$this->assertSame(
+			FormSubmitHandler::NONCE_LIFE,
+			FormSubmitHandler::nonce_life( DAY_IN_SECONDS, FormSubmitHandler::nonce_action( $this->form_id ) )
+		);
+	}
+
+	public function test_nonce_life_leaves_an_unrelated_action_untouched(): void {
+		$this->assertSame(
+			DAY_IN_SECONDS,
+			FormSubmitHandler::nonce_life( DAY_IN_SECONDS, 'some_other_plugins_action' )
+		);
+	}
+
+	public function test_nonce_life_leaves_the_unscoped_default_untouched(): void {
+		$this->assertSame( DAY_IN_SECONDS, FormSubmitHandler::nonce_life( DAY_IN_SECONDS ) );
+	}
+
+	/**
+	 * Off by default: a fresh install must behave exactly as before these
+	 * settings existed.
+	 */
+	public function test_the_nonce_and_throttle_opt_outs_default_to_off(): void {
+		$this->assertFalse( Config::form_nonce_disabled() );
+		$this->assertFalse( Config::form_throttle_disabled() );
+
+		$this->assertSame(
+			FormSubmitHandler::STATUS_BAD_NONCE,
+			FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::NONCE_FIELD => 'forged' ) ) )['status']
+		);
+	}
+
+	public function test_disabling_the_nonce_setting_lets_a_bad_nonce_through(): void {
+		update_option( Config::option_key( 'disable_form_nonce' ), true );
+		$this->queue_fields();
+		wynko_test_queue_response( 201, '{"member":{"member_id":"m_1"}}' );
+
+		$result = FormSubmitHandler::process( $this->raw( array( FormSubmitHandler::NONCE_FIELD => 'forged' ) ) );
+
+		$this->assertSame( FormSubmitHandler::STATUS_SUCCESS, $result['status'] );
+	}
+
+	public function test_disabling_the_throttle_setting_lets_a_metered_visitor_through(): void {
+		update_option( Config::option_key( 'disable_form_throttle' ), true );
+
+		$result = $this->exhaust_ip_cap();
+
+		$this->assertSame( FormSubmitHandler::STATUS_SUCCESS, $result['status'] );
+	}
+
+	public function test_wynko_form_redirect_url_filter_can_override_the_destination(): void {
+		add_filter(
+			'wynko_form_redirect_url',
+			static function ( $url ) {
+				return 'https://example.org/overridden/';
+			}
+		);
+
+		$url = FormSubmitHandler::redirect_url(
+			array(
+				'status'  => FormSubmitHandler::STATUS_FAILED,
+				'form_id' => $this->form_id,
+				'errors'  => array(),
+				'values'  => array(),
+				'slug'    => LapostaErrors::SLUG_GENERIC,
+			),
+			'https://example.org/signup/'
+		);
+
+		$this->assertSame( 'https://example.org/overridden/', $url );
 	}
 }

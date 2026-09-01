@@ -45,6 +45,32 @@ git remote get-url public >/dev/null 2>&1 || fail "no 'public' remote configured
 
 bin/wp-org-check.sh || fail "WP.org readiness check failed — fix the issues above first."
 
+# --- E2E gate ---------------------------------------------------------
+#
+# The signup-form + caching e2e suite (tests/e2e/, Playwright + wp-env)
+# must finish without failures before a release. It is not on the
+# per-commit or per-PR gate — it needs the live Laposta test account and
+# real network egress, which fork PRs and the offline pre-commit hook
+# can't have — but a release is cut from this machine, by a maintainer who
+# does have those, so this is where it belongs. A clean skip (a caching
+# plugin that won't cache headlessly under wp-env) is acceptable; an
+# actual failure blocks the release.
+
+[ -n "${WYNKO_TEST_API_KEY:-}" ] || fail "WYNKO_TEST_API_KEY is not set — the e2e release gate needs the live Laposta test key (see the Releasing section in CONTRIBUTING.md)."
+[ -n "${WYNKO_TEST_LIST_ID:-}" ] || fail "WYNKO_TEST_LIST_ID is not set — the e2e release gate needs the Laposta test list id."
+
+echo "release: running the e2e suite (signup forms + caching) — several minutes…"
+# `@wordpress/env` (via npx) stalls on hosts where Node's happy-eyeballs
+# picks an unreachable IPv6 route first; disable the autoselection for the
+# duration of the gate. Harmless where it isn't needed.
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--no-network-family-autoselection"
+npx @wordpress/env start >/dev/null 2>&1 || fail "could not start wp-env for the e2e gate."
+# Just the browser binary — not `test:e2e:install`'s `--with-deps`, which
+# needs root and only makes sense on a CI runner. Idempotent; a no-op when
+# Chromium is already present.
+npx playwright install chromium >/dev/null 2>&1 || fail "could not install the Playwright Chromium build for the e2e gate."
+npm run test:e2e || fail "the e2e suite did not pass (test names above) — fix it before releasing."
+
 # --- Compute the suggested version bump ---------------------------------
 
 current_version="$(sed -n 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' "$PLUGIN_FILE")"

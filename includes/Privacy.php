@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Suggests a paragraph on Settings → Privacy disclosing that signup data is
  * sent to Laposta. WordPress's Privacy page pulls this from every active
- * plugin via wp_add_privacy_policy_content(); readme.txt's "Privacy and
- * external services" section carries the same disclosure for WordPress.org
- * review — keep the two in step if either changes.
+ * plugin via wp_add_privacy_policy_content(); readme.txt's "External services"
+ * section carries the same disclosure for WordPress.org review — keep the two
+ * in step if either changes.
  */
 final class Privacy {
 

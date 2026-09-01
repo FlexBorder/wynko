@@ -128,6 +128,24 @@ final class SettingsPage {
 				'default'           => Config::default_for( 'throttle_form_max' ),
 			)
 		);
+		register_setting(
+			self::GROUP_SECURITY,
+			Config::option_key( 'disable_form_nonce' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( SecurityTab::class, 'sanitize_disable_nonce' ),
+				'default'           => Config::default_for( 'disable_form_nonce' ),
+			)
+		);
+		register_setting(
+			self::GROUP_SECURITY,
+			Config::option_key( 'disable_form_throttle' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( SecurityTab::class, 'sanitize_disable_throttle' ),
+				'default'           => Config::default_for( 'disable_form_throttle' ),
+			)
+		);
 
 		register_setting(
 			self::GROUP_NOTIFICATIONS,
@@ -161,9 +179,13 @@ final class SettingsPage {
 		add_settings_field( Config::option_key( 'log_level' ), esc_html__( 'Activity log detail', 'wynko-for-laposta' ), array( self::class, 'field_log_level' ), self::PAGE, 'wynko_main' );
 
 		add_settings_section( 'wynko_throttle', esc_html__( 'Signup rate limits', 'wynko-for-laposta' ), array( SecurityTab::class, 'intro' ), self::PAGE_SECURITY );
-		add_settings_field( Config::option_key( 'throttle_window' ), esc_html__( 'Window (minutes)', 'wynko-for-laposta' ), array( SecurityTab::class, 'field_window' ), self::PAGE_SECURITY, 'wynko_throttle' );
-		add_settings_field( Config::option_key( 'throttle_ip_max' ), esc_html__( 'Per visitor', 'wynko-for-laposta' ), array( SecurityTab::class, 'field_ip_max' ), self::PAGE_SECURITY, 'wynko_throttle' );
-		add_settings_field( Config::option_key( 'throttle_form_max' ), esc_html__( 'Per form', 'wynko-for-laposta' ), array( SecurityTab::class, 'field_form_max' ), self::PAGE_SECURITY, 'wynko_throttle' );
+		// The three caps and the counts table have no row of their own: they
+		// are printed by field_throttle_enabled(), nested under the checkbox
+		// that decides whether any of them mean anything — the same pattern
+		// NotificationsTab's recipients field uses under its own switch.
+		add_settings_field( Config::option_key( 'disable_form_throttle' ), esc_html__( 'Rate limiting', 'wynko-for-laposta' ), array( SecurityTab::class, 'field_throttle_enabled' ), self::PAGE_SECURITY, 'wynko_throttle' );
+		add_settings_section( 'wynko_protections', esc_html__( 'Additional protection', 'wynko-for-laposta' ), '__return_false', self::PAGE_SECURITY );
+		add_settings_field( Config::option_key( 'disable_form_nonce' ), esc_html__( 'Nonce verification', 'wynko-for-laposta' ), array( SecurityTab::class, 'field_nonce_enabled' ), self::PAGE_SECURITY, 'wynko_protections' );
 
 		add_settings_section( 'wynko_notify', esc_html__( 'Alerts', 'wynko-for-laposta' ), '__return_false', self::PAGE_NOTIFICATIONS );
 		// The recipients have no row of their own: they are printed by

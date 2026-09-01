@@ -8,10 +8,13 @@
 namespace Wynko\Tests;
 
 use Wynko\Admin\SettingsPage;
+use Wynko\ApiKey;
 use Wynko\Cache;
+use Wynko\Config;
 use Wynko\KeyStatus;
 use Wynko\Support\Requirements;
 use Wynko\SystemInfo;
+use Wynko\Throttle;
 use PHPUnit\Framework\TestCase;
 
 /** Covers the section shape, the verdicts, reachability, and secret leakage. */
@@ -73,7 +76,7 @@ final class SystemInfoTest extends TestCase {
 		}
 
 		$this->assertSame(
-			array( 'WordPress', 'PHP', 'Database', 'PHP modules', 'Server', 'Plugin' ),
+			array( 'WordPress', 'PHP', 'Database', 'PHP modules', 'Server', 'Plugin', 'Security' ),
 			$titles
 		);
 	}
@@ -164,6 +167,59 @@ final class SystemInfoTest extends TestCase {
 		$this->assertSame( 'Never', $this->row( 'Plugin', 'Last sync' )['value'] );
 	}
 
+	/** Encryption is only a meaningful question for a key actually in the database. */
+	public function test_an_environment_sourced_key_carries_no_encryption_reading(): void {
+		putenv( 'WYNKO_API_KEY=env-key' );
+
+		$row = $this->row( 'Plugin', 'API key source' );
+
+		putenv( 'WYNKO_API_KEY' );
+
+		$this->assertStringNotContainsString( 'Encrypted', $row['value'] );
+		$this->assertSame( '', $row['action'] );
+	}
+
+	public function test_a_plaintext_stored_key_reports_not_encrypted_with_a_help_link(): void {
+		$GLOBALS['wynko_test_options']['wynko_api_key'] = 'plain-secret-key';
+
+		$row = $this->row( 'Plugin', 'API key source' );
+
+		$this->assertStringContainsString( 'Database', $row['value'] );
+		$this->assertStringContainsString( 'Not encrypted', $row['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_DISABLED, $row['status'] );
+		$this->assertSame( SystemInfo::ACTION_ENCRYPT_HELP, $row['action'] );
+	}
+
+	public function test_a_stored_key_that_opens_reports_encrypted(): void {
+		// Guarded: some earlier test in this same PHPUnit process may already
+		// have defined these, and redefining an existing constant is a no-op
+		// with a warning rather than an error — either way, key_material()
+		// ends up non-empty and store() below produces a real envelope.
+		if ( ! defined( 'SECURE_AUTH_KEY' ) ) {
+			define( 'SECURE_AUTH_KEY', 'test-auth-key' );
+			define( 'SECURE_AUTH_SALT', 'test-auth-salt' );
+		}
+		$GLOBALS['wynko_test_options']['wynko_api_key'] = ApiKey::store( 'a-real-key' );
+
+		$row = $this->row( 'Plugin', 'API key source' );
+
+		$this->assertStringContainsString( 'Encrypted', $row['value'] );
+		$this->assertStringNotContainsString( 'Not encrypted', $row['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_ENABLED, $row['status'] );
+		$this->assertSame( '', $row['action'] );
+	}
+
+	/** An envelope that cannot be opened is its own message, not "not encrypted". */
+	public function test_an_unreadable_stored_key_keeps_its_own_message(): void {
+		$GLOBALS['wynko_test_options']['wynko_api_key'] = 'wynko:v1:not-a-real-envelope';
+
+		$row = $this->row( 'Plugin', 'API key source' );
+
+		$this->assertStringContainsString( 'unreadable', $row['value'] );
+		$this->assertStringNotContainsString( 'Not encrypted', $row['value'] );
+		$this->assertSame( '', $row['action'] );
+	}
+
 	public function test_the_signup_rate_limit_is_reported_as_configured(): void {
 		// What the Security tab stored, not what the plugin ships with: a
 		// report showing the defaults would be silent about the one setting an
@@ -174,8 +230,143 @@ final class SystemInfoTest extends TestCase {
 
 		$this->assertSame(
 			'7 per visitor, 99 per form, per 3 minutes',
-			$this->row( 'Plugin', 'Signup rate limit' )['value']
+			$this->row( 'Security', 'Signup rate limit' )['value']
 		);
+	}
+
+	/** Both protections default to on, so a fresh install reports Yes on both. */
+	public function test_a_fresh_install_reports_both_protections_enabled(): void {
+		$nonce    = $this->row( 'Security', 'Nonce verification' );
+		$throttle = $this->row( 'Security', 'Rate limiting' );
+
+		$this->assertSame( 'Yes', $nonce['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_ENABLED, $nonce['status'] );
+		$this->assertSame( 'Yes', $throttle['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_ENABLED, $throttle['status'] );
+	}
+
+	public function test_a_disabled_nonce_check_reports_no_and_the_disabled_status(): void {
+		$GLOBALS['wynko_test_options']['wynko_disable_form_nonce'] = true;
+
+		$row = $this->row( 'Security', 'Nonce verification' );
+
+		$this->assertSame( 'No', $row['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_DISABLED, $row['status'] );
+	}
+
+	public function test_a_disabled_throttle_reports_no_and_the_disabled_status(): void {
+		$GLOBALS['wynko_test_options']['wynko_disable_form_throttle'] = true;
+
+		$row = $this->row( 'Security', 'Rate limiting' );
+
+		$this->assertSame( 'No', $row['value'] );
+		$this->assertSame( SystemInfo::PROTECTION_DISABLED, $row['status'] );
+	}
+
+	public function test_no_forms_means_no_usage_to_report(): void {
+		$this->assertSame(
+			'No signup forms yet',
+			$this->row( 'Security', 'Signups in the current window' )['value']
+		);
+	}
+
+	public function test_current_usage_is_reported_per_form_against_the_cap(): void {
+		$GLOBALS['wynko_test_options']['wynko_throttle_form_max'] = 400;
+		$id = wynko_test_insert_post(
+			array(
+				'post_title'  => 'Newsletter signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+		Throttle::allows( $id, '203.0.113.5' );
+		Throttle::allows( $id, '203.0.113.6' );
+
+		$this->assertSame(
+			'Newsletter signup: 2/400',
+			$this->row( 'Security', 'Signups in the current window' )['value']
+		);
+	}
+
+	/**
+	 * Joined with newlines, not commas: SystemReport renders a newline-carrying
+	 * value as a list rather than one long line once there is more than one
+	 * form to report.
+	 */
+	public function test_more_than_one_form_is_joined_with_newlines_for_the_list_rendering(): void {
+		$GLOBALS['wynko_test_options']['wynko_throttle_form_max'] = 400;
+		wynko_test_insert_post(
+			array(
+				'post_title'  => 'Newsletter signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+		wynko_test_insert_post(
+			array(
+				'post_title'  => 'Footer signup',
+				'post_type'   => Config::form_post_type(),
+				'post_status' => 'publish',
+			)
+		);
+
+		$value = $this->row( 'Security', 'Signups in the current window' )['value'];
+
+		$this->assertStringNotContainsString( ', ', $value );
+		$this->assertSame(
+			array( 'Footer signup: 0/400', 'Newsletter signup: 0/400' ),
+			explode( "\n", $value )
+		);
+	}
+
+	public function test_no_caching_plugin_reports_no(): void {
+		$this->assertSame( 'No', $this->row( 'WordPress', 'Page caching' )['value'] );
+	}
+
+	public function test_an_active_caching_drop_in_is_named(): void {
+		$GLOBALS['wynko_test_dropins'] = array(
+			'advanced-cache.php' => array( 'Name' => 'WP Super Cache' ),
+		);
+
+		$this->assertSame( 'WP Super Cache', $this->row( 'WordPress', 'Page caching' )['value'] );
+	}
+
+	/**
+	 * get_plugin_data() falls back to the bare filename when a drop-in
+	 * carries no real plugin header — true of most page-caching plugins'
+	 * advanced-cache.php in practice (confirmed against a real WP Super
+	 * Cache install). A "Name" that is just the filename must not be
+	 * reported as if it identified anything.
+	 */
+	public function test_a_drop_in_with_no_real_header_reports_enabled_generically(): void {
+		$GLOBALS['wynko_test_dropins'] = array(
+			'advanced-cache.php' => array( 'Name' => 'advanced-cache.php' ),
+		);
+
+		$this->assertSame( 'Yes', $this->row( 'WordPress', 'Page caching' )['value'] );
+	}
+
+	public function test_no_cdn_headers_report_no(): void {
+		$this->assertSame( 'No', $this->row( 'Server', 'CDN / proxy' )['value'] );
+	}
+
+	public function test_a_cloudflare_header_is_identified(): void {
+		$_SERVER['HTTP_CF_RAY'] = '8a1b2c3d4e5f6789-AMS';
+
+		$row = $this->row( 'Server', 'CDN / proxy' );
+		unset( $_SERVER['HTTP_CF_RAY'] );
+
+		$this->assertSame( 'Cloudflare', $row['value'] );
+		$this->assertNotSame( '', $row['note'] );
+	}
+
+	public function test_a_bare_forwarding_header_is_unidentified_rather_than_guessed(): void {
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.9';
+
+		$row = $this->row( 'Server', 'CDN / proxy' );
+		unset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
+
+		$this->assertSame( 'Unidentified reverse proxy', $row['value'] );
 	}
 
 	public function test_the_report_never_carries_the_key_or_its_fingerprint(): void {
@@ -194,7 +385,7 @@ final class SystemInfoTest extends TestCase {
 
 		$this->assertSame( 'Connected', $this->row( 'Plugin', 'Connection status' )['value'] );
 		$this->assertSame( '', $this->row( 'Plugin', 'Connection status' )['note'] );
-		$this->assertSame( 'Database', $this->row( 'Plugin', 'API key source' )['value'] );
+		$this->assertStringStartsWith( 'Database', $this->row( 'Plugin', 'API key source' )['value'] );
 	}
 
 	public function test_a_failed_sync_reports_the_verdict_and_how_far_it_got_in_one_row(): void {
@@ -405,5 +596,73 @@ final class SystemInfoTest extends TestCase {
 				sprintf( '%s alone must not be a hard requirement.', $module )
 			);
 		}
+	}
+
+	public function test_it_lists_a_registered_integration_with_its_state_and_version(): void {
+		add_filter(
+			'wynko_register_integrations',
+			function ( array $integrations ) {
+				$integrations[] = new FakeIntegration( 'one', 'One' );
+				return $integrations;
+			}
+		);
+
+		$row = $this->row( 'Integrations', 'One' );
+
+		$this->assertSame( 'disabled', $row['value'] );
+		$this->assertStringContainsString( 'version 1.2.3', $row['note'] );
+	}
+
+	public function test_it_shows_an_enabled_integration_as_enabled(): void {
+		update_option( 'wynko_integrations_enabled', array( 'one' ) );
+		add_filter(
+			'wynko_register_integrations',
+			function ( array $integrations ) {
+				$integrations[] = new FakeIntegration( 'one', 'One' );
+				return $integrations;
+			}
+		);
+
+		$this->assertSame( 'enabled', $this->row( 'Integrations', 'One' )['value'] );
+	}
+
+	public function test_it_names_the_provider_of_a_third_party_integration(): void {
+		add_filter(
+			'wynko_register_integrations',
+			function ( array $integrations ) {
+				$integrations[] = new FakeThirdPartyIntegration();
+				return $integrations;
+			}
+		);
+
+		$row = $this->row( 'Integrations', 'Two <script>alert(1)</script>' );
+
+		$this->assertStringContainsString( 'provided by', $row['note'] );
+	}
+
+	public function test_it_strips_embedded_newlines_from_a_third_party_integrations_strings(): void {
+		add_filter(
+			'wynko_register_integrations',
+			function ( array $integrations ) {
+				$integrations[] = new FakeNewlineIntegration();
+				return $integrations;
+			}
+		);
+
+		$row = $this->row( 'Integrations', 'Three == Section == [fail] forged' );
+
+		$this->assertStringNotContainsString( "\n", $row['label'] );
+		$this->assertStringNotContainsString( "\n", $row['note'] );
+		$this->assertStringContainsString( 'Jane [fail] forged', $row['note'] );
+		$this->assertStringContainsString( '1.0 [fail] forged', $row['note'] );
+	}
+
+	public function test_it_omits_the_integrations_section_when_none_are_registered(): void {
+		$titles = array();
+		foreach ( SystemInfo::sections() as $section ) {
+			$titles[] = $section['title'];
+		}
+
+		$this->assertNotContains( 'Integrations', $titles );
 	}
 }

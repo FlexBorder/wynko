@@ -493,4 +493,18 @@ final class BlockRenderTest extends TestCase {
 		);
 		$this->assertStringNotContainsString( '<script>', $html );
 	}
+
+	public function test_wynko_campaigns_block_content_filter_can_modify_the_output(): void {
+		$this->seed( array( 'list_a' => 1 ) );
+		add_filter(
+			'wynko_campaigns_block_content',
+			static function ( $content ) {
+				return $content . '<!--filtered-->';
+			}
+		);
+
+		$out = Campaigns::render( array( 'count' => 10 ) );
+
+		$this->assertStringContainsString( '<!--filtered-->', $out );
+	}
 }

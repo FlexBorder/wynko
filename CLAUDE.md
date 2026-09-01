@@ -15,7 +15,10 @@ A WordPress plugin that shows recently sent Laposta campaigns in a Gutenberg
 block, with a settings page (API key, cache, sync, activity log). Roadmap:
 signup forms that write to Laposta, form-field auto-import, and webhooks — so
 the architecture leaves seams for a write-capable API client and a REST/webhook
-controller (no third-party plugin integrations).
+controller (no third-party plugin integrations, meaning Wynko's own core
+never depends on another plugin to function — it does not rule out optional
+bridges *to* other plugins, e.g. a Contact Form 7 integration; see
+[`docs/roadmap.md`](docs/roadmap.md)).
 
 Before naming or guideline-sensitive decisions (plugin/slug/text-domain
 naming, trademark use, licensing, trialware/upsell patterns, external

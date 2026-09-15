@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 #
-# Wynko pre-commit report — runs the ten pre-commit gate scripts
-# (security-scan.sh, coding-standards.sh, style-lint.sh, js-lint.sh,
-# unit-tests.sh, static-analysis.sh, semgrep-scan.sh, sbom-check.sh,
-# wp-org-check.sh, plugin-check.sh), captures every check's output
-# regardless of pass/fail, prints a failing check's output to stderr (so a
-# blocked commit still explains itself at the terminal, not only in the
-# report), and writes one timestamped Markdown report to
-# ../wynko-reports/ (a sibling of the repo checkout, deliberately outside
-# git — see CONTRIBUTING.md). Exits non-zero if any check failed, so
-# .githooks/pre-commit still blocks the commit.
+# Wynko pre-commit report — runs the fast pre-commit tier (lint-staged.sh,
+# unit-tests.sh, sbom-check.sh), captures every check's output regardless of
+# pass/fail, prints a failing check's output to stderr (so a blocked commit
+# still explains itself at the terminal, not only in the report), and writes
+# one timestamped Markdown report to ../wynko-reports/ (a sibling of the repo
+# checkout, deliberately outside git — see CONTRIBUTING.md). Exits non-zero
+# if any check failed, so .githooks/pre-commit still blocks the commit.
 #
-# plugin-check.sh requires `npx @wordpress/env start` already running — if
-# it isn't, that check fails closed rather than being silently skipped.
-# semgrep-scan.sh needs network access to fetch its rulesets.
-#
-# All PHP checks here run a single version (whatever's local, or the
-# php:8.5-cli Docker fallback). bin/merge-to-main.sh runs the full
-# PHP 8.0-8.5 matrix instead, at merge time — see bin/php-matrix.sh.
+# This tier is deliberately fast and offline: staged-file lint + the
+# WordPress-free unit suite + the SBOM no-op. The heavier checks —
+# full-tree PHPCS, PHPStan, Semgrep, Plugin Check, and the PHP 8.0-8.5
+# matrix — run once per branch in bin/gate.sh and bin/php-matrix.sh, the
+# first steps of bin/merge-to-main.sh, not on every commit. See
+# TECHNICAL_DEBT.md TD-073.
 #
 # Usage: bin/write-report.sh
 #
@@ -66,16 +62,9 @@ run_check() {
 	} >>"$report_file"
 }
 
-run_check "bin/security-scan.sh" "bin/security-scan.sh"
-run_check "bin/coding-standards.sh" "bin/coding-standards.sh"
-run_check "bin/style-lint.sh" "bin/style-lint.sh"
-run_check "bin/js-lint.sh" "bin/js-lint.sh"
+run_check "bin/lint-staged.sh" "bin/lint-staged.sh"
 run_check "bin/unit-tests.sh" "bin/unit-tests.sh"
-run_check "bin/static-analysis.sh" "bin/static-analysis.sh"
-run_check "bin/semgrep-scan.sh" "bin/semgrep-scan.sh"
 run_check "bin/sbom-check.sh" "bin/sbom-check.sh"
-run_check "bin/wp-org-check.sh" "bin/wp-org-check.sh"
-run_check "bin/plugin-check.sh" "bin/plugin-check.sh"
 
 echo "write-report: report written to $report_file"
 

@@ -92,10 +92,15 @@ translations, and compiles the `.mo` and editor-script JSON. Filling in new
 
 ## Hard rules
 
-- **Security and coding standards are gates, every commit.** The pre-commit
-  hook (`bin/write-report.sh`) runs ten checks — security scan, PHP/CSS/JS
-  coding standards, unit tests, static analysis, Semgrep, SBOM freshness,
-  WP.org readiness, and Plugin Check — don't `--no-verify`. New
+- **Security and coding standards are gates.** The pre-commit hook
+  (`bin/write-report.sh`) runs a fast offline tier every commit —
+  staged-file PHP coding standards + security ruleset (`bin/lint-staged.sh`),
+  the WordPress-free unit suite, and the SBOM no-op. The full-tree standards,
+  PHPStan, Semgrep, Plugin Check, and the PHP 8.0–8.5 matrix run once per
+  branch in `bin/gate.sh` + `bin/php-matrix.sh` at merge time
+  (`bin/merge-to-main.sh`) — see `TECHNICAL_DEBT.md` TD-073. Don't
+  `--no-verify`, and run `bin/gate.sh` yourself before requesting a merge if
+  you want the full signal sooner. New
   endpoints/handlers/forms must satisfy their OWASP row in `SECURITY.md`
   (capability check + nonce + sanitize + escape; webhooks verify a
   signature); a change touching Hooks, Admin Menus, Settings, Metadata,
@@ -133,9 +138,11 @@ translations, and compiles the `.mo` and editor-script JSON. Filling in new
   names and small functions over prose. Keep only non-obvious *why* notes,
   type-shape annotations, and required suppression justifications.
 - **Git flow.** Trunk is `main` and stays releasable. Branch → commit (every
-  commit runs the full pre-commit suite) → `/security-review` →
-  `bin/merge-to-main.sh` (a full local mirror of CI, PHP 8.0–8.5 matrix
-  included) → push. Never commit straight to `main`; never merge a red
+  commit runs the fast pre-commit tier) → `/security-review` →
+  `bin/merge-to-main.sh` (runs `bin/gate.sh` + the PHP 8.0–8.5 matrix locally,
+  then the `/security-review` confirmation and the trailer) → push. `origin`
+  is a private backup mirror and runs no CI; the public repo runs only
+  release verification. Never commit straight to `main`; never merge a red
   branch.
 - **Multisite.** Options/transients are per-site; keep it that way and keep
   `uninstall.php`'s per-site loop intact.

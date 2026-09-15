@@ -12,6 +12,11 @@
 /.editorconfig
 /.claude
 
+# WordPress.org SVN assets (icon/banner/screenshots) — bin/svn-deploy.sh
+# mirrors these into the assets/ directory of the SVN repo; they never ship
+# in the installable ZIP.
+/.wordpress-org
+
 # Dev environment
 /.wp-env.json
 /.wp-env.override.json

@@ -1,13 +1,13 @@
 name: E2E (signup forms + caching)
 
-# Opt-in only — never pull_request/push. This suite needs a live Laposta
-# test-account secret and real network egress, neither of which a fork PR
-# gets (see ci.yml's other jobs), and which have no place in the offline
-# pre-commit gate either. See TECHNICAL_DEBT.md TD-070.
+# Opt-in only — never pull_request/push, and no schedule. This suite needs a
+# live Laposta test-account secret and real network egress, neither of which
+# a fork PR gets, and which have no place in the offline pre-commit gate
+# either. It runs as a hard gate inside bin/release.sh; this workflow is for
+# running it on demand between releases. See TECHNICAL_DEBT.md TD-070 and
+# TD-075.
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: '17 3 * * *'
 
 permissions:
   contents: read

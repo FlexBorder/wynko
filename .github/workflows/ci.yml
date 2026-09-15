@@ -1,70 +1,30 @@
 name: CI
 
+# The full check suite — PHPUnit/PHPCS/PHPStan across PHP 8.0-8.5, Semgrep,
+# the security ruleset, JS/CSS lint, SBOM freshness, Plugin Check — runs
+# locally, once per branch, in bin/merge-to-main.sh (bin/gate.sh +
+# bin/php-matrix.sh) before anything reaches origin. origin
+# (FlexBorder/wynko-origin) is a private backup mirror and runs no CI.
+#
+# This workflow runs only on the public repository (FlexBorder/wynko), which
+# receives one squashed commit per release via bin/release.sh. Its job is
+# the one thing the local gate structurally cannot do: an independent,
+# clean-room check that the shipped/stripped tree still builds, assembles
+# into a ZIP, and passes Plugin Check. It does not re-run the local gate.
+
 on:
   push:
     branches: [ main ]
-  pull_request:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Tests & static analysis (PHP ${{ matrix.php }})
+  release-verify:
+    name: Release verification (shipped tree)
     runs-on: ubuntu-latest
-    if: github.repository != 'FlexBorder/wynko-origin'
-    strategy:
-      fail-fast: false
-      matrix:
-        php: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2 (2.37.2)
-        with:
-          php-version: ${{ matrix.php }}
-          coverage: none
-          tools: composer:v2
-
-      - name: Install dependencies
-        run: composer install --no-interaction --no-progress
-
-      - name: Unit tests
-        run: vendor/bin/phpunit
-
-      - name: Coding standards (WordPress, PHP)
-        run: vendor/bin/phpcs
-
-      - name: Static analysis
-        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-
-  javascript:
-    name: Coding standards (WordPress, JS + CSS)
-    runs-on: ubuntu-latest
-    if: github.repository != 'FlexBorder/wynko-origin'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '24'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint JavaScript
-        run: npm run lint:js
-
-      - name: Lint CSS/SCSS
-        run: npm run lint:style
-
-  plugin-check:
-    name: WordPress.org Plugin Check
-    runs-on: ubuntu-latest
-    if: github.repository != 'FlexBorder/wynko-origin'
+    if: github.repository == 'FlexBorder/wynko'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -91,6 +51,9 @@ jobs:
         run: |
           npm ci
           npm run build
+
+      - name: Assemble the installable ZIP
+        run: bin/package.sh "$GITHUB_SHA"
 
       - name: Derive excludes from .distignore
         id: pc-excludes
@@ -120,95 +83,8 @@ jobs:
           slug: wynko
           exclude-directories: ${{ steps.pc-excludes.outputs.dirs }}
           exclude-files: ${{ steps.pc-excludes.outputs.files }}
-          # Plugin Check only fails the job on ERROR-level results by
-          # default; the checks WordPress.org's own review draws from
-          # (text-domain/slug match, bundled translations, trademarks,
-          # readme completeness) are WARNING-level and passed silently
-          # without this. `strict` treats every result as an error instead
-          # of hand-picking which categories to fail on.
+          # Every result fails the job, not just ERROR-level ones — the
+          # WARNING-level checks (text-domain/slug match, bundled
+          # translations, trademarks, readme completeness) are the ones
+          # WordPress.org's own review draws from.
           strict: true
-
-  sbom:
-    name: SBOM freshness
-    runs-on: ubuntu-latest
-    if: github.repository != 'FlexBorder/wynko-origin'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '24'
-          cache: npm
-
-      # Pinned exactly, not just the major from engines.node — the SBOM records
-      # the invoking npm's own version as metadata (see bin/sbom-generate.sh),
-      # so two Node-24 builds with different npm patch releases still produce a
-      # spurious diff. This has to track whatever version generated the
-      # committed sbom/npm.cdx.json.
-      - name: Pin npm to the version the committed SBOM was generated with
-        run: npm install -g npm@11.16.0
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: SBOM matches the lock files (hard fail)
-        run: bin/sbom-check.sh --regenerate
-
-  security:
-    name: Security gate
-    runs-on: ubuntu-latest
-    if: github.repository != 'FlexBorder/wynko-origin'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2 (2.37.2)
-        with:
-          php-version: '8.3'
-          coverage: none
-          tools: composer:v2
-
-      - name: Install dependencies
-        run: composer install --no-interaction --no-progress
-
-      - name: PHPCS security ruleset (hard fail)
-        run: vendor/bin/phpcs --standard=phpcs-security.xml.dist
-
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.12'
-
-      - name: Install Semgrep
-        run: pip install --quiet semgrep
-
-      - name: Semgrep (OWASP Top 10 + PHP, hard fail)
-        run: semgrep scan --config p/owasp-top-ten --config p/php --error --quiet
-
-  security-review-attestation:
-    name: Security-review attestation
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.repository != 'FlexBorder/wynko-origin'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Verify the merge commit carries a matching Security-Reviewed trailer
-        run: |
-          parent_count=$(( $(git rev-list --parents -n 1 HEAD | wc -w) - 1 ))
-          if [ "$parent_count" -ne 2 ]; then
-            echo "::error::HEAD on main is not a merge commit — only bin/merge-to-main.sh may push to main." >&2
-            exit 1
-          fi
-
-          second_parent="$(git rev-parse HEAD^2)"
-          trailer="$(git log -1 --pretty=%B HEAD | grep -oP '^Security-Reviewed: \K[0-9a-f]{40}$' || true)"
-
-          if [ "$trailer" != "$second_parent" ]; then
-            echo "::error::merge commit is missing a matching 'Security-Reviewed: <sha>' trailer (expected $second_parent, got '${trailer:-<none>}')." >&2
-            exit 1
-          fi
-
-          echo "Security-Reviewed trailer verified: $trailer"

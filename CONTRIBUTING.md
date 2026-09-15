@@ -30,34 +30,33 @@ outside contributor, you won't need it — regular branches only ever push to
 
 ## Branching & commit flow
 
-Trunk is **`main`**; it stays releasable. Work happens on short-lived branches
-that open a pull request against `main`, where CI (`.github/workflows/ci.yml`)
-runs the tests, the static analysis, and the gating security job.
+Trunk is **`main`**; it stays releasable. Work happens on short-lived
+branches. `origin` (`FlexBorder/wynko-origin`) is a private backup mirror and
+runs no CI — the check suite runs locally, once per branch, in
+`bin/merge-to-main.sh`. The public repo (`FlexBorder/wynko`) receives one
+squashed commit per release and runs only release verification
+(`.github/workflows/ci.yml`).
 
 1. **Branch** off `main`: `git switch main && git switch -c feature/<short-name>`
    (prefixes: `feature/`, `fix/`, `chore/`).
 2. **Commit** in small, focused steps. Each `git commit` triggers the pre-commit
-   hook (`.githooks/pre-commit` → `bin/write-report.sh`), which runs ten
-   checks: the **security scan** (`bin/security-scan.sh`), the
-   **PHP coding-standards check** (`bin/coding-standards.sh`), the
-   **CSS/SCSS coding-standards check** (`bin/style-lint.sh`), the
-   **JS coding-standards check** (`bin/js-lint.sh`), **unit tests**
-   (`bin/unit-tests.sh`), **static analysis** (`bin/static-analysis.sh`),
-   a **Semgrep scan** (`bin/semgrep-scan.sh` — needs network access to fetch
-   its rulesets), the **SBOM freshness check** (`bin/sbom-check.sh`), the
-   **WordPress.org readiness guard** (`bin/wp-org-check.sh`), and the
-   official **Plugin Check** tool, all categories, strict
-   (`bin/plugin-check.sh` — needs `npx @wordpress/env start` already
-   running; it fails the commit rather than skipping if wp-env isn't up).
-   Any one finding blocks the commit — fix it (`composer lint:fix`/`npm run
-   lint:js:fix`/`npm run lint:style:fix` auto-correct most style issues) or
-   justify the suppression inline. Do not use `--no-verify`. Every run of
-   the hook — pass or fail — writes a timestamped Markdown report (all ten
-   checks' full output, including which sniffs ran and every file's
-   individual result, not just a pass/fail line) to `../wynko-reports/`, a
-   sibling of the repo checkout deliberately kept outside git; it's how you
-   read back what a pre-commit run actually found, including after a
-   failing commit. The **commit-msg hook** (`.githooks/commit-msg`) also
+   hook (`.githooks/pre-commit` → `bin/write-report.sh`), a fast offline tier:
+   **staged-file coding standards** (`bin/lint-staged.sh` — the
+   `phpcs.xml.dist` and `phpcs-security.xml.dist` rulesets over the PHP files
+   this commit touches, plus ESLint/stylelint over staged `src/` assets),
+   **unit tests** (`bin/unit-tests.sh` — the WordPress-free suite), and the
+   **SBOM freshness check** (`bin/sbom-check.sh` — a no-op unless a lock file
+   is staged). The full-tree standards, PHPStan, Semgrep, Plugin Check, and
+   the PHP 8.0–8.5 matrix run once per branch at merge time (step 4), not on
+   every commit — see `TECHNICAL_DEBT.md` TD-073; run `bin/gate.sh` yourself
+   for the full signal sooner. Any one finding blocks the commit — fix it
+   (`composer lint:fix`/`npm run lint:js:fix`/`npm run lint:style:fix`
+   auto-correct most style issues) or justify the suppression inline. Do not
+   use `--no-verify`. Every run of the hook — pass or fail — writes a
+   timestamped Markdown report to `../wynko-reports/`, a sibling of the repo
+   checkout deliberately kept outside git; it's how you read back what a
+   pre-commit run actually found, including after a failing commit. The
+   **commit-msg hook** (`.githooks/commit-msg`) also
    requires a [Conventional Commits](https://www.conventionalcommits.org/)
    subject line (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`,
    `ci:`, `build:`, `perf:`, `revert:`, `security:`, optionally scoped and
@@ -66,28 +65,27 @@ runs the tests, the static analysis, and the gating security job.
 3. **Before merging**, on the branch, run `/security-review` (Claude Code)
    and resolve or justify every finding — the one check nothing else here
    automates.
-4. **Merge** to `main` with `bin/merge-to-main.sh <branch>`: it runs a full
-   local mirror of every CI job — the PHP 8.0–8.5 matrix (`bin/php-matrix.sh`:
-   PHPUnit, PHPCS, PHPStan under each version, with a fresh `composer
-   install` per version, exactly like CI's `build` job), the security scan
-   and Semgrep, JS and CSS lint, `wp-org-check` and Plugin Check, and a full
-   SBOM regeneration pinned to the same npm version CI uses — then asks you
-   to confirm `/security-review` ran and its findings were resolved, before
-   performing `git merge --no-ff` with a `Security-Reviewed:
-   <branch-tip-sha>` trailer in the merge commit and deleting the branch.
-   This runs entirely on your machine, before anything reaches GitHub.
-   Only a merge commit carrying that trailer can reach `origin/main` — CI's
-   `security-review-attestation` job hard-fails otherwise (that job is the
-   one thing `merge-to-main.sh` can't mirror: it verifies, after the fact,
-   that this very script was used, so it can't check itself). Don't merge
-   with a bare `git merge`; it skips the attestation.
-5. **Push** the branch and open a PR against `main`, or push `main` directly
-   after a local merge. Either way, **that push** is what triggers CI on
-   GitHub's servers — a PR triggers it per-push, before any merge happens;
-   pushing `main` after `bin/merge-to-main.sh` triggers it on the merge
-   commit, including the attestation job. Because `merge-to-main.sh` already
-   mirrors every CI check locally, CI at this point is expected to be a
-   redundant, independent confirmation — not the first time any of this ran.
+4. **Merge** to `main` with `bin/merge-to-main.sh <branch>`: it runs the full
+   check suite once, on your machine —
+   - `bin/php-matrix.sh`: PHPUnit and PHPStan under PHP 8.0–8.5 (in parallel,
+     one shared `composer install`), plus one PHPCS run (`testVersion 8.0-`
+     covers the range — see `TECHNICAL_DEBT.md` TD-074);
+   - `bin/gate.sh`: full-tree PHPCS + the security ruleset, PHPStan, the unit
+     suite, JS and CSS lint, Semgrep, `wp-org-check`, Plugin Check against a
+     production-only `vendor/`, and a full SBOM regeneration;
+   then asks you (on the terminal — not stdin) to confirm `/security-review`
+   ran and its findings were resolved, before performing `git merge --no-ff`
+   with a `Security-Reviewed: <branch-tip-sha>` trailer in the merge commit
+   and deleting the branch. To confirm non-interactively, set
+   `WYNKO_SECURITY_REVIEWED` to the exact branch-tip SHA being merged
+   (SHA-matched so it can't be a stale blanket bypass). No automated check
+   re-verifies that trailer
+   (`TECHNICAL_DEBT.md` TD-076) — `bin/merge-to-main.sh` is the only
+   sanctioned path to `main`; do not merge with a bare `git merge`.
+5. **Push** the branch to `origin` (the private backup mirror — no CI runs).
+   `main` reaches the public repo only through `bin/release.sh`; the public
+   `ci.yml` then verifies the shipped tree builds, assembles into a ZIP, and
+   passes Plugin Check.
 
 Never commit straight to `main`; never merge a branch whose checks or
 `/security-review` did not pass.
@@ -103,20 +101,22 @@ Never commit straight to `main`; never merge a branch whose checks or
 | `composer analyse` | PHPStan static analysis (level 5, WP stubs). |
 | `npm run lint:js` | ESLint with `@wordpress/eslint-plugin` over `src/` (`npm run lint:js:fix` to auto-correct). |
 | `npm run lint:style` | stylelint with `@wordpress/stylelint-config` over `src/**/*.scss` (`npm run lint:style:fix` to auto-correct). |
-| `bin/security-scan.sh` | The exact security gate (PHPCS security ruleset) the pre-commit hook, `bin/merge-to-main.sh`, and CI run. |
-| `bin/coding-standards.sh` | The exact PHP standards check the pre-commit hook and CI run; `bin/php-matrix.sh` re-runs it across every supported PHP version at merge time. |
-| `bin/style-lint.sh` | The exact CSS/SCSS standards check the pre-commit hook, `bin/merge-to-main.sh`, and CI run. |
-| `bin/js-lint.sh` | The exact JS standards check the pre-commit hook, `bin/merge-to-main.sh`, and CI run. |
-| `bin/unit-tests.sh` | Single-version PHPUnit — the pre-commit hook. `bin/php-matrix.sh` covers the full version range at merge time. |
-| `bin/static-analysis.sh` | Single-version PHPStan — the pre-commit hook. `bin/php-matrix.sh` covers the full version range at merge time. |
-| `bin/php-matrix.sh` | PHPUnit + PHPCS + PHPStan under a fresh `composer install` per PHP version, 8.0–8.5 — mirrors CI's `build` matrix exactly. `bin/merge-to-main.sh` only; too slow for every commit. |
-| `bin/semgrep-scan.sh` | The exact Semgrep scan (`p/owasp-top-ten`, `p/php`) the pre-commit hook, `bin/merge-to-main.sh`, and CI run. Needs network access. |
-| `bin/sbom-check.sh` | The exact SBOM freshness check the pre-commit hook runs (no-op unless a lock file is staged); `bin/merge-to-main.sh` and CI instead run `--regenerate` unconditionally, with npm pinned to the version the committed SBOM was generated with. |
-| `bin/write-report.sh` | Runs all ten pre-commit checks above and writes their combined output to `../wynko-reports/`. This is what the pre-commit hook actually calls. |
-| `bin/wp-org-check.sh` | WordPress.org readiness guard (readme/header fields — see below). Runs in the pre-commit hook, `bin/merge-to-main.sh`, the `plugin-check` CI job on every push/PR, and again from `bin/release.sh` before a release. |
-| `npm run test:e2e` | The `tests/e2e/` Playwright suite (signup forms + caching) against a live Laposta test account; needs `npx @wordpress/env start` first plus `WYNKO_TEST_API_KEY` / `WYNKO_TEST_LIST_ID`. Runs nightly and on demand via `.github/workflows/e2e.yml`, and as a hard gate in `bin/release.sh`. Not in the pre-commit hook or `bin/merge-to-main.sh`. |
-| `bin/plugin-check.sh` | The official [Plugin Check](https://wordpress.org/plugins/plugin-check/) tool, all categories, strict — every finding blocks, not just errors. Runs in the pre-commit hook and `bin/merge-to-main.sh` (both need `npx @wordpress/env start` first) and, via the `WordPress/plugin-check-action`, in CI. |
-| `bin/merge-to-main.sh` | The merge gate — a full local mirror of every CI job except `security-review-attestation`. See "Branching & commit flow" above. |
+| `bin/lint-staged.sh` | Staged-file slice of the standards checks (both PHPCS rulesets + ESLint/stylelint over staged `src/` assets) — the pre-commit hook. |
+| `bin/security-scan.sh` | Full-tree PHPCS security ruleset. `bin/gate.sh` at merge time. |
+| `bin/coding-standards.sh` | Full-tree PHPCS (WordPress standards). `bin/gate.sh` at merge time. |
+| `bin/style-lint.sh` | Full-tree CSS/SCSS standards check. `bin/gate.sh` at merge time. |
+| `bin/js-lint.sh` | Full-tree JS standards check. `bin/gate.sh` at merge time. |
+| `bin/unit-tests.sh` | Single-version PHPUnit — the pre-commit hook and `bin/gate.sh`. `bin/php-matrix.sh` covers the full version range at merge time. |
+| `bin/static-analysis.sh` | Single-version PHPStan — `bin/gate.sh`. `bin/php-matrix.sh` covers the full version range at merge time. |
+| `bin/php-matrix.sh` | PHPUnit + PHPStan under PHP 8.0–8.5 (parallel, one shared `composer install`) + one PHPCS run. `bin/merge-to-main.sh` only. |
+| `bin/gate.sh` | The full single-version check suite (all of the above at full scope, Semgrep, `wp-org-check`, Plugin Check, SBOM regen), run once per branch. First step of `bin/merge-to-main.sh`; run it yourself before requesting a merge. |
+| `bin/semgrep-scan.sh` | Semgrep scan (`p/owasp-top-ten`, `p/php`). `bin/gate.sh` at merge time. Needs network access. |
+| `bin/sbom-check.sh` | SBOM freshness. The pre-commit hook runs it in the default no-op mode (nothing unless a lock file is staged); `bin/gate.sh` runs `--regenerate` unconditionally, npm pinned to the version the committed SBOM was generated with. |
+| `bin/write-report.sh` | Runs the fast pre-commit tier (`bin/lint-staged.sh`, `bin/unit-tests.sh`, `bin/sbom-check.sh`) and writes their combined output to `../wynko-reports/`. This is what the pre-commit hook actually calls. |
+| `bin/wp-org-check.sh` | WordPress.org readiness guard (readme/header fields — see below). Runs in `bin/gate.sh`, the public `ci.yml` release-verify job, and again from `bin/release.sh` before a release. |
+| `npm run test:e2e` | The `tests/e2e/` Playwright suite (signup forms + caching) against a live Laposta test account; needs `npx @wordpress/env start` first plus `WYNKO_TEST_API_KEY` / `WYNKO_TEST_LIST_ID`. On demand via `.github/workflows/e2e.yml`, and a hard gate in `bin/release.sh`. Not in the pre-commit hook or `bin/merge-to-main.sh`. |
+| `bin/plugin-check.sh` | The official [Plugin Check](https://wordpress.org/plugins/plugin-check/) tool, all categories, strict — every finding blocks, not just errors. Runs in `bin/gate.sh` (needs `npx @wordpress/env start` first) and, via the `WordPress/plugin-check-action`, in the public `ci.yml`. |
+| `bin/merge-to-main.sh` | The merge gate — `bin/gate.sh` + `bin/php-matrix.sh` + the `/security-review` confirmation. See "Branching & commit flow" above. |
 | `composer sbom:check` | The same check, run unconditionally. CI + pre-release. |
 | `composer sbom` | Regenerates `sbom/*.cdx.json` (runtime dependencies only). |
 | `composer audit:deps` | Outdated packages + security advisories, both ecosystems. Pre-release; reports, doesn't gate. |
@@ -155,14 +155,14 @@ tracked gap and its revisit trigger.
 A change is ready to merge to `main` (or open as a PR) when **all** of these hold:
 
 1. The pre-commit hook passes on every commit (it always runs — see
-   "Branching & commit flow"), which already covers `composer test`,
-   `composer lint`, `composer lint:security`, `composer analyse`, `npm run
-   lint:js`, `npm run lint:style`, a Semgrep scan, `wp-org-check`, and
-   Plugin Check, at a single PHP version.
-2. `bin/merge-to-main.sh` passes — it re-runs everything above across the
-   full PHP 8.0–8.5 matrix and a full pinned-npm SBOM regen, mirroring CI.
-   Passing this means CI is expected to be a formality, not the first real
-   check.
+   "Branching & commit flow"): staged-file coding standards, `composer test`,
+   and the SBOM freshness check.
+2. `bin/merge-to-main.sh` passes — `bin/gate.sh` (full-tree `composer lint`,
+   `composer lint:security`, `composer analyse`, `npm run lint:js`, `npm run
+   lint:style`, Semgrep, `wp-org-check`, Plugin Check, a pinned-npm SBOM
+   regen) plus `bin/php-matrix.sh` (PHPUnit + PHPStan across PHP 8.0–8.5,
+   PHPCS once). This is the full check suite — nothing on the server re-runs
+   it.
 3. You have run Claude Code's **`/security-review`** on the branch and resolved
    (or justified) every finding.
 4. Any new endpoint, handler, webhook, or form implements the control its OWASP
@@ -171,8 +171,8 @@ A change is ready to merge to `main` (or open as a PR) when **all** of these hol
    Custom Post Types, Taxonomies, Users, the HTTP API, JS/Ajax, Cron,
    i18n, or Privacy? Check the matching row in `HANDBOOK_COMPLIANCE.md` is
    still accurate, and update it in the same commit if not.
-5. Once a remote exists, the CI **`security` job is green** — it hard-fails on
-   any PHPCS security or Semgrep OWASP/PHP finding and blocks merge.
+5. The security checks in `bin/gate.sh` are green — the PHPCS security ruleset
+   and the Semgrep OWASP/PHP scan both hard-fail on any finding.
 6. Added a **runtime** dependency? `sbom/` is regenerated and committed
    alongside the lock file. The pre-commit hook blocks the mismatch, but don't
    rely on it. Dev-only changes need nothing — the SBOM does not cover them.
@@ -337,6 +337,14 @@ places version numbers live in sync instead of you editing them by hand:
    reads the release notes back out of the tag commit's body (the same
    changelog entry approved in step 3), and creates the GitHub Release with
    the ZIP attached — automatically, no further action needed.
+7. That GitHub Release, in turn, triggers `.github/workflows/svn-deploy.yml`,
+   which runs `bin/svn-deploy.sh` to mirror the release to
+   `plugins.svn.wordpress.org/wynko`: `trunk/` gets exactly what
+   `bin/package.sh` put in the ZIP, `assets/` gets the icon, banner, and
+   screenshots from `.wordpress-org/` (never shipped in the ZIP itself — see
+   `.distignore`), and a new `tags/x.y.z` is cut from `trunk/`, all in one
+   SVN commit. See `RELEASE_IDENTITY.md` for the one-time WordPress.org
+   credential setup this needs.
 
 While you're reviewing the changelog draft, also check `Tested up to:` in
 `readme.txt` against the WordPress version you actually tested against

@@ -1,10 +1,10 @@
 === Wynko for Laposta ===
-Contributors:      roydg
+Contributors:      roydg, flexbordercoltd
 Tags:              laposta, newsletter, email marketing, signup form, campaigns
 Requires at least: 6.4
 Tested up to:      7.1
 Requires PHP:      8.0
-Stable tag:        1.1.0
+Stable tag:        1.2.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -188,7 +188,24 @@ No. Campaign data is cached for 60 minutes by default (you can change this), so 
 
 Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spacing to your theme. CSS custom properties are there if you want more control. The campaigns block ships no front-end CSS at all.
 
+== Screenshots ==
+
+1. Settings: connect your Laposta API key, and tune caching and signup rate limits.
+2. Adding the Wynko: Campaigns block to a post or page from the block editor.
+3. The Campaigns block on the front end, listing the site's most recently sent newsletters.
+4. Building a signup form under Wynko → Signup forms — fields come straight from the chosen Laposta list.
+5. A signup form rendered on the Astra theme, styled entirely by the theme.
+6. The same signup form rendered on the Kadence theme.
+
 == Changelog ==
+
+= 1.2.0 =
+* Added: Auto-publish releases to WordPress.org SVN
+* Fixed: Avoid pwn-request pattern in the SVN deploy workflow
+* Fixed: Make the /security-review confirmation robust
+* Fixed: Make bin/plugin-check.sh self-sufficient for wp-env
+* Fixed: Regenerate composer SBOM for version 1.1.0
+* Documentation: Document WYNKO_SECURITY_REVIEWED in the merge flow
 
 = 1.1.0 =
 * New: bundled Contact Form 7 and HTML Forms integrations — subscribe people to a Laposta list from a form you already have by adding a single checkbox. Off by default; enable under Wynko → Integrations.

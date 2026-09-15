@@ -2,17 +2,18 @@
 #
 # Wynko merge gate — the sanctioned way to merge a branch into main.
 #
-# Runs a full local mirror of every CI job (build's PHP 8.0-8.5 matrix,
-# security's PHPCS-security + Semgrep, javascript's JS+CSS lint,
-# plugin-check's wp-org-check + Plugin Check, sbom's full regen with the
-# same pinned npm CI uses) against the branch, then requires an explicit
-# confirmation that /security-review (Claude Code) ran on the branch and
-# its findings were resolved, before recording that attestation as a
-# `Security-Reviewed: <branch-tip-sha>` trailer on the merge commit. CI's
-# security-review-attestation job rejects any merge commit reaching main
-# without a matching trailer — see CONTRIBUTING.md. That job is the one
-# thing this script can't mirror: it verifies, after the fact, that this
-# very script was used — it can't check itself.
+# Runs the branch gate (bin/gate.sh — full-tree PHPCS + security ruleset,
+# PHPStan, unit suite, JS/CSS lint, Semgrep, wp-org-check, Plugin Check
+# against a production vendor/, full SBOM regen) and the PHP 8.0-8.5 matrix
+# (bin/php-matrix.sh), then requires an explicit confirmation that
+# /security-review (Claude Code) ran on the branch and its findings were
+# resolved, before recording that attestation as a
+# `Security-Reviewed: <branch-tip-sha>` trailer on the merge commit.
+#
+# These checks are not re-run per commit — the pre-commit hook is a fast
+# staged-file tier (see .githooks/pre-commit). This script is where the
+# heavy, full-scope work happens, once per branch. See TECHNICAL_DEBT.md
+# TD-073.
 #
 # Usage: bin/merge-to-main.sh <branch>
 #
@@ -42,53 +43,31 @@ git switch --quiet "$BRANCH"
 
 gate_failed=0
 
-echo "== build (PHP 8.0-8.5 matrix: PHPUnit, PHPCS, PHPStan) =="
+echo "== PHP 8.0-8.5 matrix (PHPUnit, PHPStan per version; PHPCS once) =="
 bin/php-matrix.sh || gate_failed=1
 
-echo "== security (PHPCS security ruleset) =="
-bin/security-scan.sh || gate_failed=1
-
-echo "== security (Semgrep) =="
-bin/semgrep-scan.sh || gate_failed=1
-
-echo "== javascript (ESLint) =="
-bin/js-lint.sh || gate_failed=1
-
-echo "== javascript (stylelint) =="
-bin/style-lint.sh || gate_failed=1
-
-echo "== plugin-check (WordPress.org readiness) =="
-bin/wp-org-check.sh || gate_failed=1
-
-# CI's plugin-check job installs production-only dependencies before running
-# Plugin Check ("matches the shipped ZIP" — see .github/workflows/ci.yml).
-# The php-matrix step above just left vendor/ full of dev tooling (PHPUnit,
-# PHPCS, PHPStan, Mockery, …) for six PHP versions; scanning that instead of
-# a production vendor/ makes Plugin Check's strict, all-categories run scan
-# far more than CI does, which was driving it to exhaust host memory. Swap to
-# a --no-dev vendor/ just for this step; the sbom step below reinstalls with
-# dev deps anyway, and vendor/ is git-ignored so nothing downstream depends
-# on this being restored.
-echo "== plugin-check: swapping to a production-only vendor/ (matches CI) =="
-docker run --rm -u "$(id -u):$(id -g)" -e COMPOSER_HOME=/tmp/composer \
-	-v "$PWD":/app -w /app composer:2 \
-	install --no-dev --no-interaction --optimize-autoloader || gate_failed=1
-
-echo "== plugin-check (Plugin Check, all categories, strict) =="
-bin/plugin-check.sh || gate_failed=1
-
-echo "== sbom (full regen, pinned npm) =="
-npm install -g npm@11.16.0 || gate_failed=1
-bin/sbom-check.sh --regenerate || gate_failed=1
+echo "== branch gate (full-tree standards, Semgrep, Plugin Check, SBOM) =="
+bin/gate.sh || gate_failed=1
 
 git switch --quiet main
 
 [ "$gate_failed" -eq 0 ] || fail "the local gate failed on $BRANCH — fix it before merging."
 
-printf 'Have you run /security-review on %s at %s and resolved every finding? [y/N] ' \
-	"$BRANCH" "$BRANCH_SHA"
-read -r confirmation
-[ "$confirmation" = "y" ] || fail "merge cancelled — run /security-review first."
+# The confirmation must come from a human. Read it from the controlling
+# terminal, not stdin — a `docker`/`npm` call in the gate above can drain a
+# piped stdin, which would silently skip the prompt. For automation, set
+# WYNKO_SECURITY_REVIEWED to the exact branch-tip SHA being merged (so it
+# cannot be a stale blanket bypass) instead of piping an answer.
+if [ "${WYNKO_SECURITY_REVIEWED:-}" = "$BRANCH_SHA" ]; then
+	printf 'merge-to-main: security review pre-confirmed for %s via WYNKO_SECURITY_REVIEWED\n' "$BRANCH_SHA"
+elif [ -r /dev/tty ]; then
+	printf 'Have you run /security-review on %s at %s and resolved every finding? [y/N] ' \
+		"$BRANCH" "$BRANCH_SHA"
+	read -r confirmation </dev/tty
+	[ "$confirmation" = "y" ] || fail "merge cancelled — run /security-review first."
+else
+	fail "no terminal for the /security-review confirmation — set WYNKO_SECURITY_REVIEWED=$BRANCH_SHA to confirm non-interactively."
+fi
 
 git merge --no-ff "$BRANCH" -m "$(printf 'Merge branch '\''%s'\'' into main\n\nSecurity-Reviewed: %s' "$BRANCH" "$BRANCH_SHA")"
 git branch -d "$BRANCH"

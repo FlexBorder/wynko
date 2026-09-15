@@ -24,6 +24,12 @@ set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
+# `@wordpress/env` (via npx) stalls on hosts where Node's happy-eyeballs
+# picks an unreachable IPv6 address first; without this the `wp plugin list`
+# calls below return nothing and the script wrongly reports the plugin
+# inactive. Same workaround bin/release.sh applies before its wp-env calls.
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--no-network-family-autoselection"
+
 if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q -- '-cli-1$'; then
 	echo "plugin-check: wp-env isn't running. Start it first:" >&2
 	echo "  npx @wordpress/env start" >&2

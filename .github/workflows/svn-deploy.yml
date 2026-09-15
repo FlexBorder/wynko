@@ -1,0 +1,61 @@
+name: SVN Deploy
+
+# Mirrors a published GitHub Release to the WordPress.org SVN repository
+# (bin/svn-deploy.sh). Triggered off the Release workflow's completion via
+# workflow_run rather than `on: release: published` — release.yml creates
+# the GitHub Release using the default GITHUB_TOKEN, and GitHub deliberately
+# does not let GITHUB_TOKEN-authored events trigger other workflows (loop
+# protection), so an `on: release` trigger here would silently never fire.
+# workflow_run watches the workflow run itself instead, which isn't subject
+# to that restriction.
+#
+# This job carries WordPress.org SVN credentials, so it deliberately never
+# checks out or builds the tag's own code (that would run the tag's
+# composer/npm scripts with those credentials in the environment — a
+# textbook "pwn request", https://securitylab.github.com/research/github-actions-preventing-pwn-requests/).
+# It checks out this repo's own trusted default-branch code (actions/checkout
+# with no `ref:` override) and only consumes the ZIP release.yml already
+# built and uploaded as an artifact from its own, unprivileged run.
+
+on:
+  workflow_run:
+    workflows: [ 'Release' ]
+    types: [ completed ]
+
+permissions:
+  contents: read
+
+jobs:
+  svn-deploy:
+    name: Publish to WordPress.org SVN
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.repository == 'FlexBorder/wynko'
+    permissions:
+      contents: read
+      actions: read # to download the artifact from the triggering run
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download the built ZIP
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: wynko-zip
+          path: dist
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Install Subversion
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      # head_branch on a tag-triggered workflow run is the tag name itself
+      # (e.g. v1.2.0) — the same value release.yml reads via GITHUB_REF_NAME.
+      # Read into an env var first rather than interpolating the `${{ }}`
+      # expression directly into the run: script.
+      - name: Deploy to WordPress.org SVN
+        env:
+          SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: bin/svn-deploy.sh "$HEAD_BRANCH" dist/*.zip

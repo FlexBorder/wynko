@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 #
-# Wynko pre-commit hook: block commits that fail the security scan, the
-# WordPress Coding Standards check, the SBOM freshness check, the
-# WordPress.org readme/header guard, or the official Plugin Check tool.
-# Activated via `git config core.hooksPath .githooks`, which Composer runs
-# automatically on install/update (see composer.json scripts).
+# Wynko pre-commit hook: block commits that fail the fast pre-commit tier —
+# staged-file coding standards (bin/lint-staged.sh), the WordPress-free unit
+# suite (bin/unit-tests.sh), and the SBOM freshness check (bin/sbom-check.sh,
+# a no-op unless a lock file is staged). Activated via
+# `git config core.hooksPath .githooks`, which Composer runs automatically on
+# install/update (see composer.json scripts).
 #
-# bin/write-report.sh runs all five checks (even after one fails) and writes
+# bin/write-report.sh runs all three checks (even after one fails) and writes
 # their combined output to ../wynko-reports/ before this hook exits, so a
-# failing commit still leaves a readable record of what failed. Plugin Check
-# needs `npx @wordpress/env start` running first — the hook fails closed if
-# it isn't, it doesn't skip the check.
+# failing commit still leaves a readable record of what failed.
+#
+# The heavier checks — full-tree PHPCS, PHPStan, Semgrep, Plugin Check, and
+# the PHP 8.0-8.5 matrix — run once per branch in bin/gate.sh and
+# bin/php-matrix.sh at merge time (bin/merge-to-main.sh), not on every commit.
+# See TECHNICAL_DEBT.md TD-073.
 #
 set -euo pipefail
 

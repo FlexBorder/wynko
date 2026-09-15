@@ -96,7 +96,12 @@ else
 	svn_cmd cp "$wc/trunk" "$tag_dir"
 fi
 
-if svn status "$wc" | grep -q .; then
+# Captured instead of piped through `grep -q`: with `set -o pipefail`, `grep
+# -q` exits as soon as it finds a match, sending SIGPIPE to `svn status` —
+# pipefail then reports the pipeline as failed (svn status's SIGPIPE exit)
+# even though grep matched, so this would wrongly skip every real commit.
+status_output="$(svn status "$wc")"
+if [ -n "$status_output" ]; then
 	printf '==> committing\n'
 	svn_cmd commit -m "Release $version" "$wc"
 else

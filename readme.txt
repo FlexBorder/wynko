@@ -4,7 +4,7 @@ Tags:              laposta, newsletter, email marketing, signup form, campaigns
 Requires at least: 6.4
 Tested up to:      7.1
 Requires PHP:      8.0
-Stable tag:        1.2.1
+Stable tag:        1.2.2
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -199,18 +199,14 @@ Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spaci
 
 == Changelog ==
 
+= 1.2.2 =
+* No changes to plugin functionality — release process fixes only.
+
 = 1.2.1 =
-* Fixed: Regenerate composer SBOM for version 1.2.0
-* Fixed: Pin svn-deploy's workflow_dispatch to main and verify run provenance
-* Fixed: Use the actual WordPress.org SVN slug, add manual re-run
+* No changes to plugin functionality — release process fixes only.
 
 = 1.2.0 =
-* Added: Auto-publish releases to WordPress.org SVN
-* Fixed: Avoid pwn-request pattern in the SVN deploy workflow
-* Fixed: Make the /security-review confirmation robust
-* Fixed: Make bin/plugin-check.sh self-sufficient for wp-env
-* Fixed: Regenerate composer SBOM for version 1.1.0
-* Documentation: Document WYNKO_SECURITY_REVIEWED in the merge flow
+* No changes to plugin functionality — release process improvements only.
 
 = 1.1.0 =
 * New: bundled Contact Form 7 and HTML Forms integrations — subscribe people to a Laposta list from a form you already have by adding a single checkbox. Off by default; enable under Wynko → Integrations.

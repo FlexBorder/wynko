@@ -23,8 +23,12 @@
 #
 set -euo pipefail
 
-SLUG='wynko'
-SVN_URL="https://plugins.svn.wordpress.org/$SLUG"
+# The WordPress.org-assigned slug — the name the plugin is actually approved
+# and listed under, which is not necessarily the ZIP's internal folder name
+# (bin/package.sh's own SLUG constant, currently "wynko"; see TECHNICAL_DEBT.md
+# if that mismatch ever needs closing).
+WPORG_SLUG='wynko-for-laposta'
+SVN_URL="https://plugins.svn.wordpress.org/$WPORG_SLUG"
 
 fail() {
 	printf 'svn-deploy: %s\n' "$1" >&2
@@ -59,8 +63,10 @@ if [ -z "$zip_path" ]; then
 fi
 [ -f "$zip_path" ] || fail "zip not found: $zip_path"
 unzip -q "$zip_path" -d "$STAGING/zip"
-trunk_src="$STAGING/zip/$SLUG"
-[ -d "$trunk_src" ] || fail "unexpected ZIP layout: $trunk_src not found"
+# The ZIP's single top-level folder — whatever bin/package.sh named it —
+# becomes trunk/'s contents. Not assumed to match $WPORG_SLUG.
+trunk_src="$(find "$STAGING/zip" -mindepth 1 -maxdepth 1 -type d)"
+[ -n "$trunk_src" ] && [ -d "$trunk_src" ] || fail "unexpected ZIP layout: no top-level folder in $zip_path"
 
 printf '==> checking out the SVN working copy\n'
 wc="$STAGING/svn"

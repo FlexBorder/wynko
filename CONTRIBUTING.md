@@ -339,7 +339,7 @@ places version numbers live in sync instead of you editing them by hand:
    the ZIP attached — automatically, no further action needed.
 7. That GitHub Release, in turn, triggers `.github/workflows/svn-deploy.yml`,
    which runs `bin/svn-deploy.sh` to mirror the release to
-   `plugins.svn.wordpress.org/wynko`: `trunk/` gets exactly what
+   `plugins.svn.wordpress.org/wynko-for-laposta`: `trunk/` gets exactly what
    `bin/package.sh` put in the ZIP, `assets/` gets the icon, banner, and
    screenshots from `.wordpress-org/` (never shipped in the ZIP itself — see
    `.distignore`), and a new `tags/x.y.z` is cut from `trunk/`, all in one

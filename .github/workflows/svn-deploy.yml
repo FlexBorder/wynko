@@ -9,18 +9,38 @@ name: SVN Deploy
 # workflow_run watches the workflow run itself instead, which isn't subject
 # to that restriction.
 #
+# Also accepts workflow_dispatch, so a failed or misconfigured deploy (e.g.
+# the wrong SVN slug) can be re-run against an existing Release run's
+# artifact without cutting a whole new release just to retry this step.
+# Two things keep that manual path from reopening the pwn-request problem
+# this job otherwise avoids: the checkout is pinned to `main` regardless of
+# which ref the dispatch is run from (workflow_dispatch alone does not
+# guarantee that — `actions/checkout` with no `ref:` follows the dispatch's
+# own selected ref, not the default branch), and the given run_id is
+# verified (below) to actually be a completed, successful Release run for
+# the given tag before its artifact is trusted, rather than trusting the
+# artifact name alone.
+#
 # This job carries WordPress.org SVN credentials, so it deliberately never
 # checks out or builds the tag's own code (that would run the tag's
 # composer/npm scripts with those credentials in the environment — a
 # textbook "pwn request", https://securitylab.github.com/research/github-actions-preventing-pwn-requests/).
-# It checks out this repo's own trusted default-branch code (actions/checkout
-# with no `ref:` override) and only consumes the ZIP release.yml already
-# built and uploaded as an artifact from its own, unprivileged run.
+# It checks out this repo's own trusted main-branch code and only consumes
+# a ZIP release.yml already built and uploaded as an artifact from its own,
+# unprivileged run.
 
 on:
   workflow_run:
     workflows: [ 'Release' ]
     types: [ completed ]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'The completed "Release" workflow run ID to pull the ZIP artifact from'
+        required: true
+      tag:
+        description: 'The release tag that run built, e.g. v1.2.0'
+        required: true
 
 permissions:
   contents: read
@@ -30,13 +50,42 @@ jobs:
     name: Publish to WordPress.org SVN
     runs-on: ubuntu-latest
     if: >
-      github.event.workflow_run.conclusion == 'success' &&
-      github.repository == 'FlexBorder/wynko'
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') &&
+      github.repository == 'FlexBorder/wynko' &&
+      github.ref == 'refs/heads/main'
     permissions:
       contents: read
-      actions: read # to download the artifact from the triggering run
+      actions: read # to inspect/download the artifact from the triggering (or given) run
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Verify the given run is a successful Release build (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.inputs.run_id }}
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          run_json="$(gh api "repos/$REPO/actions/runs/$RUN_ID")"
+          name="$(jq -r '.name' <<<"$run_json")"
+          status="$(jq -r '.status' <<<"$run_json")"
+          conclusion="$(jq -r '.conclusion' <<<"$run_json")"
+          branch="$(jq -r '.head_branch' <<<"$run_json")"
+          [ "$name" = 'Release' ] || {
+            echo "run $RUN_ID is not a Release workflow run (got: $name)"
+            exit 1
+          }
+          [ "$status" = 'completed' ] && [ "$conclusion" = 'success' ] || {
+            echo "run $RUN_ID did not complete successfully (status: $status, conclusion: $conclusion)"
+            exit 1
+          }
+          [ "$branch" = "$TAG" ] || {
+            echo "run $RUN_ID built tag $branch, not the requested $TAG"
+            exit 1
+          }
 
       - name: Download the built ZIP
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -44,7 +93,7 @@ jobs:
           name: wynko-zip
           path: dist
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
 
       - name: Install Subversion
         run: sudo apt-get update && sudo apt-get install -y subversion
@@ -57,5 +106,5 @@ jobs:
         env:
           SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_BRANCH: ${{ github.event.inputs.tag || github.event.workflow_run.head_branch }}
         run: bin/svn-deploy.sh "$HEAD_BRANCH" dist/*.zip

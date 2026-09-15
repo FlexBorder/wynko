@@ -4,7 +4,7 @@ Tags:              laposta, newsletter, email marketing, signup form, campaigns
 Requires at least: 6.4
 Tested up to:      7.1
 Requires PHP:      8.0
-Stable tag:        1.2.0
+Stable tag:        1.2.1
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -198,6 +198,11 @@ Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spaci
 6. The same signup form rendered on the Kadence theme.
 
 == Changelog ==
+
+= 1.2.1 =
+* Fixed: Regenerate composer SBOM for version 1.2.0
+* Fixed: Pin svn-deploy's workflow_dispatch to main and verify run provenance
+* Fixed: Use the actual WordPress.org SVN slug, add manual re-run
 
 = 1.2.0 =
 * Added: Auto-publish releases to WordPress.org SVN

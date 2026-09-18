@@ -141,6 +141,11 @@ return array(
 			'terms_url'         => '',
 		),
 	),
+	// The campaigns shortcode's tag, kept alongside the forms shortcode tag
+	// above rather than in 'options' since it is not a stored option.
+	'campaigns'        => array(
+		'shortcode' => 'wynko_campaigns',
+	),
 	'options'          => array(
 		'api_key'                    => array(
 			'key'     => 'wynko_api_key',

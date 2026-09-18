@@ -10,6 +10,7 @@ namespace Wynko\Admin;
 use Wynko\Integrations;
 use Wynko\Integrations\Integration;
 use Wynko\Integrations\Registry;
+use Wynko\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,7 +57,9 @@ final class IntegrationsPage {
 		);
 
 		if ( array() === $integrations ) {
-			printf( '<p>%s</p></div>', esc_html__( 'No integrations are registered.', 'wynko-for-laposta' ) );
+			printf( '<p>%s</p>', esc_html__( 'No integrations are registered.', 'wynko-for-laposta' ) );
+			self::render_get_involved_section();
+			echo '</div>';
 			return;
 		}
 
@@ -77,7 +80,9 @@ final class IntegrationsPage {
 
 		echo '</tbody></table>';
 		self::render_unavailable_notice( $integrations );
-		echo '</form></div>';
+		echo '</form>';
+		self::render_get_involved_section();
+		echo '</div>';
 	}
 
 	/**
@@ -99,6 +104,65 @@ final class IntegrationsPage {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * Where to take an integration idea or a wish to build one, printed once
+	 * below the table (and below the "no integrations registered" message)
+	 * regardless of how many integrations are currently listed. Styled like
+	 * the table-wide unavailable notice above it: centered, grey, one line.
+	 *
+	 * @return void
+	 */
+	private static function render_get_involved_section(): void {
+		printf(
+			'<p class="description wynko-integrations-get-involved">%s</p>',
+			wp_kses( self::get_involved_text(), self::allowed_description_html() )
+		);
+	}
+
+	/**
+	 * The one-line pointer to the GitHub issue tracker for ideas/requests and
+	 * to the KB article for building an integration.
+	 *
+	 * @return string
+	 */
+	private static function get_involved_text(): string {
+		return sprintf(
+			/* translators: 1: link to the GitHub issue tracker, 2: link to the "build your own integration" KB article (either may render as plain text if its registry entry is ever cleared). */
+			__( 'Have an idea or a request for an integration? Submit it on %1$s. If you want to develop your own, get started %2$s.', 'wynko-for-laposta' ),
+			self::registry_link( 'github_issues', __( 'GitHub', 'wynko-for-laposta' ) ),
+			self::registry_link( 'integration_dev_kb', __( 'here', 'wynko-for-laposta' ) )
+		);
+	}
+
+	/**
+	 * One anchor from the URL registry, falling back to plain text with a
+	 * "(not available yet)" suffix when the name has no URL registered —
+	 * matching AboutTab::render_help_item()'s own fallback, since an empty
+	 * href would just reload this screen and read as broken.
+	 *
+	 * @param string $name Registered URL name.
+	 * @param string $text Link text.
+	 * @return string
+	 */
+	private static function registry_link( string $name, string $text ): string {
+		$url = Urls::url( $name );
+		if ( '' === $url ) {
+			return sprintf(
+				/* translators: %s: what the missing link would have said. */
+				esc_html__( '%s (not available yet)', 'wynko-for-laposta' ),
+				esc_html( $text )
+			);
+		}
+
+		return sprintf(
+			'<a href="%s" target="%s" rel="%s">%s</a>',
+			esc_url( $url ),
+			esc_attr( Urls::target( $name ) ),
+			esc_attr( Urls::rel( $name ) ),
+			esc_html( $text )
+		);
 	}
 
 	/**

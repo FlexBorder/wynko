@@ -266,6 +266,15 @@ final class Config {
 	}
 
 	/**
+	 * Returns the campaigns shortcode tag.
+	 *
+	 * @return string
+	 */
+	public static function campaigns_shortcode(): string {
+		return (string) self::data()['campaigns']['shortcode'];
+	}
+
+	/**
 	 * Returns a form's post-meta key, '' when the name is not declared.
 	 *
 	 * @param string $name One of list_id, fields, messages, settings, button.

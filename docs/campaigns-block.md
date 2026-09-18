@@ -17,6 +17,31 @@
    arranged according to **Order by** and **Direction**; campaigns Laposta
    reports no delivery date for are listed last.
 
+## The `[wynko_campaigns]` shortcode
+
+The same list can be placed anywhere shortcodes run — a classic-editor post,
+a widget, a template — with `[wynko_campaigns]`. It renders through the same
+code as the block, so the output is identical. Every attribute is optional
+and mirrors a block setting:
+
+| Attribute  | Block setting        | Default    | Values |
+| ---------- | --------------------- | ---------- | ------ |
+| `count`    | Number of campaigns   | `5`        | `1`–`100` |
+| `list`     | List                  | *(all)*    | a Laposta list id |
+| `order_by` | Order by              | `date`     | `date`, `subject`, `name` |
+| `order`    | Direction              | `desc`     | `asc`, `desc` |
+| `label`    | Item label             | `subject`  | `subject`, `date`, `subject_date`, `name`, `name_date` |
+
+For example, the five most recent campaigns sent to one list, oldest first,
+labelled with their name and send date:
+
+```
+[wynko_campaigns count="5" list="abc123" order="asc" label="name_date"]
+```
+
+An unrecognised `order_by`, `order`, or `label` value falls back to its
+default rather than causing an error.
+
 ---
 
 Back to the [README](../README.md) · [All documentation](README.md)

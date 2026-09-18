@@ -111,7 +111,7 @@ final class AboutTab {
 	 */
 	public static function inspiration_note(): string {
 		return sprintf(
-			/* translators: 1: the name "MC4WP — Mailchimp for WordPress", linked to the plugin; 2: the name "MC4WP", linked to the plugin. */
+			/* translators: 1: the inspiring plugin's full name, linked to it; 2: its short name, linked to it. */
 			esc_html__( 'Wynko was inspired by %1$s. If the list you want to connect lives in Mailchimp rather than Laposta, use %2$s instead.', 'wynko-for-laposta' ),
 			self::link( 'mc4wp', esc_html__( 'MC4WP — Mailchimp for WordPress', 'wynko-for-laposta' ) ),
 			self::link( 'mc4wp', esc_html__( 'MC4WP', 'wynko-for-laposta' ) )
@@ -148,6 +148,11 @@ final class AboutTab {
 		echo '<h3>' . esc_html__( 'Getting help', 'wynko-for-laposta' ) . '</h3>';
 		// list-style-type, for the same reason render_dependencies() carries it.
 		echo '<ul style="list-style-type:disc;margin-left:1.5em;">';
+		self::render_help_item(
+			'documentation',
+			__( 'Documentation', 'wynko-for-laposta' ),
+			__( "Wynko's own documentation site", 'wynko-for-laposta' )
+		);
 		self::render_help_item(
 			'support_forum',
 			__( 'Support requests', 'wynko-for-laposta' ),

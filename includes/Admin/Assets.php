@@ -7,6 +7,8 @@
 
 namespace Wynko\Admin;
 
+use Wynko\Urls;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -49,6 +51,8 @@ final class Assets {
 		if ( ! self::is_wynko_screen( $hook_suffix ) || ! current_user_can( Menu::CAP ) ) {
 			return;
 		}
+
+		add_filter( 'admin_footer_text', array( self::class, 'footer_text' ) );
 
 		$asset = self::asset_meta();
 
@@ -93,6 +97,27 @@ final class Assets {
 					// the specific consequence instead.
 					'bulkDeactivate' => __( 'Deactivating may stop a form that relies on one of the checked integrations from working as expected. Deactivate the checked integrations anyway?', 'wynko-for-laposta' ),
 				),
+			)
+		);
+	}
+
+	/**
+	 * Replaces the left-hand admin footer credit on Wynko's own screens with a
+	 * pointer to the documentation site — the WordPress version on the right
+	 * (update_footer) is left untouched.
+	 *
+	 * @return string
+	 */
+	public static function footer_text(): string {
+		return sprintf(
+			/* translators: %s: link to the plugin's documentation site. */
+			esc_html__( 'Need help with Wynko? Visit the %s.', 'wynko-for-laposta' ),
+			sprintf(
+				'<a href="%s" target="%s" rel="%s">%s</a>',
+				esc_url( Urls::url( 'documentation' ) ),
+				esc_attr( Urls::target( 'documentation' ) ),
+				esc_attr( Urls::rel( 'documentation' ) ),
+				esc_html__( 'documentation', 'wynko-for-laposta' )
 			)
 		);
 	}

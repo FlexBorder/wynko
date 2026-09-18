@@ -38,11 +38,12 @@ final class AboutTabTest extends TestCase {
 		$this->assertStringContainsString( 'Test connection now', $html );
 	}
 
-	public function test_an_unregistered_support_url_renders_as_text_not_an_empty_link(): void {
+	public function test_the_support_links_are_all_real_links_not_empty_hrefs(): void {
 		$html = $this->render();
 
 		$this->assertStringNotContainsString( 'href=""', $html );
-		$this->assertStringContainsString( 'not available yet', $html );
+		$this->assertStringContainsString( 'https://wordpress.org/support/plugin/wynko-for-laposta/', $html );
+		$this->assertStringContainsString( 'https://github.com/FlexBorder/wynko/issues', $html );
 	}
 
 	public function test_it_keeps_the_independence_notice(): void {

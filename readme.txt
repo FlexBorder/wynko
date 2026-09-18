@@ -4,7 +4,7 @@ Tags:              laposta, newsletter, email marketing, signup form, campaigns
 Requires at least: 6.4
 Tested up to:      7.1
 Requires PHP:      8.0
-Stable tag:        1.2.2
+Stable tag:        1.3.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,8 @@ Wynko connects your WordPress site to your Laposta account, then gets out of the
 Once you've entered your API key, you get two things you can drop anywhere on your site: a **signup form** that adds people straight to one of your Laposta lists, and a **campaigns list** that shows the newsletters you've most recently sent.
 
 No embed codes. No iframes. Just your own site, with your own styling.
+
+Full documentation for every screen, plus the hooks and filters for developers, lives at https://getwynko.com/docs/.
 
 = Signup forms that can't get out of sync =
 
@@ -39,11 +41,7 @@ Your Laposta API key is the key to your whole mailing list, so Wynko treats it c
 * **It's checked before it's saved.** Wynko asks Laposta whether the key works before storing it. A wrong key is rejected right away instead of quietly failing later.
 * **It's never shown back to you.** Once saved, the key isn't printed into the settings page, so it can't be read off your screen or pulled out of the page source.
 * **It's encrypted at rest, when your server allows it.** If the `sodium` PHP extension is available (bundled with PHP since 7.2, so almost always) and your site has real WordPress security salts, the key is sealed with authenticated encryption before it's written to the database — a raw database export or a SQL-injection leak doesn't hand over a usable key. See the FAQ for exactly what this does and doesn't protect against.
-* **You can keep it out of your database entirely.** This is the safest option, and the one we recommend. Add one line to your `wp-config.php` file and the key lives there instead:
-
-`define( 'WYNKO_API_KEY', 'your-laposta-api-key' );`
-
-A key defined this way never touches your database, so it can't leak through a database backup, a stray export, or a database-level breach. If a key is defined in `wp-config.php`, it always wins — Wynko won't let a saved value quietly override it.
+* **You can keep it out of your database entirely.** This is the safest option, and the one we recommend. Add one line to your `wp-config.php` file — `define( 'WYNKO_API_KEY', 'your-laposta-api-key' );` — and the key lives there instead. A key defined this way never touches your database, so it can't leak through a database backup, a stray export, or a database-level breach. If a key is defined in `wp-config.php`, it always wins — Wynko won't let a saved value quietly override it.
 
 * **It never shows up in the log.** The activity log records what happened, never your key.
 
@@ -67,7 +65,7 @@ Signup forms are public by nature, so every submission is checked and metered be
 
 = Source code and contributing =
 
-Development happens at https://github.com/FlexBorder/wynko — issues and pull requests are welcome.
+Full documentation is at https://getwynko.com/docs/. Development happens at https://github.com/FlexBorder/wynko — issues and pull requests are welcome.
 
 Laposta is a trademark of its respective owner. This plugin is developed independently by FlexBorder Co., Ltd with Laposta's permission and is not an official Laposta product.
 
@@ -86,7 +84,7 @@ Wynko doesn't store signups on your own site, and its own server-side code makes
 Laposta's terms of service: https://www.laposta.nl/en/terms-and-conditions
 Laposta's privacy policy: https://www.laposta.nl/en/privacy-statement
 
-The admin screens also show a handful of outbound links you may click, which your browser — not Wynko — then requests: Laposta's own help article on getting an API key (docs.laposta.org) and list-management page (app.laposta.nl); WordPress core's reference docs on security salts (developer.wordpress.org); the plugin's own documentation site, linked from its row on the Plugins screen (getwynko.com); and, on the About screen, a link to another plugin's page on the official directory (wordpress.org). None of these run unless you click them, and none of them are third-party services Wynko itself connects to.
+The admin screens also show a handful of outbound links you may click, which your browser — not Wynko — then requests: Laposta's own help article on getting an API key (docs.laposta.org) and list-management page (app.laposta.nl); WordPress core's reference docs on security salts (developer.wordpress.org); the plugin's own documentation site, linked from its row on the Plugins screen (getwynko.com); the plugin's GitHub issue tracker, linked from the About and Integrations screens for bug reports and integration requests (github.com); the plugin's WordPress.org support forum, linked from the About screen (wordpress.org/support); and, also on the About screen, a link to another plugin's page on the official directory (wordpress.org). None of these run unless you click them, and none of them are third-party services Wynko itself connects to.
 
 == Installation ==
 
@@ -188,6 +186,14 @@ No. Campaign data is cached for 60 minutes by default (you can change this), so 
 
 Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spacing to your theme. CSS custom properties are there if you want more control. The campaigns block ships no front-end CSS at all.
 
+= Can I show recent campaigns with a shortcode? =
+
+Yes. `[wynko_campaigns]` renders the same list as the Wynko: Campaigns block, for places a block won't reach — a classic-editor post, a widget, a template. Every block setting has a matching attribute: `count`, `list`, `order_by`, `order`, and `label`, all optional. For example `[wynko_campaigns count="5" list="abc123" order="asc" label="name_date"]`.
+
+= I can't find the answer to my question here — where else can I look? =
+
+The full documentation, covering every screen plus hooks and filters for developers, is at https://getwynko.com/docs/.
+
 == Screenshots ==
 
 1. Settings: connect your Laposta API key, and tune caching and signup rate limits.
@@ -198,6 +204,11 @@ Yes. Wynko only ships the minimum layout CSS and leaves colours, fonts and spaci
 6. The same signup form rendered on the Kadence theme.
 
 == Changelog ==
+
+= 1.3.0 =
+* New: [wynko_campaigns] shortcode — drop recent campaigns anywhere shortcodes are supported, not just in the block editor, using the same attributes (count, list, order_by, order, label) as the Campaigns block.
+* New: the Integrations screen now points you to the GitHub issue tracker for integration ideas/requests, and to a new "build your own integration" guide for developers.
+* Documentation: links to getwynko.com/docs added throughout — the About tab's Getting Help section, the admin footer, the readme, and a new FAQ entry — plus a working WordPress.org support forum link (was previously a dead end).
 
 = 1.2.2 =
 * No changes to plugin functionality — release process fixes only.

@@ -98,12 +98,19 @@ final class UrlsTest extends TestCase {
 		$this->assertSame( '', Urls::laposta_list_url( '' ) );
 	}
 
-	public function test_the_support_links_are_registered_even_before_they_exist(): void {
-		// An unregistered name falls back to _self, so a _blank target is proof
-		// the entry is in the registry rather than merely absent.
+	public function test_the_support_forum_is_registered(): void {
+		$this->assertSame( 'https://wordpress.org/support/plugin/wynko-for-laposta/', Urls::url( 'support_forum' ) );
 		$this->assertSame( '_blank', Urls::target( 'support_forum' ) );
+	}
+
+	public function test_the_integration_dev_kb_is_registered(): void {
+		$this->assertSame( 'https://getwynko.com/docs/build-an-integration', Urls::url( 'integration_dev_kb' ) );
+		$this->assertSame( '_blank', Urls::target( 'integration_dev_kb' ) );
+	}
+
+	public function test_the_github_issue_tracker_is_registered(): void {
+		$this->assertSame( 'https://github.com/FlexBorder/wynko/issues', Urls::url( 'github_issues' ) );
 		$this->assertSame( '_blank', Urls::target( 'github_issues' ) );
-		$this->assertSame( '', Urls::url( 'support_forum' ) );
-		$this->assertSame( '', Urls::url( 'github_issues' ) );
+		$this->assertSame( 'noopener noreferrer', Urls::rel( 'github_issues' ) );
 	}
 }

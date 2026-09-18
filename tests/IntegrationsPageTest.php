@@ -293,6 +293,26 @@ final class IntegrationsPageTest extends TestCase {
 		$this->assertStringNotContainsString( 'Integrations can only be activated once the plugin they depend on is active.', $output );
 	}
 
+	public function test_render_page_links_to_the_github_issue_tracker_for_ideas(): void {
+		wynko_test_set_can_manage( true );
+
+		ob_start();
+		IntegrationsPage::render_page();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'https://github.com/FlexBorder/wynko/issues', $output );
+	}
+
+	public function test_render_page_links_to_the_integration_dev_kb(): void {
+		wynko_test_set_can_manage( true );
+
+		ob_start();
+		IntegrationsPage::render_page();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'https://getwynko.com/docs/build-an-integration', $output );
+	}
+
 	public function test_render_page_confirms_deactivation_with_the_integration_own_warning(): void {
 		wynko_test_set_can_manage( true );
 		add_filter(

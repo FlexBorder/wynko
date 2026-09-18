@@ -34,9 +34,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * — a form is opted in by containing the tag for whichever list it should
  * feed, nothing more.
  *
- * Field mapping follows the convention MC4WP's own Contact Form 7
- * integration uses: a list's required custom field `first_name` is supplied
- * by a CF7 field literally named `wynko-first_name` — an exact match.
+ * A list's required custom field `first_name` is supplied by a CF7 field
+ * literally named `wynko-first_name` — an exact match.
  */
 final class ContactForm7Integration implements Integration {
 

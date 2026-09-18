@@ -23,6 +23,7 @@ use Wynko\Admin\SystemReport;
 use Wynko\Blocks\Campaigns as CampaignsBlock;
 use Wynko\Blocks\Form as FormBlock;
 use Wynko\Forms\PostType;
+use Wynko\Frontend\CampaignsShortcode;
 use Wynko\Frontend\FormSubmitHandler;
 use Wynko\Frontend\Shortcode;
 use Wynko\Integrations;
@@ -63,6 +64,7 @@ final class Plugin {
 		add_action( 'init', array( FormBlock::class, 'register' ) );
 		add_action( 'init', array( PostType::class, 'register' ) );
 		add_action( 'init', array( Shortcode::class, 'register' ) );
+		add_action( 'init', array( CampaignsShortcode::class, 'register' ) );
 
 		// Bust the cache when the duration changes (any context, incl. WP-CLI).
 		add_action( 'update_option_' . Config::option_key( 'cache_minutes' ), array( Cache::class, 'bust' ) );

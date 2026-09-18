@@ -53,10 +53,18 @@
 }
 
 /* The one table-wide explanation for why some rows have no Activate link,
-   printed once under the table rather than repeated per row. */
+   printed once under the table rather than repeated per row, and the "want
+   another integration?" pointer right under it — both centered the same
+   way, with a small shared gap between them rather than each carrying its
+   own full 1.5rem on the side that faces the other. */
 .wynko-integrations-unavailable-notice {
 	text-align: center;
-	padding: 1.5rem;
+	padding: 1.5rem 1.5rem 0.25rem;
+}
+
+.wynko-integrations-get-involved {
+	text-align: center;
+	padding: 0.25rem 1.5rem 1.5rem;
 }
 
 /* The activity log's filter bar. A row of controls rather than a stacked form,
